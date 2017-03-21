@@ -10,8 +10,7 @@
     :get-as-list
     :add
     :scale
-    :make-float-array
-    :to-float
+    :to-dfloat
     :range
     :x-or-large
     :with-gensyms
@@ -35,8 +34,8 @@
     inds))
 
 
-(defun -i-weight (d &optional (p 2.0))
-  (/ 1.0 (expt d p)))
+(defun -i-weight (d &optional (p 2.0d0))
+  (/ 1.0d0 (expt d p)))
 
 
 (defun -get-inv-weights (dd)
@@ -47,7 +46,7 @@
 
 (defun pos (path f)
   (with-struct (path- lens points n) path
-    (let ((ff (mod (to-float f) 1.0))
+    (let ((ff (mod (to-dfloat f) 1.0d0))
           (inds (range n)))
       (reduce
         #'add

@@ -108,7 +108,7 @@
 (defun snek* (&optional (max-num 100000))
   (make-snek
     :edges (make-int-array max-num)
-    :verts (make-float-array max-num)
+    :verts (make-dfloat-array max-num)
     :max-num max-num))
 
 
@@ -171,7 +171,7 @@
 
 
 (defun -remove-edge (edges pos num)
-  (loop for i from pos to (2- num) do
+  (loop for i from pos to (- num 2) do
     (setf (aref edges i 0) (aref edges (1+ i) 0))
     (setf (aref edges i 1) (aref edges (1+ i) 1)))
   (set-from-list edges (1- num) (list 0 0)))
@@ -186,11 +186,13 @@
       0)))
 
 
-(defun insert-vert (snk v)
+(defun insert-vert (snk xy)
   (with-struct (snek- verts num-verts) snk
-     (setf (aref verts num-verts 0) (to-float (first v)))
-     (setf (aref verts num-verts 1) (to-float (second v)))
-     (- (incf (snek-num-verts snk)) 1)))
+    (destructuring-bind (x y)
+      (to-dfloat* xy)
+      (setf (aref verts num-verts 0) x)
+      (setf (aref verts num-verts 1) y)
+      (- (incf (snek-num-verts snk)) 1))))
 
 
 (defun get-vert (snk v)
@@ -249,19 +251,19 @@
 (defun do-move-vert-alt (a snk)
   (let ((verts (snek-verts snk)))
     (with-struct (move-vert-alt- v xy rel) a
-      (if rel
+      (let ((fxy (to-dfloat* xy)))
         (set-from-list
-          verts v
-          (add
-            (get-as-list verts v)
-            xy))
-        (set-from-list verts v xy)))))
+          verts
+          v
+          (if rel
+            (add (get-as-list verts v) fxy)
+            fxy))))))
 
 
 (defun -get-force-alterations (u v f)
   (list
     (move-vert v f)
-    (move-vert u (scale f -1.0))))
+    (move-vert u (scale f -1.0d0))))
 
 
 (defmacro force (snk v1 v2 r)
@@ -357,12 +359,12 @@
     (apply #'dst (mapcar (lambda (v) (get-as-list verts v)) e))))
 
 
-(defun snek-init-circle (snk num rad &key (x 0.0) (y 0.0))
+(defun snek-init-circle (snk num rad &key (x 0.0d0) (y 0.0d0))
   (let ((verts (loop for i from 0 below num collect
     (insert-vert snk
       (add
         (list x y)
-        (scale (cos-sin (/ (* i PI 2.0) num)) rad))))))
+        (scale (cos-sin (/ (* i PI 2.0d0) num)) rad))))))
 
     (loop for i from 0 below num do
       (insert-edge snk (list (nth i verts) (nth (mod (1+ i) num) verts))))))

@@ -13,8 +13,8 @@
     :dst
     :scale
     :sub
-    :make-float-array
-    :to-float
+    :make-dfloat-array
+    :to-dfloat
     :with-struct))
 
 (in-package :lin-path)
@@ -53,7 +53,7 @@
 
 (defun pos (path f)
   (with-struct (path- lens points n) path
-    (let ((ff (mod (to-float f) 1.0)))
+    (let ((ff (mod (to-dfloat f) 1.0d0)))
       (let ((ind (-find-seg-ind lens ff n)))
         (let ((pb (get-as-list points ind))
               (pa (get-as-list points (1- ind)))
@@ -69,8 +69,8 @@
 
 (defun make (points)
   (let ((n (length points)))
-    (let ((p (make-float-array n))
-          (l (make-float-array n :cols 1)))
+    (let ((p (make-dfloat-array n))
+          (l (make-dfloat-array n :cols 1)))
       (loop
         for d in points
         for i from 0

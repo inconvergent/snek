@@ -8,7 +8,7 @@
 
 (defun main (size fn)
 
-  (let ((mid (.5* size))
+  (let ((mid (half size))
         (repeat 15)
         (grains 4)
         (itt 1000)

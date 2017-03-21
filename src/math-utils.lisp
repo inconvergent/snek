@@ -70,7 +70,7 @@
 
 
 (defun mid (a b)
-  (iscale (add a b) 2.0))
+  (iscale (add a b) 2.0d0))
 
 
 (defun len (a)
@@ -84,8 +84,8 @@
 (defun norm (a)
   (let ((l (len a)))
     (cond
-      ((<= l 0) a)
-      (t (scale a (/ 1.0 l))))))
+      ((<= l 0d0) a)
+      (t (scale a (/ 1.0d0 l))))))
 
 
 (defun nsub (a b)
@@ -127,12 +127,12 @@
 
 
 
-(defun rnd-float (&optional (x 1.0))
-  (random (to-float x)))
+(defun rnd-float (&optional (x 1.0d0))
+  (random (to-dfloat x)))
 
 
-(defun rnd-float* (&optional (x 1.0))
-  (- x (* 2.0 (random (to-float x)))))
+(defun rnd-float* (&optional (x 1.0d0))
+  (- x (* 2.0d0 (random (to-dfloat x)))))
 
 
 (defmacro nrep (n &body body)
@@ -141,16 +141,16 @@
       (loop for ,i from 0 below ,nname collect ,@body))))
 
 
-(defun inc (x stp) (mod (+ x stp) 1.0))
+(defun inc (x stp) (mod (+ x stp) 1.0d0))
 
 
-(defmacro get-rnd-lin-stp (&optional (init 0.0))
+(defmacro get-rnd-lin-stp (&optional (init 0.0d0))
   (with-gensyms (x stp)
     `(let ((,x ,init))
       (lambda (,stp)
         (setf ,x (inc ,x (rnd-float* ,stp)))))))
 
-(defmacro get-rnd-lin-stp* (&optional (init 0.0))
+(defmacro get-rnd-lin-stp* (&optional (init 0.0d0))
   (with-gensyms (x stp)
     `(let ((,x ,init))
       (lambda (,stp)
@@ -158,7 +158,7 @@
 
 (defmacro get-rnd-circ-stp* ()
   (with-gensyms (xy stp)
-    `(let ((,xy (list 0.0 0.0)))
+    `(let ((,xy (list 0.0d0 0.0d0)))
       (lambda (,stp)
         (add ,xy (rnd-in-circ ,stp))))))
 
@@ -167,17 +167,17 @@
   (if (> n 1)
     (let ((nn (1- n)))
       (loop for i from 0 below n
-          collect (to-float (+ a (* i (/ (- b a) nn))))))
-    (list (to-float a))))
+          collect (to-dfloat (+ a (* i (/ (- b a) nn))))))
+    (list (to-dfloat a))))
 
 
 (defun rndspace (a b n)
-  (let ((d (to-float (- b a))))
+  (let ((d (to-dfloat (- b a))))
     (sort (nrep n (+ a (random d))) #'<)))
 
 
 (defun rndspace* (a b n)
-  (let ((d (to-float (- b a))))
+  (let ((d (to-dfloat (- b a))))
     (nrep n (+ a (random d)))))
 
 
@@ -190,7 +190,7 @@
 ; SHAPES
 
 
-(defun on-spiral (i itt rad &key (x 0.0) (y 0.0) (rot 1.0))
+(defun on-spiral (i itt rad &key (x 0.0d0) (y 0.0d0) (rot 1.0d0))
   (add
     (list x y)
     (scale
@@ -198,11 +198,11 @@
       (* (/ i itt) rad))))
 
 
-(defun on-circ (i itt rad &key (x 0.0) (y 0.0))
+(defun on-circ (i itt rad &key (x 0.0d0) (y 0.0d0))
   (add
     (list x y)
     (scale
-      (cos-sin (/ (* i PI 2.0) itt))
+      (cos-sin (/ (* i PI 2.0d0) itt))
       rad)))
 
 
@@ -214,16 +214,16 @@
       (/ i itt))))
 
 
-(defun rnd-on-circ (rad &key (x 0.0) (y 0.0))
+(defun rnd-on-circ (rad &key (x 0.0d0) (y 0.0d0))
   (add
     (list x y)
     (scale
-      (cos-sin (random (* PI 2.0)))
+      (cos-sin (random (* PI 2.0d0)))
       rad)))
 
 
-(defun rnd-in-circ (rad &key (x 0.0) (y 0.0))
-  (let ((ab (sort (list (random 1.0) (random 1.0)) #'<)))
+(defun rnd-in-circ (rad &key (x 0.0d0) (y 0.0d0))
+  (let ((ab (sort (list (random 1.0d0) (random 1.0d0)) #'<)))
     (add
       (list x y)
       (scale
@@ -231,20 +231,20 @@
         (* (second ab) rad)))))
 
 
-(defun rnd-in-box (sx sy &key (x 0.0) (y 0.0))
+(defun rnd-in-box (sx sy &key (x 0.0d0) (y 0.0d0))
   (add
-    (list (rnd-float* (to-float sx))
-          (rnd-float* (to-float sy)))
+    (list (rnd-float* (to-dfloat sx))
+          (rnd-float* (to-dfloat sy)))
     (list x y)))
 
 
 (defun rnd-on-line (x1 x2)
   (add
     x1
-    (scale (sub x2 x1) (random 1.0))))
+    (scale (sub x2 x1) (random 1.0d0))))
 
 
-(defun rnd-on-spiral (rad &key (x 0.0) (y 0.0) (rot 1.0))
+(defun rnd-on-spiral (rad &key (x 0.0d0) (y 0.0d0) (rot 1.0d0))
   (let ((i (random 1.0)))
     (add
       (list x y)
@@ -253,13 +253,13 @@
           (* i rad)))))
 
 
-(defun polygon (n rad &key (x 0.0) (y 0.0) (rot 0.0))
+(defun polygon (n rad &key (x 0.0d0) (y 0.0d0) (rot 0.0d0))
   (loop for i from 0 to n
     collect
       (add
         (list x y)
         (scale
-          (cos-sin (+ rot (* (/ i n) 2 PI)))
+          (cos-sin (+ rot (* (/ i n) 2.0d0 PI)))
           rad))))
 
 

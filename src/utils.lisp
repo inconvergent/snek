@@ -1,31 +1,21 @@
 
-(defun .1* (l) (* l 0.1))
-
-(defun .25* (l) (* l 0.25))
-
-(defun .5* (l) (* l 0.5))
-
 (defun 2* (l) (* l 2))
-
-(defun 3* (l) (* l 3))
-
-(defun 4* (l) (* l 4))
 
 (defun 2+ (l) (+ l 2))
 
-(defun 2- (l) (- l 2))
+(defun half (l) (/ l 2))
 
 
 (defmacro print-every (i n)
   `(if (= 0 (mod ,i ,n)) (print ,i)))
 
 
-(defun make-float-array (rows &key (cols 2) (initial 0.0))
+(defun make-dfloat-array (rows &key (cols 2) (initial 0.0d0))
   (make-array
     (list rows cols)
     :adjustable t
     :initial-element initial
-    :element-type 'float ))
+    :element-type 'double-float ))
 
 
 (defun make-int-array (rows  &key (cols 2) (initial 0))
@@ -36,19 +26,20 @@
     :element-type 'integer))
 
 
-(defmacro to-int (x)
-  `(coerce ,x 'integer))
+(defun to-int (x)
+  (coerce x 'integer))
+
+(defun to-int* (xx)
+  (mapcar (lambda (x) (coerce x 'integer)) xx))
+
+(defun to-dfloat (x)
+  (coerce x 'double-float))
+
+(defun to-dfloat* (xx)
+  (mapcar (lambda (x) (coerce x 'double-float)) xx))
 
 
-(defmacro to-float (x)
-  `(coerce ,x 'float))
-
-
-(defmacro to-dfloat (x)
-  `(coerce ,x 'double-float))
-
-
-(defun x-or-large (x &optional (l 100000.0) (lim 0.00001))
+(defun x-or-large (x &optional (l 100000.0d0) (lim 0.00001d0))
   (if (> x lim) x l))
 
 

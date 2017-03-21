@@ -6,19 +6,29 @@
 ;(setf *random-state* (make-random-state t))
 
 
+(defvar *tests* 0)
+(defvar *fails* 0)
+(defvar *passes* 0)
+
+
 ; TODO: approximately similar to
 
 
 (defmacro do-test (a &optional (b nil))
   (with-gensyms (aname bname)
+    (incf *tests*)
     `(let ((,aname ,a)
            (,bname ,b))
       (if (funcall #'equalp ,aname ,bname)
-        (format t "~%~a ~%--> ok" ',a)
-        (format t "~%~a ~%--> not ok. ~%--  wanted: ~% ~a ~%--  got: ~% ~a"
-                ',a
-                ',b
-                ,aname))
+        (progn
+          (incf *passes*)
+          (format t "~%~a ~%--> ok" ',a))
+        (progn
+          (incf *fails*)
+          (format t "~%~a ~%--> not ok. ~%--  wanted: ~% ~a ~%--  got: ~% ~a"
+            ',a
+            ',b
+            ,aname)))
       (format t "~%---------------------------~%"))))
 
 
@@ -37,7 +47,7 @@
 
   (do-test
     (nsub '(1 2) '(2 10))
-    '(-0.12403473 -0.99227786))
+    '(-0.12403473430574564d0 -0.9922778744459652d0))
 
   (do-test
     (lenn '(1 2))
@@ -46,6 +56,10 @@
   (do-test
     (len '(1 2))
     2.236068)
+
+  (do-test
+    (len '(1.0d0 2.0d0))
+    2.23606797749979d0)
 
   (do-test
     (dst '(1 2) '(1 3))
@@ -237,7 +251,7 @@
 
   (do-test
     (edge-length snk '(1 2))
-    7.615773))
+    7.615773105863909d0))
 
 
 (defun test-snek-2 (snk)
@@ -531,6 +545,10 @@
       (snek-num-verts snk)
       12)))
 
+(defun summary ()
+  (format t "~% tests:  ~a~% fails:  ~a~% passes: ~a~%"
+          *tests* *fails* *passes*))
+
 
 (defun main ()
 
@@ -563,6 +581,10 @@
 
   (format t "~%~%~%--------------------------------------- snek with")
   (test-snek-withs)
-  )
+
+  (format t "~%~%~%--------------------------------------- summary")
+  (summary)
+
+  (format t "~%~%"))
 
 (main)
