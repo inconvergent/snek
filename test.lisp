@@ -14,6 +14,12 @@
 ; TODO: approximately similar to
 
 
+(defmacro title (&body body)
+  `(progn
+     (format t "~%~a ##############~%" ',@body)
+     ,@body))
+
+
 (defmacro do-test (a &optional (b nil))
   (with-gensyms (aname bname)
     (incf *tests*)
@@ -581,6 +587,7 @@
       (sort (verts-in-rad snk (list 500 500) 200.0d0) #'<)
       #(3 4))))
 
+
 (defun summary ()
   (format t "~% tests:  ~a~% fails:  ~a~% passes: ~a~%"
           *tests* *fails* *passes*))
@@ -588,42 +595,17 @@
 
 (defun main ()
 
-  (format t "~%~%~%--------------------------------------- test utils")
-  (test-utils)
-
-  (format t "~%~%~%--------------------------------------- test bin")
-  (test-bin)
-
-  (format t "~%~%~%--------------------------------------- snek 1")
-  (test-snek (snek*))
-
-  (format t "~%~%~%--------------------------------------- snek 2")
-  (test-snek-2 (snek*))
-
-  (format t "~%~%~%--------------------------------------- snek 3")
-  (test-snek-3 (snek*))
-
-  (format t "~%~%~%--------------------------------------- snek move")
-  (test-snek-move)
-
-  (format t "~%~%~%--------------------------------------- snek join")
-  (test-snek-join)
-
-  (format t "~%~%~%--------------------------------------- snek append")
-  (test-snek-append)
-
-  (format t "~%~%~%--------------------------------------- snek split")
-  (test-snek-split)
-
-  (format t "~%~%~%--------------------------------------- snek with")
-  (test-snek-withs)
-
-  (format t "~%~%~%--------------------------------------- snek zmap")
-  (test-snek-zmap)
-
-  (format t "~%~%~%--------------------------------------- summary")
-  (summary)
-
-  (format t "~%~%"))
+  (title (test-utils))
+  (title (test-bin))
+  (title (test-snek (snek*)))
+  (title (test-snek-2 (snek*)))
+  (title (test-snek-3 (snek*)))
+  (title (test-snek-move))
+  (title (test-snek-join))
+  (title (test-snek-append))
+  (title (test-snek-split))
+  (title (test-snek-withs))
+  (title (test-snek-zmap))
+  (title (summary)))
 
 (main)

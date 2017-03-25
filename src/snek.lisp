@@ -451,6 +451,8 @@
       (prin1 (aref verts i 1)))))
 
 
+; SANDPAINT
+
 (defun snek-draw-edges (snk sand grains)
   (with-struct (snek- verts edges num-edges) snk
     (if (> num-edges 0)
