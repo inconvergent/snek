@@ -163,6 +163,23 @@
       (lambda (,stp)
         (incf ,x (rnd* ,stp))))))
 
+
+(defmacro get-acc-rnd-lin-stp (&optional (init-x 0.0d0) (init-a 0.0d0))
+  (with-gensyms (x a s)
+    `(let ((,a (to-dfloat ,init-a))
+           (,x (to-dfloat ,init-x)))
+      (lambda (,s)
+        (setf ,x (inc ,x (incf ,a (rnd* ,s))))))))
+
+
+(defmacro get-acc-rnd-lin-stp* (&optional (init-x 0.0d0) (init-a 0.0d0))
+  (with-gensyms (x a s)
+    `(let ((,a (to-dfloat ,init-a))
+           (,x (to-dfloat ,init-x)))
+      (lambda (,s)
+        (incf ,x (incf ,a (rnd* ,s)))))))
+
+
 (defmacro get-rnd-circ-stp* (&optional (init (list 0.0d0 0.0d0)))
   (with-gensyms (xy stp)
     `(let ((,xy (to-dfloat* ,init)))

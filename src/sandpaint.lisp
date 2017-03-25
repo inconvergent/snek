@@ -6,6 +6,7 @@
     :make
     :pixel-hack
     :strokes
+    :path
     :pix
     :pix*
     :save
@@ -191,6 +192,15 @@
       (destructuring-bind (u v)
         line
         (-draw-stroke vals size grains u v r g b a)))))
+
+
+(defun path (sand path grains)
+  (with-struct (sandpaint- size vals r g b a) sand
+    (loop
+      for u in path
+      for w in (cdr path)
+      do
+        (-draw-stroke vals size grains u w r g b a))))
 
 
 (defun save (sand name &key (gamma 1.0))
