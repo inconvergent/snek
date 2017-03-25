@@ -545,6 +545,42 @@
       (snek-num-verts snk)
       12)))
 
+(defun test-snek-zmap ()
+  (let ((snk (snek*)))
+
+    (insert-vert snk '(100 200))
+    (insert-vert snk '(200 300))
+    (insert-vert snk '(300 400))
+    (insert-vert snk '(400 500))
+    (insert-vert snk '(500 600))
+    (insert-vert snk '(600 700))
+    (insert-vert snk '(700 800))
+    (insert-vert snk '(800 900))
+
+    (zmap-update snk 100.0d0)
+
+    (do-test
+      (sort (verts-in-rad snk (list 500 500) 50.0d0) #'<)
+      #())
+
+    (do-test
+      (sort (verts-in-rad snk (list 800 800) 200.0d0) #'<)
+      #(6 7))
+
+    (do-test
+      (sort (verts-in-rad snk (list -500 500) 50.0d0) #'<)
+      #())
+
+    (zmap-update snk 1000.0d0)
+
+    (do-test
+      (sort (verts-in-rad snk (list 500 500) 1000.0d0) #'<)
+      #(0 1 2 3 4 5 6 7))
+
+    (do-test
+      (sort (verts-in-rad snk (list 500 500) 200.0d0) #'<)
+      #(3 4))))
+
 (defun summary ()
   (format t "~% tests:  ~a~% fails:  ~a~% passes: ~a~%"
           *tests* *fails* *passes*))
@@ -581,6 +617,9 @@
 
   (format t "~%~%~%--------------------------------------- snek with")
   (test-snek-withs)
+
+  (format t "~%~%~%--------------------------------------- snek zmap")
+  (test-snek-zmap)
 
   (format t "~%~%~%--------------------------------------- summary")
   (summary)

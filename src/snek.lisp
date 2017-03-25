@@ -5,26 +5,18 @@
 
 ; MACROS
 
-(defmacro with-snek ((snk) &body body)
-  (with-gensyms (sname)
-    `(let ((,sname ,snk))
+(defmacro with-snek ((snk &key (zwidth nil)) &body body)
+  (with-gensyms (sname zname)
+    `(let ((,sname ,snk)
+           (,zname ,zwidth))
       (incf (snek-wc ,sname))
+      (if ,zname
+        (zmap-update ,sname (to-dfloat ,zname)))
       (do-alts
          (remove-if-not
            #'alt-p
            (flatten (list ,@body)))
          ,sname))))
-
-
-(defmacro with-snek-print ((snk) &body body)
-  (with-gensyms (aname sname)
-    `(let ((,sname ,snk))
-      (incf (snek-wc ,sname))
-      (let ((,aname (remove-if-not
-                       #'alt-p
-                       (flatten (list ,@body)))))
-        (print ,aname)
-        (do-alts ,aname ,sname)))))
 
 
 (defmacro with-rnd-edge ((snk i) &body body)
@@ -102,6 +94,8 @@
   (num-edges 0 :type integer :read-only nil)
   (num-verts 0 :type integer :read-only nil)
   (wc 0 :type integer :read-only nil)
+  (zmap nil :read-only nil)
+  (zwidth -1.0d0 :read-only nil)
   (max-num 100000 :type integer :read-only t))
 
 
@@ -352,6 +346,72 @@
       append-edge-alt split-edge-alt)))
 
 
+; ZONEMAP
+
+(defun zmap-xy-to-zone (xy zwidth)
+  (mapcar (lambda (x) (floor x zwidth)) xy))
+
+
+(defun zmap-v-to-zone (verts v zwidth)
+  (list
+    (floor (aref verts v 0) zwidth)
+    (floor (aref verts v 1) zwidth)))
+
+
+(defun zmap-add-v-to-zone (zmap z v)
+  (multiple-value-bind (vals exists)
+    (gethash z zmap)
+    (if (not exists)
+      (progn
+        (setf
+          vals
+          (make-array 20 :fill-pointer 0 :element-type 'integer))
+        (setf (gethash z zmap) vals)))
+    (vector-push-extend v vals)))
+
+
+(defun zmap-update (snk width)
+  (with-struct (snek- verts num-verts) snk
+  (let ((zmap (make-hash-table :test #'equal)))
+    (loop for v from 0 below num-verts
+      do
+        (zmap-add-v-to-zone
+          zmap
+          (zmap-v-to-zone verts v (to-dfloat width))
+          v)
+        (setf (snek-zmap snk) zmap)
+        (setf (snek-zwidth snk) width)))))
+
+
+(defun zmap-nearby-zones (z)
+  (destructuring-bind (a b)
+    z
+    (let ((zs (make-array 9 :fill-pointer 0)))
+      (loop for i from (1- a) to (1+ a) do
+        (loop for j from (1- b) to (1+ b) do
+          (vector-push (list i j) zs) ))
+      zs)))
+
+
+(defun verts-in-rad (snk xy rad)
+  (with-struct (snek- verts zmap zwidth) snk
+    (let ((zs (zmap-nearby-zones
+                (zmap-xy-to-zone xy zwidth)))
+          (inds (make-array 20 :fill-pointer 0 :element-type 'integer))
+          (rad2 (* rad rad)))
+      (loop for i from 0 below 9 do
+        (multiple-value-bind (vals exists)
+        (gethash (aref zs i) zmap)
+        (if exists
+          (loop for j from 0 below (length vals)
+            do
+            (let ((zj (aref vals j)))
+              (if
+                (< (dst2 xy (get-as-list verts zj)) rad2)
+                (vector-push-extend zj inds)))))))
+      inds)))
+
+
 ; OTHER UTILS
 
 (defun edge-length (snk e)
@@ -359,11 +419,11 @@
     (apply #'dst (mapcar (lambda (v) (get-as-list verts v)) e))))
 
 
-(defun snek-init-circle (snk num rad &key (x 0.0d0) (y 0.0d0))
+(defun snek-init-circle (snk num rad &key (xy (list 0.0d0 0.0d0)))
   (let ((verts (loop for i from 0 below num collect
     (insert-vert snk
       (add
-        (list x y)
+        xy
         (scale (cos-sin (/ (* i PI 2.0d0) num)) rad))))))
 
     (loop for i from 0 below num do

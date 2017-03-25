@@ -61,7 +61,7 @@ must be set in `src/load`. `zpng` is automatically installed via `quicklisp`.
 
 There are some tests included. Run them like this:
 
-    ./run-test.lisp
+    ./test.lisp
 
 
 ## Stability changes and Versioning
@@ -84,7 +84,5 @@ to issues, or take requests.
  - snek as package?
  - Randomized order of alteration apply
  - Maintain list of singly-connected vertices?
- - zonemaps?
- - kd-tree?
  - System for adding arbitrary alterations
 
