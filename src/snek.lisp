@@ -383,13 +383,18 @@
         (setf (snek-zwidth snk) width)))))
 
 
+(defmacro -extend (x y &body body)
+  `(dolist
+    (,x '(-1 0 1))
+    (dolist
+      (,y '(-1 0 1))
+      ,@body)))
+
 (defun zmap-nearby-zones (z)
   (destructuring-bind (a b)
     z
     (let ((zs (make-array 9 :fill-pointer 0)))
-      (loop for i from (1- a) to (1+ a) do
-        (loop for j from (1- b) to (1+ b) do
-          (vector-push (list i j) zs) ))
+      (-extend i j (vector-push (list (+ a i) (+ b j)) zs))
       zs)))
 
 

@@ -60,7 +60,7 @@
   (mapcar #'/ b a))
 
 
-(defun lenn (a)
+(defun len2 (a)
   (reduce #'+ (mapcar (lambda (x) (* x x)) a)))
 
 
@@ -73,7 +73,7 @@
 
 
 (defun len (a)
-  (sqrt (lenn a)))
+  (sqrt (len2 a)))
 
 
 (defun dst (a b)
@@ -81,7 +81,7 @@
 
 
 (defun dst2 (a b)
-  (lenn (sub a b)))
+  (len2 (sub a b)))
 
 
 (defun norm (a)
@@ -268,6 +268,7 @@
         (scale
           (cos-sin (+ rot (* (/ i n) 2.0d0 PI)))
           rad))))
+
 
 (defun close-path (p)
   (append p (list (nth 0 p))))
