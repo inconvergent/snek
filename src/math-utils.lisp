@@ -9,7 +9,7 @@
         (list (sin ,aname) (cos ,aname)))))
 
 
-(defmacro 2d-square-loop ((x y s) &body body)
+(defmacro square-loop ((x y s) &body body)
   (with-gensyms (sname)
     `(let ((,sname ,s))
       (loop for ,x from 0 below ,sname do
@@ -116,10 +116,10 @@
 
 
 ; TODO: add dim option
-(defun get-as-list (arr row)
+(defun get-as-list (arr row &optional (dims (range 2)))
   (mapcar
     (lambda (d) (aref arr row d))
-    (list 0 1)))
+    dims))
 
 
 (defun set-from-list (arr row vals)
@@ -130,9 +130,7 @@
 
 
 
-; SHAPES AND RANGES
-
-
+; RANGES
 
 (defun rnd (&optional (x 1.0d0))
   (random (to-dfloat x)))
@@ -213,7 +211,6 @@
 
 ; SHAPES
 
-
 (defun on-spiral (i itt rad &key (xy (list 0.0d0 0.0d0)) (rot 1.0d0))
   (add
     xy
@@ -287,7 +284,8 @@
           rad))))
 
 
+; OTHER
+
 (defun close-path (p)
   (append p (list (nth 0 p))))
-
 

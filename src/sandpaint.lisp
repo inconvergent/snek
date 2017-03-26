@@ -12,7 +12,7 @@
     :save
     :set-rgba)
   (:import-from :common-lisp-user
-    :2d-square-loop
+    :square-loop
     :rnd-in-circ
     :rnd-on-line
     :add
@@ -20,6 +20,7 @@
     :lround
     :sub
     :to-dfloat
+    :to-dfloat*
     :with-struct))
 
 
@@ -70,7 +71,7 @@
 
 
 (defun copy-rgba-array-to-from (target source size)
-  (2d-square-loop (x y size)
+  (square-loop (x y size)
     (loop for i from 0 to 3 do
       (setf (aref target x y i) (aref source x y i)))))
 
@@ -107,7 +108,7 @@
     (let ((new-vals (make-rgba-array size)))
       (copy-rgba-array-to-from new-vals vals size)
 
-      (2d-square-loop (x y size)
+      (square-loop (x y size)
         (let* ((xy (list x y))
                (dx (iscale
                      (sub
@@ -140,7 +141,7 @@
       (append active bg))
 
     (let ((vals (make-rgba-array size)))
-      (2d-square-loop (x y size)
+      (square-loop (x y size)
         (setf (aref vals x y 0) (* ba br))
         (setf (aref vals x y 1) (* ba bg))
         (setf (aref vals x y 2) (* ba bb))
@@ -157,11 +158,11 @@
 
 (defun set-rgba (sand rgba)
   (destructuring-bind (r g b a)
-    (mapcar (lambda (x) (to-dfloat x)) rgba)
-      (setf (sandpaint-r sand) (* r a))
-      (setf (sandpaint-g sand) (* g a))
-      (setf (sandpaint-b sand) (* b a))
-      (setf (sandpaint-a sand) a)))
+    (to-dfloat* rgba)
+    (setf (sandpaint-r sand) (* r a))
+    (setf (sandpaint-g sand) (* g a))
+    (setf (sandpaint-b sand) (* b a))
+    (setf (sandpaint-a sand) a)))
 
 
 (defun pixel-hack (sand)
@@ -194,13 +195,15 @@
         (-draw-stroke vals size grains u v r g b a)))))
 
 
-(defun path (sand path grains)
+(defun path (sand path grains &optional closed)
   (with-struct (sandpaint- size vals r g b a) sand
     (loop
       for u in path
       for w in (cdr path)
       do
-        (-draw-stroke vals size grains u w r g b a))))
+        (-draw-stroke vals size grains u w r g b a))
+    (if closed
+      (-draw-stroke vals size grains (first path) (last path) r g b a))))
 
 
 (defun save (sand name &key (gamma 1.0))
@@ -220,7 +223,7 @@
           :if-does-not-exist :create
           :element-type '(unsigned-byte 8))
         (zpng:start-png png stream)
-        (2d-square-loop (x y size)
+        (square-loop (x y size)
           (zpng:write-pixel (-png-tuple vals y x gamma) png))
         (zpng:finish-png png)))))
 

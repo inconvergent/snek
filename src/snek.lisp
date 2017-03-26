@@ -35,9 +35,13 @@
     (list ,@body)))
 
 
-(defmacro with-rnd-vert-value ((snk i) &body body)
-  `(let ((,i (rnd-get (snek-verts ,snk))))
-    (list ,@body)))
+(defmacro with-rnd-vert-value ((snk v) &body body)
+  (with-gensyms (sname)
+    `(let ((sname ,snk))
+      (let ((,v (get-as-list
+                  (snek-verts ,sname)
+                  (snek-num-verts ,sname))))
+        (list ,@body)))))
 
 
 (defmacro with-all-verts ((snk i) &body body)
@@ -431,15 +435,27 @@
         xy
         (scale (cos-sin (/ (* i PI 2.0d0) num)) rad))))))
 
-    (loop for i from 0 below num do
-      (insert-edge snk (list (nth i verts) (nth (mod (1+ i) num) verts))))))
+    (loop for i from 0 below num collect
+      (insert-edge snk (list (nth i verts)
+                             (nth (mod (1+ i) num) verts))))))
+
+
+(defun snek-init-poly (snk rad n &key (xy (list 0.0d0 0.0d0)) (rot (* 0.25 PI)))
+  (let ((verts (loop for v in (polygon n rad :xy xy :rot rot) collect
+    (insert-vert snk v))))
+
+    (loop for i from 0 below n collect
+      (insert-edge snk (list (nth i verts)
+                             (nth (mod (1+ i) n) verts))))))
+
 
 (defun snek-init-line (snk num a b)
   (let ((verts (loop for i from 0 below num collect
     (insert-vert snk (on-line i num a b)))))
 
-    (loop for i from 0 below num do
-      (insert-edge snk (list (nth i verts) (nth (mod (1+ i) num) verts))))))
+    (loop for i from 0 below num collect
+      (insert-edge snk (list (nth i verts)
+                             (nth (mod (1+ i) num) verts))))))
 
 
 (defun show-snek-edges (snk)
@@ -458,22 +474,32 @@
 
 ; SANDPAINT
 
+; TODO: rewrite these two functions?
+
 (defun snek-draw-edges (snk sand grains)
-  (with-struct (snek- verts edges num-edges) snk
+  (with-struct (snek- verts num-edges) snk
     (if (> num-edges 0)
       (sandpaint:strokes
         sand
-          (loop
-            with ee
-            for i from 0 below num-edges
-            do
-              (setf ee (get-as-list edges i))
-            if (< (first ee) (second ee))
-            collect
-              (list
-                (get-as-list verts (first ee))
-                (get-as-list verts (second ee))))
+        (with-all-edges (snk e)
+          (get-as-list verts (first e))
+          (get-as-list verts (second e)))
         grains))))
+
+
+(defun snek-draw-some-edges (snk sand edges grains)
+  (with-struct (snek- verts) snk
+    (sandpaint:strokes
+      sand
+      (loop
+        for ee in edges
+        collect
+          (destructuring-bind (a b)
+            ee
+            (list
+              (get-as-list verts a)
+              (get-as-list verts b))))
+    grains)))
 
 
 (defun snek-draw-verts (snk sand)

@@ -3,6 +3,7 @@
   (:use :common-lisp)
   (:export
     :pos
+    :pos*
     :make
     :move)
   (:import-from :common-lisp-user
@@ -15,6 +16,7 @@
     :sub
     :make-dfloat-array
     :to-dfloat
+    :to-dfloat*
     :with-struct))
 
 (in-package :lin-path)
@@ -44,27 +46,37 @@
 
 
 ; TODO: binary search
-(defun -find-seg-ind (lens ff n)
+(defun -find-seg-ind (lens f n)
   (loop
     for ind from 0 below n
-    until (< ff (aref lens ind 0))
+    until (< f (aref lens ind 0))
     finally (return ind)))
 
 
-(defun pos (path f)
-  (with-struct (path- lens points n) path
-    (let ((ff (mod (to-dfloat f) 1.0d0)))
-      (let ((ind (-find-seg-ind lens ff n)))
+(defun -calc-pos (points lens n f)
+  (let ((ind (-find-seg-ind lens f n)))
         (let ((pb (get-as-list points ind))
               (pa (get-as-list points (1- ind)))
               (s (diff-scale
                    (aref lens (1- ind) 0)
-                   ff
+                   f
                    (- (aref lens ind 0)
                       (aref lens (1- ind) 0)))))
           (add
             pa
-            (scale (sub pb pa) s)))))))
+            (scale (sub pb pa) s)))))
+
+
+(defun pos (path f)
+  (with-struct (path- lens points n) path
+    (-calc-pos points lens n (mod (to-dfloat f) 1.0d0))))
+
+
+(defun pos* (path ff)
+  (with-struct (path- lens points n) path
+    (mapcar
+      (lambda (f) (-calc-pos points lens n (mod f 1.0d0)))
+      (to-dfloat* ff))))
 
 
 (defun make (points)
@@ -80,7 +92,7 @@
       (make-path :n n :points p :lens l))))
 
 
-(defun move (path rel)
+(defun move (path rel &optional (closed nil))
   (with-struct (path- points lens n) path
     (loop
       for ab in rel
@@ -88,5 +100,11 @@
       do
         (incf (aref points i 0) (first ab))
         (incf (aref points i 1) (second ab)))
+
+    (if closed
+      (progn
+        (setf (aref points (1- n) 0) (aref points 0 0))
+        (setf (aref points (1- n) 1) (aref points 0 1))))
+
     (-set-path-lens points lens n)))
 
