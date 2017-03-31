@@ -92,19 +92,33 @@
       (make-path :n n :points p :lens l))))
 
 
-(defun move (path rel &optional (closed nil))
-  (with-struct (path- points lens n) path
-    (loop
-      for ab in rel
-      for i from 0
-      do
-        (incf (aref points i 0) (first ab))
-        (incf (aref points i 1) (second ab)))
+(defun -move-rel (points i xy)
+  (destructuring-bind (x y)
+    xy
+    (incf (aref points i 0) x)
+    (incf (aref points i 1) y)))
 
-    (if closed
-      (progn
-        (setf (aref points (1- n) 0) (aref points 0 0))
-        (setf (aref points (1- n) 1) (aref points 0 1))))
 
-    (-set-path-lens points lens n)))
+(defun -move (points i xy)
+  (destructuring-bind (x y)
+    xy
+    (setf (aref points i 0) x)
+    (setf (aref points i 1) y)))
+
+
+(defun move (path pos &key rel closed)
+  (let ((do-move (if rel '-move-rel '-move)))
+    (with-struct (path- points lens n) path
+      (loop
+        for xy in pos
+        for i from 0
+        do
+          (funcall do-move points i xy))
+
+      (if closed
+        (progn
+          (setf (aref points (1- n) 0) (aref points 0 0))
+          (setf (aref points (1- n) 1) (aref points 0 1))))
+
+      (-set-path-lens points lens n))))
 

@@ -1,8 +1,8 @@
 
-This code is released under the MIT licence. However, parts of utils.lisp
-are from On Lisp by Paul Graham, and they are bound by the following notice:
+This code is released under the MIT licence. However, pg-utils.lisp is from On
+Lisp by Paul Graham, and they are bound by the following notice:
 
-This code is copyright 1993 by Paul Graham, but anyone who wants 
+This code is copyright 1993 by Paul Graham, but anyone who wants
 to use the code in any nonprofit activity, or distribute free
 verbatim copies (including this notice), is encouraged to do so.
 

@@ -10,7 +10,7 @@
 
   (let ((mid (half size))
         (repeat 15)
-        (grains 4)
+        (grains 3)
         (itt 1000)
         (sand (sandpaint:make size
                 :active (list 0 0 0 0.01)
@@ -19,7 +19,7 @@
     (loop for i in (linspace 100 900 repeat)
           for j from 1 to repeat do
       (print-every j 2)
-      (let ((snk (snek*))
+      (let ((snk (make-snek))
             (va (list 0 0))
             (vb (list 0 0))
             (p1 (list 100 i))
@@ -33,7 +33,7 @@
             (setf vb (add vb (rnd-in-circ (* 0.001 j))))
 
             (with-snek (snk)
-              (with-all-verts (snk v)
+              (itr-verts (snk v)
                 (move-vert v (add (rnd-in-circ 0.1) vb)))
               (join-verts v1 v2))
 
@@ -43,7 +43,7 @@
 
     (sandpaint:pixel-hack sand)
     (format t "~%writing to ~a" fn)
-    (sandpaint:chromatic-aberration sand (list mid mid) 100.0)
+    ;(sandpaint:chromatic-aberration sand (list mid mid) :scale 100.0)
     (sandpaint:save sand fn)))
 
 

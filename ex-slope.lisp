@@ -27,7 +27,7 @@
       (loop for j from 1 to repeat
         do
           (print-every j 2)
-          (let ((snk (snek*)))
+          (let ((snk (make-snek)))
             (setf va (add va (rnd-in-circ noise :xy (list 0.0 0.0))))
 
             (loop for k from 1 to itt

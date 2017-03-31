@@ -1,113 +1,94 @@
 
+; TODO: make an actual package?
 (defpackage :snek (:use :common-lisp))
 
 
-
-; MACROS
-
-(defmacro with-snek ((snk &key (zwidth nil)) &body body)
-  (with-gensyms (sname zname)
-    `(let ((,sname ,snk)
-           (,zname ,zwidth))
-      (incf (snek-wc ,sname))
-      (if ,zname
-        (zmap-update ,sname (to-dfloat ,zname)))
-      (do-alts
-         (remove-if-not
-           #'alt-p
-           (flatten (list ,@body)))
-         ,sname))))
+(defstruct (snek (:constructor -make-snek))
+  (wc 0 :type integer)
+  (verts nil)
+  (num-verts 0 :type integer)
+  (zmap nil)
+  (zwidth nil)
+  (main-grp nil)
+  (grps (make-hash-table :test #'equal))
+  (vert-to-grp nil)
+  (alt-names nil :read-only t)
+  (max-verts nil :type integer :read-only t)
+  (max-main-grp-edges nil :type integer :read-only t)
+  (max-grp-edges nil :type integer :read-only t))
 
 
-(defmacro with-rnd-edge ((snk i) &body body)
-  (with-gensyms (num-edges edges sname)
-    `(let ((,sname ,snk))
-      (let ((,num-edges (snek-num-edges ,sname))
-            (,edges (snek-edges ,sname)))
-        (if (> ,num-edges 0)
-          (let ((,i (get-as-list ,edges (random ,num-edges))))
-            (list ,@body))
-          nil)))))
+(defstruct grp
+  (name nil)
+  (edges nil)
+  (verts (make-vec))
+  (num-edges 0 :type integer)
+  (num-verts 0 :type integer)
+  (type nil :type symbol :read-only t)
+  (closed nil :read-only t))
 
 
-(defmacro with-rnd-vert ((snk i) &body body)
-  `(let ((,i (random (snek-num-verts ,snk))))
-    (list ,@body)))
+(defun new-grp (snk &key (type nil) (closed nil))
+  "
+  constructor for grp instances.
+
+  at the moment type and closed are not used for anything in particular, but
+  they are there to indicate what kind of a group it is. eventually they will
+  be used to indicate that a grp is eg a path, or a NURBS etc.
+  "
+  (with-struct (snek- max-grp-edges grps) snk
+    ; TODO: probably not use gensym. that won't work when exporting structures?
+    (let ((name (gensym)))
+      (setf
+        (gethash name grps)
+        (make-grp
+          :name name
+          :closed closed
+          :type type
+          :edges (make-int-array max-grp-edges)))
+      name)))
 
 
-(defmacro with-rnd-vert-value ((snk v) &body body)
-  (with-gensyms (sname)
-    `(let ((sname ,snk))
-      (let ((,v (get-as-list
-                  (snek-verts ,sname)
-                  (snek-num-verts ,sname))))
-        (list ,@body)))))
+(defun make-snek (&key (max-verts 100000)
+                       (max-main-grp-edges 100000)
+                       (max-grp-edges 1000)
+                       (alts))
+  "
+  constructor for snek instances.
 
+  - max-verts is the maximum number of verts in snek (across all grps).
+  - max-main-grp-edges is the max number of edges in the main grp
+  - max-grp-edges is the max allowed number of edges in a group
 
-(defmacro with-all-verts ((snk i) &body body)
-  (with-gensyms (num-verts sname)
-    `(let ((,sname ,snk))
-      (let ((,num-verts (snek-num-verts,sname)))
-        (loop for ,i from 0 below ,num-verts
-          collect (list ,@body))))))
+  - alts is a list of tuples: ((alt-x 'do-alt-x) (alt-y 'do-alt-y))
+    where alt-x is the name of an alteration struct and do-alt-x is the name of
+    a function that applies alt-x to snek. see snek-alterations for examples.
+  "
+  (let ((alt-names (make-hash-table :test #'equal)))
 
+    (dolist (a '(move-vert-alt join-verts-alt append-edge-alt split-edge-alt))
+      (setf (gethash a alt-names) (symb 'do- a)))
 
-(defmacro with-all-edges ((snk i) &body body)
-  (with-gensyms (num-edges sname kname edges)
-    `(let ((,sname ,snk))
-      (let ((,num-edges (snek-num-edges ,sname))
-            (,edges (snek-edges ,sname)))
-        (loop
-          with ,i
-          for ,kname from 0 below ,num-edges
-          do
-            (setf ,i (get-as-list ,edges ,kname))
-          if (< (first ,i) (second ,i))
-          collect (list ,@body))))))
+    (dolist (pair alts)
+      (destructuring-bind (a f)
+        pair
+        (setf (gethash a alt-names) f)))
 
+    (let ((snk (-make-snek
+                 :verts (make-dfloat-array max-verts)
+                 :vert-to-grp (make-symb-array max-verts)
+                 :alt-names alt-names
+                 :max-verts max-verts
+                 :max-main-grp-edges max-main-grp-edges
+                 :max-grp-edges max-grp-edges))
+          (main-grp (make-grp
+                      :name 'main
+                      :type 'main
+                      :edges (make-int-array max-main-grp-edges))))
 
-(defmacro with-rnd-verts ((snk u v) &body body)
-  `(with-rnd-vert (,snk ,u)
-    (with-rnd-vert (,snk ,v)
-      ,@body)))
-
-
-(defmacro with-verts-closer-than (r (snk u v) &body body)
-  (with-gensyms (rname sname)
-    `(let ((,sname ,snk)
-           (,rname ,r))
-      (with-all-verts (,snk ,u)
-        (with-all-verts (,snk ,v)
-          (if (< (edge-length ,sname (list ,u ,v)) ,rname)
-            (list ,@body)))))))
-
-
-(defmacro with-prob (p &body body)
-  (with-gensyms (pname)
-    `(let ((,pname ,p))
-       (if (< (random 1.0) ,p)
-         (list ,@body)))))
-
-
-
-; SNEK
-
-(defstruct snek
-  (edges nil :read-only nil)
-  (verts nil :read-only nil)
-  (num-edges 0 :type integer :read-only nil)
-  (num-verts 0 :type integer :read-only nil)
-  (wc 0 :type integer :read-only nil)
-  (zmap nil :read-only nil)
-  (zwidth -1.0d0 :read-only nil)
-  (max-num 100000 :type integer :read-only t))
-
-
-(defun snek* (&optional (max-num 100000))
-  (make-snek
-    :edges (make-int-array max-num)
-    :verts (make-dfloat-array max-num)
-    :max-num max-num))
+      (setf (gethash nil (snek-grps snk)) main-grp)
+      (setf (snek-main-grp snk) main-grp)
+      snk)))
 
 
 (defun -edge-compare (a b c d)
@@ -145,8 +126,10 @@
              (eql c (aref arr mid 1)))
             mid)
           ((not (-edge-compare a (aref arr mid 0) c (aref arr mid 1)))
-            (-binary-edge-search arr target num :left left :right (1- mid)))
-          (t (-binary-edge-search arr target num :left (1+ mid) :right right))))))
+            (-binary-edge-search arr target num :left left
+                                                :right (1- mid)))
+          (t (-binary-edge-search arr target num :left (1+ mid)
+                                                 :right right))))))
 
 
 (defun -insert-edge (edges edge pos num)
@@ -184,13 +167,29 @@
       0)))
 
 
-(defun insert-vert (snk xy)
-  (with-struct (snek- verts num-verts) snk
+(defun -add-vert-to-grp (v vert-to-grp grps g)
+  (setf (aref vert-to-grp v) g)
+  (multiple-value-bind (grp exists)
+    (gethash g grps)
+    (if exists
+      (with-struct (grp- verts) grp
+        (vector-push-extend v verts)
+        (incf (grp-num-verts grp))))))
+
+
+(defun insert-vert (snk xy &key g)
+  (with-struct (snek- verts vert-to-grp grps num-verts) snk
+    (-add-vert-to-grp num-verts vert-to-grp grps g)
     (destructuring-bind (x y)
       (to-dfloat* xy)
       (setf (aref verts num-verts 0) x)
       (setf (aref verts num-verts 1) y)
       (- (incf (snek-num-verts snk)) 1))))
+
+
+(defun insert-verts (snk vv &key g)
+  (loop for xy in vv collect
+    (insert-vert snk xy :g g)))
 
 
 (defun get-vert (snk v)
@@ -199,310 +198,93 @@
           (aref verts v 1))))
 
 
-(defun insert-edge (snk e)
-  (with-struct (snek- edges num-edges) snk
-    (cond
-      ((-binary-edge-search edges e num-edges)
-       nil)
-      ((eql (first e) (second e))
-       nil)
-      (t
-        (setf (snek-num-edges snk) (+ 2 num-edges))
-        (-find-insert-edge edges num-edges e)
-        (sort
-          (-find-insert-edge edges (1+ num-edges) (reverse e))
-          #'<)))))
+(defun get-vert-grp (snk v)
+  (with-struct (snek- vert-to-grp) snk
+    (aref vert-to-grp v)))
 
 
-(defun remove-edge (snk e)
-  (with-struct (snek- edges num-edges) snk
-     (setf (snek-num-edges snk) (- num-edges (loop for i in
-       (list
-         (-find-remove-edge edges num-edges e)
-         (-find-remove-edge edges (1- num-edges) (reverse e)))
-       sum i)))
-     (- num-edges (snek-num-edges snk))))
+(defun get-verts (snk vv)
+  (let ((verts (snek-verts snk)))
+    (mapcar (lambda (v) (get-as-list verts v)) vv)))
+
+
+; TODO: more efficient?
+(defun get-grp-vert-vals (snk g)
+  (get-verts snk
+    (get-grp-verts snk g)))
+
+
+; TODO
+;(defun get-edge-grp)
+
+
+(defun get-grp-verts (snk g)
+  (with-struct (snek- grps) snk
+    (multiple-value-bind (grp exists)
+      (gethash g grps)
+      (if exists
+        (to-list (grp-verts grp))
+        nil))))
+
+
+(defun get-num-edges (snk &key g)
+  (with-grp (snk grp g)
+    (grp-num-edges grp)))
+
+
+(defun get-edges (snk &key g)
+  (with-grp (snk grp g)
+    (with-struct (grp- edges num-edges) grp
+      (loop for i from 0 below num-edges collect
+        (get-as-list edges i)))))
+
+
+(defun get-edge-arr (snk &key g)
+  (grp-edges (gethash g (snek-grps snk))))
+
+
+(defun insert-edge (snk ee &key g)
+  (with-grp (snk grp g)
+    (with-struct (grp- edges num-edges) grp
+      (destructuring-bind (a b)
+        ee
+        (cond
+          ((-binary-edge-search edges ee num-edges) nil)
+          ((eql a b) nil)
+          (t
+            (setf (grp-num-edges grp) (2+ num-edges))
+            (-find-insert-edge edges num-edges ee)
+            (sort
+              (-find-insert-edge edges (1+ num-edges) (reverse ee))
+              #'<)))))))
+
+
+(defun remove-edge (snk ee &key g)
+  (with-grp (snk grp g)
+    (with-struct (grp- edges num-edges) grp
+      (setf (grp-num-edges grp)
+            (- num-edges
+              (loop for i in
+                (list
+                  (-find-remove-edge edges num-edges ee)
+                  (-find-remove-edge edges
+                                     (1- num-edges)
+                                     (reverse ee)))
+                sum i)))
+      (- num-edges (grp-num-edges grp)))))
 
 
 ; TODO: binary search
-(defun get-one-ring (snk v)
-  (let ((num (snek-num-edges snk))
-        (edges (snek-edges snk)))
-    (loop for i from 0 below num
-      if (eql v (aref edges i 0))
-      collect (get-as-list edges i))))
-
-
-
-; ALTERATIONS
-
-
-; MOVE VERT
-
-(defstruct (move-vert-alt
-    (:constructor move-vert (v xy &key (rel t))))
-  (rel t :type boolean :read-only t)
-  (xy nil :type list :read-only t)
-  (v -1 :type integer :read-only t))
-
-
-(defun do-move-vert-alt (a snk)
-  (let ((verts (snek-verts snk)))
-    (with-struct (move-vert-alt- v xy rel) a
-      (let ((fxy (to-dfloat* xy)))
-        (set-from-list
-          verts
-          v
-          (if rel
-            (add (get-as-list verts v) fxy)
-            fxy))))))
-
-
-(defun -get-force-alterations (u v f)
-  (list
-    (move-vert v f)
-    (move-vert u (scale f -1.0d0))))
-
-
-(defmacro force (snk v1 v2 r)
-  (with-gensyms (vname v1name v2name rname)
-    `(let ((,vname (snek-verts ,snk))
-           (,v1name ,v1)
-           (,v2name ,v2)
-           (,rname ,r))
-      (-get-force-alterations
-        ,v1 ,v2
-        (scale
-          (nsub
-            (get-as-list ,vname ,v1name)
-            (get-as-list ,vname ,v2name))
-          ,rname)))))
-
-
-
-; APPEND EDGE
-
-(defstruct (append-edge-alt
-    (:constructor append-edge (v xy &key (rel t))))
-  (xy nil :type list :read-only t)
-  (v -1 :type integer :read-only t)
-  (rel t :type boolean :read-only t))
-
-
-(defun do-append-edge-alt (a snk)
-  (with-struct (append-edge-alt- v xy rel) a
-    (cond
-      (rel (insert-vert snk (add (get-vert snk v) xy)))
-      (t (insert-vert snk xy)))
-
-    (insert-edge snk
-      (list
-        v
-        (1- (snek-num-verts snk))))))
-
-
-; JOIN VERTS
-
-(defstruct (join-verts-alt
-    (:constructor join-verts (v1 v2)))
-  (v1 -1 :type integer :read-only t)
-  (v2 -1 :type integer :read-only t))
-
-
-(defun do-join-verts-alt (a snk)
-  (with-struct (join-verts-alt- v1 v2) a
-    (insert-edge snk (list v1 v2))))
-
-
-; SPLIT EDGE
-
-(defstruct (split-edge-alt
-    (:constructor split-edge (e)))
-  (e nil :type list :read-only t))
-
-
-(defun do-split-edge-alt (a snk)
-  (with-struct (split-edge-alt- e) a
-    (let ((res (remove-edge snk e))
-          (verts (snek-verts snk)))
-      (destructuring-bind (a b) e
-        (if (> res 1)
-          (let ((c (insert-vert snk
-                      (lmid (list (get-as-list verts a)
-                                  (get-as-list verts b))))))
-            (insert-edge snk (list a c))
-            (insert-edge snk (list c b))))))))
-
-
-; ALTERATION UTILS
-
-; IMPORTANT: alts must only contain alterations.
-(defun do-alts (alts snk)
-  (dolist (a alts)
-    (funcall (symb 'do- (type-of a)) a snk)))
-
-
-; TODO: it should be possible to add arbitrary alterations.
-(defun alt-p (a)
-  (member
-    (type-of a)
-    '(move-vert-alt join-verts-alt
-      append-edge-alt split-edge-alt)))
-
-
-; ZONEMAP
-
-(defun zmap-xy-to-zone (xy zwidth)
-  (mapcar (lambda (x) (floor x zwidth)) xy))
-
-
-(defun zmap-v-to-zone (verts v zwidth)
-  (list
-    (floor (aref verts v 0) zwidth)
-    (floor (aref verts v 1) zwidth)))
-
-
-(defun zmap-add-v-to-zone (zmap z v)
-  (multiple-value-bind (vals exists)
-    (gethash z zmap)
-    (if (not exists)
-      (progn
-        (setf
-          vals
-          (make-array 20 :fill-pointer 0 :element-type 'integer))
-        (setf (gethash z zmap) vals)))
-    (vector-push-extend v vals)))
-
-
-(defun zmap-update (snk width)
-  (with-struct (snek- verts num-verts) snk
-  (let ((zmap (make-hash-table :test #'equal)))
-    (loop for v from 0 below num-verts
-      do
-        (zmap-add-v-to-zone
-          zmap
-          (zmap-v-to-zone verts v (to-dfloat width))
-          v)
-        (setf (snek-zmap snk) zmap)
-        (setf (snek-zwidth snk) width)))))
-
-
-(defmacro -extend (x y &body body)
-  `(dolist
-    (,x '(-1 0 1))
-    (dolist
-      (,y '(-1 0 1))
-      ,@body)))
-
-(defun zmap-nearby-zones (z)
-  (destructuring-bind (a b)
-    z
-    (let ((zs (make-array 9 :fill-pointer 0)))
-      (-extend i j (vector-push (list (+ a i) (+ b j)) zs))
-      zs)))
-
-
-(defun verts-in-rad (snk xy rad)
-  (with-struct (snek- verts zmap zwidth) snk
-    (let ((zs (zmap-nearby-zones
-                (zmap-xy-to-zone xy zwidth)))
-          (inds (make-array 20 :fill-pointer 0 :element-type 'integer))
-          (rad2 (* rad rad)))
-      (loop for i from 0 below 9 do
-        (multiple-value-bind (vals exists)
-        (gethash (aref zs i) zmap)
-        (if exists
-          (loop for j from 0 below (length vals)
-            do
-            (let ((zj (aref vals j)))
-              (if
-                (< (dst2 xy (get-as-list verts zj)) rad2)
-                (vector-push-extend zj inds)))))))
-      inds)))
-
-
-; OTHER UTILS
-
-(defun edge-length (snk e)
-  (with-struct (snek- verts) snk
-    (apply #'dst (mapcar (lambda (v) (get-as-list verts v)) e))))
-
-
-(defun snek-init-circle (snk num rad &key (xy (list 0.0d0 0.0d0)))
-  (let ((verts (loop for i from 0 below num collect
-    (insert-vert snk
-      (add
-        xy
-        (scale (cos-sin (/ (* i PI 2.0d0) num)) rad))))))
-
-    (loop for i from 0 below num collect
-      (insert-edge snk (list (nth i verts)
-                             (nth (mod (1+ i) num) verts))))))
-
-
-(defun snek-init-poly (snk rad n &key (xy (list 0.0d0 0.0d0)) (rot (* 0.25 PI)))
-  (let ((verts (loop for v in (polygon n rad :xy xy :rot rot) collect
-    (insert-vert snk v))))
-
-    (loop for i from 0 below n collect
-      (insert-edge snk (list (nth i verts)
-                             (nth (mod (1+ i) n) verts))))))
-
-
-(defun snek-init-line (snk num a b)
-  (let ((verts (loop for i from 0 below num collect
-    (insert-vert snk (on-line i num a b)))))
-
-    (loop for i from 0 below num collect
-      (insert-edge snk (list (nth i verts)
-                             (nth (mod (1+ i) num) verts))))))
-
-
-(defun show-snek-edges (snk)
-  (let ((edges (snek-edges snk)))
-    (loop for i from 0 below (snek-num-edges snk) do
-      (print (aref edges i 0))
-      (prin1 (aref edges i 1)))))
-
-
-(defun show-snek-verts (snk)
-  (let ((verts (snek-verts snk)))
-    (loop for i from 0 below (snek-num-verts snk) do
-      (print (aref verts i 0))
-      (prin1 (aref verts i 1)))))
-
-
-; SANDPAINT
-
-; TODO: rewrite these two functions?
-
-(defun snek-draw-edges (snk sand grains)
-  (with-struct (snek- verts num-edges) snk
-    (if (> num-edges 0)
-      (sandpaint:strokes
-        sand
-        (with-all-edges (snk e)
-          (get-as-list verts (first e))
-          (get-as-list verts (second e)))
-        grains))))
-
-
-(defun snek-draw-some-edges (snk sand edges grains)
-  (with-struct (snek- verts) snk
-    (sandpaint:strokes
-      sand
-      (loop
-        for ee in edges
-        collect
-          (destructuring-bind (a b)
-            ee
-            (list
-              (get-as-list verts a)
-              (get-as-list verts b))))
-    grains)))
-
-
-(defun snek-draw-verts (snk sand)
-  (with-struct (snek- verts num-verts) snk
-    (sandpaint:pix* sand verts num-verts)))
+(defun get-one-ring (snk v &key g)
+  "
+  returns all edges connected to vert v.
+
+  if a grp g is supplied, it will select edges from g, otherwise
+  it will use the main grp.
+  "
+  (with-grp (snk grp g)
+    (with-struct (grp- edges num-edges) grp
+      (loop for i from 0 below num-edges
+        if (eql v (aref edges i 0))
+        collect (get-as-list edges i)))))
 

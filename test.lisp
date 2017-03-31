@@ -290,7 +290,8 @@
     '(2 3))
 
   (do-test
-    (-binary-edge-insert-search (snek-edges snk) '(1 2) 2)
+    (-binary-edge-insert-search
+      (get-edge-arr snk) '(1 2) 2)
     2)
 
   (do-test
@@ -300,6 +301,10 @@
   (do-test
     (get-one-ring snk 1)
     '((1 0) (1 2)))
+
+  (do-test
+    (get-edges snk)
+    '((0 1) (1 0) (1 2) (2 1) (2 3) (3 2)))
 
   (do-test
     (remove-edge snk '(0 1))
@@ -318,12 +323,13 @@
     2)
 
   (do-test
-    (snek-num-edges snk)
+    (get-num-edges snk)
     0)
 
   (do-test
     (snek-num-verts snk)
-    4))
+    4)
+  )
 
 
 (defun test-snek-3 (snk)
@@ -357,27 +363,29 @@
 
   (do-test
     (-binary-edge-search
-      (snek-edges snk)
+      (get-edge-arr snk)
       '(2 3)
-      (snek-num-edges snk))
+      (get-num-edges snk))
     4)
 
   (do-test
     (-binary-edge-search
-      (snek-edges snk)
+      (get-edge-arr snk)
       '(0 1)
-      (snek-num-edges snk))
+      (get-num-edges snk))
     0)
 
   (do-test
     (-binary-edge-search
-      (snek-edges snk)
+      (get-edge-arr snk)
       '(10 1)
-      (snek-num-edges snk))
+      (get-num-edges snk))
     nil))
 
 (defun init-snek ()
-  (let ((snk (snek* 16)))
+  (let ((snk (make-snek
+                :max-verts 16
+                :max-main-grp-edges 16)))
     (insert-vert snk '(0 2))
     (insert-vert snk '(2 3))
     (insert-vert snk '(3 4))
@@ -429,11 +437,11 @@
       (join-verts 7 1))
 
   (do-test
-    (snek-num-edges snk)
+    (get-num-edges snk)
     14)
 
   (do-test
-    (snek-edges snk)
+    (get-edge-arr snk)
     (make-array
       (list 16 2)
       :adjustable nil
@@ -450,7 +458,7 @@
       (append-edge 7 '(1 2)))
 
   (do-test
-    (snek-num-edges snk)
+    (get-num-edges snk)
     16)
 
   (do-test
@@ -458,7 +466,7 @@
     13)
 
   (do-test
-    (snek-edges snk)
+    (get-edge-arr snk)
     (make-array
       (list 16 2)
       :adjustable nil
@@ -485,7 +493,7 @@
       (split-edge '(5 6)))
 
   (do-test
-    (snek-num-edges snk)
+    (get-num-edges snk)
     14)
 
   (do-test
@@ -493,7 +501,7 @@
     12)
 
   (do-test
-    (snek-edges snk)
+    (get-edge-arr snk)
     (make-array
       (list 16 2)
       :adjustable nil
@@ -520,7 +528,7 @@
         (move-vert v (list 2 2))))
 
     (do-test
-      (snek-num-edges snk)
+      (get-num-edges snk)
       12)
 
     (do-test
@@ -532,8 +540,22 @@
       1)
 
     (with-snek (snk)
-      (with-all-verts (snk v)
+      (itr-verts (snk v)
         (move-vert v (list 2 2))))
+
+    (do-test
+      (itr-verts (snk i) i)
+      '((0) (1) (2) (3) (4) (5) (6) (7) (8) (9) (10)))
+
+    (do-test
+      (itr-edges (snk e) e)
+      '(((0 1)) ((1 2)) ((1 3)) ((3 7)) ((5 6)) ((6 10))))
+
+    (do-test
+      (itr-edges (snk e) (edge-length snk e))
+      '((2.23606797749979d0) (1.4142135623730951d0)
+        (4.47213595499958d0) (4.123105625617661d0)
+        (3.1622776601683795d0) (1.0d0)))
 
     (do-test
       (snek-wc snk)
@@ -544,7 +566,7 @@
         (split-edge e)))
 
     (do-test
-      (snek-num-edges snk)
+      (get-num-edges snk)
       14)
 
     (do-test
@@ -552,7 +574,7 @@
       12)))
 
 (defun test-snek-zmap ()
-  (let ((snk (snek*)))
+  (let ((snk (make-snek)))
 
     (insert-vert snk '(100 200))
     (insert-vert snk '(200 300))
@@ -588,6 +610,102 @@
       #(3 4))))
 
 
+(defun test-snek-grp ()
+  (let ((snk (make-snek
+               :max-verts 22
+               :max-main-grp-edges 20
+               :max-grp-edges 21)))
+
+    (let ((g1 (new-grp snk :type 'path :closed t))
+          (g2 (new-grp snk))
+          (g3 (new-grp snk :type 'path :closed t)))
+      (insert-vert snk '(100 200) :g g1)
+      (insert-vert snk '(200 300) :g g1)
+      (insert-vert snk '(300 400) :g (new-grp snk))
+      (insert-vert snk '(400 500) :g (new-grp snk))
+      (insert-vert snk '(600 700) :g g2)
+      (insert-vert snk '(700 800) :g g3)
+      (insert-vert snk '(800 900) :g g1)
+      (insert-vert snk '(500 600))
+      (insert-vert snk '(900 600))
+
+      (do-test
+        (flatten (itr-verts (snk i :g g2) i))
+        '(4))
+
+      (do-test
+        (flatten (itr-verts (snk i :g nil) i))
+        '(7 8))
+
+      (do-test
+        (itr-edges (snk e :g g1) e)
+        '())
+
+      (do-test
+        (get-vert-grp snk 0)
+        g1)
+
+      (do-test
+        (get-vert-grp snk 4)
+        g2)
+
+      (do-test
+        (get-vert-grp snk 5)
+        g3)
+
+      (do-test
+        (get-vert-grp snk 6)
+        g1)
+
+      (do-test
+        (get-vert-grp snk 8)
+        nil)
+
+      (do-test
+        (get-grp-verts snk g1)
+        '(0 1 6))
+
+      (do-test
+        (get-grp-verts snk g3)
+        '(5))
+
+      (do-test
+        (get-grp-verts snk 200)
+        nil)
+
+      (do-test
+        (length (get-grp-verts snk nil))
+        2)
+
+      (do-test
+        (get-grp-verts snk -1)
+        nil)
+
+      (do-test
+        (length (itr-grps (snk g) g))
+        5)
+
+      (do-test
+        (with-prob 1.0 1)
+        '(1))
+
+      (do-test
+        (with-prob 0.5 1)
+        nil)
+
+      (do-test
+        (array-dimensions (grp-edges (gethash nil (snek-grps snk))))
+        '(20 2))
+
+      (do-test
+        (array-dimensions (grp-edges (gethash g1 (snek-grps snk))))
+        '(21 2))
+
+      (do-test
+        (array-dimensions (snek-verts snk))
+        '(22 2)))))
+
+
 (defun summary ()
   (format t "~% tests:  ~a~% fails:  ~a~% passes: ~a~%"
           *tests* *fails* *passes*))
@@ -597,15 +715,17 @@
 
   (title (test-utils))
   (title (test-bin))
-  (title (test-snek (snek*)))
-  (title (test-snek-2 (snek*)))
-  (title (test-snek-3 (snek*)))
+  (title (test-snek (make-snek)))
+  (title (test-snek-2 (make-snek)))
+  (title (test-snek-3 (make-snek)))
   (title (test-snek-move))
   (title (test-snek-join))
   (title (test-snek-append))
   (title (test-snek-split))
   (title (test-snek-withs))
   (title (test-snek-zmap))
+  (title (test-snek-grp))
   (title (summary)))
 
 (main)
+

@@ -2,6 +2,7 @@
 
 ![head](img/img.png?raw=true "head")
 
+
 ## About
 
 `snek` is a simple data structure for working with vertices and edges. More
@@ -20,8 +21,8 @@ Here is and example of manipulating a `snek` instance called `snk` using
 ```lisp
 ; context start
 (with-snek (snk)
-  ; iterate
-  (with-all-verts (snk v)
+  ; iterate vertices
+  (itr-verts (snk v)
     ; move alteration
     (move-vert v (rnd-in-circ))
     ; w will be an arbitrary
@@ -35,10 +36,11 @@ Here is and example of manipulating a `snek` instance called `snk` using
 ; alterations have been applied
 ```
 
-There are two more examples. They can be executed like this:
+There are some examples included. They can be executed like this:
 
-    ./run-slope.lisp res/slop.png
-    ./run-lines.lisp res/lines.png
+    ./ex-slope.lisp res/slop.png
+    ./ex-lines.lisp res/lines.png
+    ./ex-grp.lisp res/grp.png
 
 Notice that the resulting image will end up in `res`.
 
@@ -48,10 +50,13 @@ Notice that the resulting image will end up in `res`.
   - https://twitter.com/sandpaintbot
   - https://twitter.com/scratchpaintbot
 
+![lines](img/ex-lines.png?raw=true "lines")
+
+
 ## Dependencies
 
-This code requires `Quicklisp` and `zpng`. Note that the The path to quicklisp
-must be set in `src/load`. `zpng` is automatically installed via `quicklisp`.
+This code requires `Quicklisp` and `zpng`. The path to quicklisp must be set in
+`src/load`. `zpng` is automatically installed via `quicklisp`.
 
  - http://www.xach.com/lisp/zpng/
  - https://www.quicklisp.org/beta/
@@ -64,7 +69,7 @@ There are some tests included. Run them like this:
     ./test.lisp
 
 
-## Stability changes and Versioning
+## Stability, Changes and Versioning
 
 This code is highly experimental on my part. It is likely to change with no
 warning or explanation. I will keep a note of the version number in `VERSION`.
@@ -78,11 +83,10 @@ collaboration/Open Source project. As such I am unlikely to accept PRs, reply
 to issues, or take requests.
 
 
-## Todo
+## Wanted Changes
 
  - math utils as package?
  - snek as package?
  - Randomized order of alteration apply
  - Maintain list of singly-connected vertices?
- - System for adding arbitrary alterations
 

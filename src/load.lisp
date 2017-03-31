@@ -4,11 +4,15 @@
 
 (load "../quicklisp/setup")
 
-(load "./src/utils")
 (load "./src/pg-utils")
+(load "./src/utils")
 (load "./src/math-utils")
 (load "./src/linear-path")
 (load "./src/inv-dst-path")
 (load "./src/sandpaint")
+(load "./src/snek-macros")
 (load "./src/snek")
+(load "./src/snek-alterations")
+(load "./src/snek-utils")
+(load "./src/snek-zmap")
 

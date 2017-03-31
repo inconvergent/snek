@@ -5,6 +5,7 @@
     :chromatic-aberration
     :make
     :pixel-hack
+    :stroke
     :strokes
     :path
     :pix
@@ -12,7 +13,9 @@
     :save
     :set-rgba)
   (:import-from :common-lisp-user
+    :get-as-list
     :square-loop
+    :range
     :rnd-in-circ
     :rnd-on-line
     :add
@@ -79,7 +82,7 @@
 
 (defstruct sandpaint
   (vals nil :read-only nil)
-  (size -1 :type integer :read-only nil)
+  (size nil :type integer :read-only nil)
   (r 0.0d0 :type double-float :read-only nil)
   (g 0.0d0 :type double-float :read-only nil)
   (b 0.0d0 :type double-float :read-only nil)
@@ -103,7 +106,7 @@
     (if (and (>= nx 0) (< nx size) (>= ny 0) (< ny size))
       (setf (aref new-vals nx ny i) (aref old-vals x y i)))))
 
-(defun chromatic-aberration (sand C s)
+(defun chromatic-aberration (sand center &key (scale 1.0) (noise 1.0))
   (with-struct (sandpaint- size vals) sand
     (let ((new-vals (make-rgba-array size)))
       (copy-rgba-array-to-from new-vals vals size)
@@ -112,9 +115,9 @@
         (let* ((xy (list x y))
                (dx (iscale
                      (sub
-                       (add (rnd-in-circ 1.0) xy)
-                       C)
-                     s)))
+                       (add (rnd-in-circ noise) xy)
+                       center)
+                     scale)))
           (-offset-rgba new-vals vals size x y (add xy dx) 0)
           (-offset-rgba new-vals vals size x y (sub xy dx) 2)))
 
@@ -165,9 +168,19 @@
     (setf (sandpaint-a sand) a)))
 
 
-(defun pixel-hack (sand)
+(defun pixel-hack (sand &optional (sa 0.9d0))
+  "
+  scale opacity of pix (0 0) by sa.
+  "
   (let ((vals (sandpaint-vals sand)))
-    (setf (aref vals 0 0 3) 0.5d0)))
+    (destructuring-bind (r g b a)
+      (mapcar (lambda (i) (aref vals 0 0 i)) (range 4))
+      (if (>= 1.0d0 a)
+        (let ((na (* a (to-dfloat sa))))
+          (setf (aref vals 0 0 0) (* (/ r a) na))
+          (setf (aref vals 0 0 1) (* (/ g a) na))
+          (setf (aref vals 0 0 2) (* (/ b a) na))
+          (setf (aref vals 0 0 3) na))))))
 
 
 (defun pix (sand vv)
@@ -193,6 +206,13 @@
       (destructuring-bind (u v)
         line
         (-draw-stroke vals size grains u v r g b a)))))
+
+
+(defun stroke (sand line grains)
+  (with-struct (sandpaint- size vals r g b a) sand
+    (destructuring-bind (u v)
+      line
+      (-draw-stroke vals size grains u v r g b a))))
 
 
 (defun path (sand path grains &optional closed)

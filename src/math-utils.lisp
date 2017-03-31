@@ -20,6 +20,10 @@
 (defun diff-scale (a b s) (/ (- b a) s))
 
 
+(defun lexpt (xx p)
+  (mapcar (lambda (x) (expt x p)) xx))
+
+
 (defun scale (a s)
   (mapcar (lambda (x) (* x s)) a))
 
@@ -115,22 +119,20 @@
   (aref l (random (length l))))
 
 
-; TODO: add dim option
-(defun get-as-list (arr row &optional (dims (range 2)))
-  (mapcar
-    (lambda (d) (aref arr row d))
-    dims))
-
-
-(defun set-from-list (arr row vals)
-  (mapcar
-    (lambda (d v) (setf (aref arr row d) v))
-    (list 0 1)
-    vals))
-
-
-
 ; RANGES
+
+(defun range (a &optional (b nil))
+  (if (not b)
+    (loop for x from 0 below a collect x)
+    (loop for x from a below b collect x)))
+
+
+(defun rndi (a &optional (b nil))
+  (let ((a (to-int a)))
+    (if (not b)
+      (random a)
+      (+ a (random (- (to-int b) a))))))
+
 
 (defun rnd (&optional (x 1.0d0))
   (random (to-dfloat x)))
@@ -178,11 +180,22 @@
         (incf ,x (incf ,a (rnd* ,s)))))))
 
 
-(defmacro get-rnd-circ-stp* (&optional (init (list 0.0d0 0.0d0)))
+(defmacro get-rnd-circ-stp* (&optional (init '(list 0.0d0 0.0d0)))
   (with-gensyms (xy stp)
     `(let ((,xy (to-dfloat* ,init)))
       (lambda (,stp)
         (add ,xy (rnd-in-circ ,stp))))))
+
+
+(defmacro get-acc-rnd-circ-stp* (&optional (init '(list 0.0d0 0.0d0))
+                                           (init-a '(list 0.0d0 0.0d0)))
+  (with-gensyms (xy stp a)
+    `(let ((,a (to-dfloat* ,init-a))
+           (,xy (to-dfloat* ,init)))
+      (lambda (,stp)
+        (setf ,xy
+              (add ,xy
+                   (setf ,a (add ,a (rnd-in-circ ,stp)))))))))
 
 
 (defun linspace (a b n)
@@ -207,6 +220,21 @@
   (if (not b)
     (loop for x from 0 below a collect x)
     (loop for x from a below b collect x)))
+
+
+; GET SET
+
+(defun get-as-list (arr row &optional (dims (range 2)))
+  (mapcar
+    (lambda (d) (aref arr row d))
+    dims))
+
+
+(defun set-from-list (arr row vals)
+  (mapcar
+    (lambda (d v) (setf (aref arr row d) v))
+    (list 0 1)
+    vals))
 
 
 ; SHAPES
@@ -275,7 +303,7 @@
 
 
 (defun polygon (n rad &key (xy (list 0.0d0 0.0d0)) (rot 0.0d0))
-  (loop for i from 0 to n
+  (loop for i from 0 below n
     collect
       (add
         xy
