@@ -38,9 +38,9 @@ Here is and example of manipulating a `snek` instance called `snk` using
 
 There are some examples included. They can be executed like this:
 
-    ./ex-slope.lisp res/slop.png
-    ./ex-lines.lisp res/lines.png
-    ./ex-grp.lisp res/grp.png
+    ./ex-slope.lisp res/slope
+    ./ex-lines.lisp res/lines
+    ./ex-grp.lisp res/grp
 
 Notice that the resulting image will end up in `res`.
 

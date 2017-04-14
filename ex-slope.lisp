@@ -43,7 +43,6 @@
 
 
    (sandpaint:pixel-hack sand)
-   (format t "~%writing to ~a" fn)
    (sandpaint:save sand fn))))
 
 

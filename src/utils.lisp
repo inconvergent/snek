@@ -26,11 +26,13 @@
     :initial-element initial
     :element-type 'double-float ))
 
+
 (defun make-symb-array (rows &key (initial nil))
   (make-array
     rows
     :initial-element initial
     :element-type 'symbol))
+
 
 (defun make-int-array (rows  &key (cols 2) (initial 0))
   (make-array
@@ -80,15 +82,23 @@
     `(let ((,aname ,a))
       (if (eql ,aname ,b) ,aname nil))))
 
+
 (defmacro white (&optional (alpha 1.0d0))
   `(list 1.0d0 1.0d0 1.0d0 ,alpha))
+
 
 (defmacro black (&optional (alpha 1.0d0))
   `(list 0.0d0 0.0d0 0.0d0 ,alpha))
 
+
 (defmacro dark (&optional (alpha 1.0d0))
   `(list 0.2d0 0.2d0 0.2d0 ,alpha))
 
+
 (defmacro gray (v &optional (alpha 1.0d0))
   `(list ,v ,v ,v ,alpha))
+
+
+(defun append-postfix (fn postfix)
+  (concatenate 'string fn postfix))
 

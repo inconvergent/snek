@@ -87,7 +87,7 @@
         for d in points
         for i from 0
         do
-          (set-from-list p i d))
+          (set-from-list p i (to-dfloat* d)))
       (-set-path-lens p l n)
       (make-path :n n :points p :lens l))))
 

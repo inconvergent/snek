@@ -13,21 +13,19 @@
     :save
     :set-rgba)
   (:import-from :common-lisp-user
+    :add
+    :append-postfix
     :get-as-list
-    :square-loop
+    :iscale
+    :lround
     :range
     :rnd-in-circ
     :rnd-on-line
-    :add
-    :iscale
-    :lround
+    :square-loop
     :sub
     :to-dfloat
     :to-dfloat*
     :with-struct))
-
-
-(ql:quickload "ZPNG")
 
 (in-package :sandpaint)
 
@@ -226,24 +224,25 @@
       (-draw-stroke vals size grains (first path) (last path) r g b a))))
 
 
-(defun save (sand name &key (gamma 1.0))
-  (if (not name) (error "missing result file name."))
-  (with-struct (sandpaint- size vals) sand
-    (let ((png
-             (make-instance
-               'zpng::pixel-streamed-png
-               :color-type :truecolor-alpha
-               :width size
-               :height size)))
+(defun save (sand fn &key (gamma 1.0))
+  (if (not fn) (error "missing result file name."))
+  (let ((fnimg (append-postfix fn ".png")))
+    (with-struct (sandpaint- size vals) sand
+      (let ((png (make-instance
+                   'zpng::pixel-streamed-png
+                   :color-type :truecolor-alpha
+                   :width size
+                   :height size)))
 
-      (with-open-file
-        (stream name
-          :direction :output
-          :if-exists :supersede
-          :if-does-not-exist :create
-          :element-type '(unsigned-byte 8))
-        (zpng:start-png png stream)
-        (square-loop (x y size)
-          (zpng:write-pixel (-png-tuple vals y x gamma) png))
-        (zpng:finish-png png)))))
+        (with-open-file
+          (stream fnimg
+            :direction :output
+            :if-exists :supersede
+            :if-does-not-exist :create
+            :element-type '(unsigned-byte 8))
+          (zpng:start-png png stream)
+          (square-loop (x y size)
+            (zpng:write-pixel (-png-tuple vals y x gamma) png))
+          (zpng:finish-png png))))
+    (format t "~%file: ~a~%~%" fnimg)))
 

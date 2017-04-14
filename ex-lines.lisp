@@ -42,7 +42,6 @@
 
 
     (sandpaint:pixel-hack sand)
-    (format t "~%writing to ~a" fn)
     ;(sandpaint:chromatic-aberration sand (list mid mid) :scale 100.0)
     (sandpaint:save sand fn)))
 

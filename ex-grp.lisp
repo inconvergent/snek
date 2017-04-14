@@ -10,9 +10,9 @@
   (loop for x in (linspace 200 800 rep) for i from 0 do
     (loop for y in (linspace 200 800 rep) for j from 0 do
       (let ((g (new-grp snk :type 'path :closed t)))
-        (snek-init-polygon snk rad (rndi 3 6)
+        (print (snek-init-polygon snk rad (rndi 3 6)
                            :xy (list x y)
-                           :g g)))))
+                           :g g))))))
 
 (defun main (size fn)
   (let ((grains 4)
@@ -50,7 +50,6 @@
 
     (sandpaint:chromatic-aberration sand (list 500 500) :scale 200.0)
     (sandpaint:pixel-hack sand)
-    (format t "~%writing to ~a" fn)
     (sandpaint:save sand fn)))
 
 

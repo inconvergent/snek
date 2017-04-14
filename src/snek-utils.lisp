@@ -25,9 +25,13 @@
 
 (defun snek-init-path (snk points &key g closed)
   (let ((vv (insert-verts snk points :g g)))
-    (loop for a in vv
-          for b in (if closed (-roll-once vv) (cdr vv))
-          collect (insert-edge snk (list a b) :g g))))
+    (if closed
+      (loop for a in vv
+            for b in (-roll-once vv)
+            collect (insert-edge snk (list a b) :g g))
+      (loop for a in vv
+            for b in (cdr vv)
+            collect (insert-edge snk (list a b) :g g)))))
 
 
 ; SANDPAINT
@@ -51,4 +55,19 @@
 (defun snek-draw-verts (snk sand)
   (with-struct (snek- verts num-verts) snk
     (sandpaint:pix* sand verts num-verts)))
+
+
+; EXPORT
+
+(defun snek-export-2obj (snk fn &key g)
+  (with-open-file (stream fn :direction :output :if-exists :supersede)
+    (format stream "o mesh~%")
+    (dolist (ll (get-grp-vert-vals snk g))
+      (destructuring-bind (a b)
+        ll
+        (format stream "v ~f ~f~%" a b)))
+    (dolist (ll (get-edges snk :g g))
+      (destructuring-bind (a b)
+        (add ll '(1 1))
+        (format stream "e ~d ~d~%" a b)))))
 
