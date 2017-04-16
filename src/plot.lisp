@@ -4,16 +4,19 @@
   (:export
     :make
     :dot-stroke
+    :path
     :save
     :stipple-stroke
     :stipple-strokes)
   (:import-from :common-lisp-user
     :add
     :append-postfix
+    :dst
     :get-as-list
     :half
     :iscale
     :len
+    :linspace
     :lround
     :make-vec
     :nrep
@@ -41,9 +44,11 @@
 (defstruct plot
   (verts nil :read-only nil)
   (edges nil :read-only nil)
+  (lines nil :read-only nil)
   (coverage nil :read-only nil)
   (num-verts 0 :type integer :read-only nil)
   (num-edges 0 :type integer :read-only nil)
+  (num-lines 0 :type integer :read-only nil)
   (discards 0 :type integer :read-only nil)
   (size nil :type integer :read-only nil))
 
@@ -53,6 +58,7 @@
     :size size
     :verts (make-vec)
     :edges (make-vec)
+    :lines (make-vec)
     :coverage (make-coverage-array size)))
 
 
@@ -73,9 +79,9 @@
   (let ((itt (round (* 2.0d0 (len offset))))
         (cov-count 0)
         (cov (make-vec)))
-    (loop for i in (range itt) do
+    (loop for s in (linspace 0.0 1.0 itt) do
       (destructuring-bind (x y)
-        (lround (on-line i itt a b))
+        (lround (on-line s a b))
         (if (and (>= x 0) (< x size) (>= y 0) (< y size))
           (progn
             (incf cov-count (if (> (aref coverage x y) 0) 1 0))
@@ -95,6 +101,32 @@
   (destructuring-bind (a b)
     v
     (list b (- 0 a))))
+
+
+(defun -coverage-path (size coverage path)
+  (loop
+    for a in path
+    for b in (cdr path)
+    do
+      (let ((n (round (dst a b))))
+        (loop for s in (linspace 0.0 1.0 n) do
+          (destructuring-bind (x y)
+            (lround (on-line s a b))
+            (if (and (>= x 0) (< x size) (>= y 0) (< y size))
+              (incf (aref coverage x y))))))))
+
+
+(defun path (plt path)
+  (let ((n (length path)))
+  (with-struct (plot- size verts lines num-verts num-lines coverage) plt
+    ; todo: test if path is outside boundary
+    (dolist (p path)
+      (vector-push-extend p verts))
+    (vector-push-extend
+      (range num-verts (+ num-verts n)) lines)
+    (incf (plot-num-verts plt) n)
+    (incf (plot-num-lines plt))
+    (-coverage-path size coverage path))))
 
 
 (defun -stipple (plt xy offset)
@@ -134,8 +166,7 @@
 ; this wrapper is probably inefficient.
 (defun stipple-strokes (plt lines num s &key perp)
   (loop for line in lines do
-    (stipple-stroke plt line num s
-                    :perp perp)))
+    (stipple-stroke plt line num s :perp perp)))
 
 
 (defun -png-tuple (v) (list v v v 255))
@@ -165,7 +196,7 @@
           (zpng:finish-png png))))
 
 
-(defun -write-2obj (size verts edges fn)
+(defun -write-2obj (size verts edges lines fn)
   (with-open-file (stream fn :direction :output :if-exists :supersede)
     (format stream "o mesh~%")
     (dolist (ll (coerce verts 'list))
@@ -176,18 +207,26 @@
       (dolist (ee (coerce edges 'list))
         (destructuring-bind (a b)
           (add ee '(1 1))
-          (format stream "e ~d ~d~%" a b))))))
+          (format stream "e ~d ~d~%" a b))))
+    (if lines
+      (dolist (ll (coerce lines 'list))
+        (format stream "l")
+        (dolist (l ll)
+          (format stream " ~d" (1+ l)))
+        (format stream "~%")))))
 
 
 (defun save (plt fn)
   (if (not fn) (error "missing result file name."))
   (let ((fnimg (append-postfix fn ".png"))
         (fnobj (append-postfix fn ".2obj")))
-    (with-struct (plot- size verts edges coverage num-verts num-edges discards) plt
+    (with-struct (plot- size verts edges lines coverage
+                        num-verts num-edges num-lines discards) plt
       (-write-png coverage size fnimg)
-      (-write-2obj size verts edges fnobj)
+      (-write-2obj size verts edges lines fnobj)
       (format t "~%~%num verts: ~a ~%" num-verts)
       (format t "num edges: ~a ~%" num-edges)
+      (format t "num lines ~a ~%" num-lines)
       (format t "num discards: ~a ~%" discards))
     (format t "~%files ~a" fnimg)
     (format t "~%      ~a~%~%" fnobj)))

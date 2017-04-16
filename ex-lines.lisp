@@ -25,9 +25,9 @@
             (p1 (list 100 i))
             (p2 (list 900 i)))
 
-        (loop for k from 1 to itt do
-          (let ((v1 (insert-vert snk (on-line k itt p1 p2)))
-                (v2 (insert-vert snk (add va (on-line k itt p1 p2)))))
+        (loop for s in (linspace 0.0 1.0 itt) do
+          (let ((v1 (insert-vert snk (on-line s p1 p2)))
+                (v2 (insert-vert snk (add va (on-line s p1 p2)))))
 
             (setf va (add va (rnd-in-circ (* 0.7 j))))
             (setf vb (add vb (rnd-in-circ (* 0.001 j))))

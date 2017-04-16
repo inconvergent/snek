@@ -107,7 +107,7 @@
   (mapcar #'round l))
 
 
-(defun lget (ii a)
+(defun lget (a ii)
   (mapcar (lambda (i) (nth i a)) ii))
 
 
@@ -239,28 +239,27 @@
 
 ; SHAPES
 
-(defun on-spiral (i itt rad &key (xy (list 0.0d0 0.0d0)) (rot 1.0d0))
+
+(defun on-spiral (p rad &key (xy (list 0.0d0 0.0d0)) (rot 1.0d0))
   (add
     xy
     (scale
-      (cos-sin (/ (* i PI rot) itt))
-      (* (/ i itt) rad))))
+      (cos-sin (* p PI rot))
+      (* p rad))))
 
 
-(defun on-circ (i itt rad &key (xy (list 0.0d0 0.0d0)))
+(defun on-circ (p rad &key (xy (list 0.0d0 0.0d0)))
   (add
     xy
     (scale
-      (cos-sin (/ (* i PI 2.0d0) itt))
+      (cos-sin (* p PI 2.0d0))
       rad)))
 
 
-(defun on-line (i itt x1 x2)
+(defun on-line (p x1 x2)
   (add
     x1
-    (scale
-      (sub x2 x1)
-      (/ i itt))))
+    (scale (sub x2 x1) p)))
 
 
 (defun rnd-on-circ (rad &key (xy (list 0.0d0 0.0d0)))
@@ -310,6 +309,30 @@
         (scale
           (cos-sin (+ rot (* (/ i n) 2.0d0 PI)))
           rad))))
+
+
+(defun -make-front-path (aa bb cc as bs)
+  (let ((p1 (add cc (scale (sub aa cc) as)))
+        (p2 (add cc (scale (sub bb cc) bs))))
+    (list p1 cc p2)))
+
+
+(defun -make-full-path (aa bb cc as bs)
+  (let ((p1 (add cc (scale (sub aa cc) as)))
+        (p2 (add cc (scale (sub bb cc) bs))))
+    (list p1 cc p2 (add p2 (scale (sub aa p2) as)) p1)))
+
+
+; three point perspective
+
+(defun make-perspective-transform (A B C)
+  (lambda (P a* b* u* d*)
+    (let ((PA (sub A P))
+          (PB (sub B P))
+          (PC (sub C P)))
+      (let ((U (sub P (scale PC u*)))
+            (D (add P (scale PC d*))))
+        (append (-make-full-path A B U a* b*) (-make-full-path A B D a* b*))))))
 
 
 ; OTHER
