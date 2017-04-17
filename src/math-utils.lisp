@@ -198,9 +198,9 @@
                    (setf ,a (add ,a (rnd-in-circ ,stp)))))))))
 
 
-(defun linspace (a b n)
+(defun linspace (a b n &key (end t))
   (if (> n 1)
-    (let ((nn (1- n)))
+    (let ((nn (if end (1- n) n)))
       (loop for i from 0 below n
           collect (to-dfloat (+ a (* i (/ (- b a) nn))))))
     (list (to-dfloat a))))

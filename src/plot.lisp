@@ -108,7 +108,7 @@
     for a in path
     for b in (cdr path)
     do
-      (let ((n (round (dst a b))))
+      (let ((n (* 2 (round (dst a b)))))
         (loop for s in (linspace 0.0 1.0 n) do
           (destructuring-bind (x y)
             (lround (on-line s a b))

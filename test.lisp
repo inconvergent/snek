@@ -100,6 +100,14 @@
     (list 0.0 5.0 10.0))
 
   (do-test
+    (linspace 0 10 2 :end nil)
+    (list 0.0 5.0))
+
+  (do-test
+    (linspace 0 10 2 :end t)
+    (list 0.0 10.0))
+
+  (do-test
     (range 2 5)
     (list 2 3 4))
 
