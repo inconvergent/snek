@@ -42,6 +42,11 @@ There are some examples included. They can be executed like this:
     ./ex-lines.lisp res/lines
     ./ex-grp.lisp res/grp
 
+There is also and example of how to use the plotting functionality. This will
+export a simple vector file and an image to indicate the result
+
+    ./ex-plot-perspective.lisp res/perspective
+
 Notice that the resulting image will end up in `res`.
 
 `snek` is used in
