@@ -3,6 +3,8 @@
   (:use :common-lisp)
   (:export
     :chromatic-aberration
+    :circ
+    :circ*
     :make
     :pixel-hack
     :stroke
@@ -87,15 +89,16 @@
   (a 1.0d0 :type double-float :read-only nil))
 
 
-; TODO implement wrapper
-;(defun -sandpaint-vert-box (vals size mx my grains w h r g b a)
-;  (loop for i from 0 to grains do
-;    (destructuring-bind (x y)
-;      (mapcar #'round (rnd-in-box w h :x mx :y my))
-;      (-operator-over size vals x y r g b a))))
-
 (defun -draw-pix (vals size x y r g b a)
   (-operator-over size vals x y r g b a))
+
+
+(defun -draw-circ (vals size xy rad n r g b a)
+  (loop for i below n do
+    (destructuring-bind (x y)
+      (lround (add xy (rnd-in-circ rad)))
+      (if (and (>= x 0) (< x size) (>= y 0) (< y size))
+        (-operator-over size vals x y r g b a)))))
 
 
 (defun -offset-rgba (new-vals old-vals size x y nxy i)
@@ -196,6 +199,20 @@
                  (round (aref vv i 0))
                  (round (aref vv i 1))
                  r g b a))))
+
+
+(defun circ (sand vv rad n)
+  (with-struct (sandpaint- size vals r g b a) sand
+    (loop for v in vv do
+      (-draw-circ vals size v rad n r g b a))))
+
+
+(defun circ* (sand vv num rad grains)
+  (with-struct (sandpaint- size vals r g b a) sand
+    (loop for i from 0 below num do
+      (-draw-circ vals size (list (aref vv i 0)
+                                  (aref vv i 1))
+                  rad grains r g b a))))
 
 
 (defun strokes (sand lines grains)

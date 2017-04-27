@@ -57,6 +57,11 @@
     (sandpaint:pix* sand verts num-verts)))
 
 
+(defun snek-draw-circ (snk sand rad grains)
+  (with-struct (snek- verts num-verts) snk
+    (sandpaint:circ* sand verts num-verts rad grains)))
+
+
 ; EXPORT
 
 (defun snek-export-2obj (snk fn &key g)
