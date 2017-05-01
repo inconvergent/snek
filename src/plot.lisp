@@ -2,8 +2,8 @@
 (defpackage :plot
   (:use :common-lisp)
   (:export
-    :make
     :dot-stroke
+    :make
     :path
     :save
     :stipple-stroke

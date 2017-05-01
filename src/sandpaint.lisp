@@ -6,19 +6,21 @@
     :circ
     :circ*
     :make
-    :pixel-hack
-    :stroke
-    :strokes
     :path
     :pix
     :pix*
+    :pixel-hack
     :save
-    :set-rgba)
+    :set-rgba
+    :stroke
+    :strokes)
   (:import-from :common-lisp-user
     :add
     :append-postfix
     :get-as-list
     :iscale
+    :inside
+    :inside*
     :lround
     :range
     :rnd-in-circ
@@ -56,21 +58,19 @@
     (aref vals x y i)
     (+ (* (aref vals x y i) -alpha) color)))
 
-(defun -operator-over (size vals x y r g b a)
-  (if (and (>= x 0) (< x size) (>= y 0) (< y size))
-    (let ((ia (- 1.0 a)))
-      (-setf-operator-over vals x y 0 ia r)
-      (-setf-operator-over vals x y 1 ia g)
-      (-setf-operator-over vals x y 2 ia b)
-      (-setf-operator-over vals x y 3 ia a))))
+(defun -operator-over (vals x y r g b a)
+  (let ((ia (- 1.0 a)))
+    (-setf-operator-over vals x y 0 ia r)
+    (-setf-operator-over vals x y 1 ia g)
+    (-setf-operator-over vals x y 2 ia b)
+    (-setf-operator-over vals x y 3 ia a)))
 
 
 (defun -draw-stroke (vals size grains v1 v2 r g b a)
   (loop for i from 1 to grains
     do
-      (destructuring-bind (x y)
-        (lround (rnd-on-line v1 v2))
-        (-operator-over size vals x y r g b a))))
+      (inside* (size (rnd-on-line v1 v2) x y)
+        (-operator-over vals x y r g b a))))
 
 
 (defun copy-rgba-array-to-from (target source size)
@@ -89,16 +89,10 @@
   (a 1.0d0 :type double-float :read-only nil))
 
 
-(defun -draw-pix (vals size x y r g b a)
-  (-operator-over size vals x y r g b a))
-
-
 (defun -draw-circ (vals size xy rad n r g b a)
   (loop for i below n do
-    (destructuring-bind (x y)
-      (lround (add xy (rnd-in-circ rad)))
-      (if (and (>= x 0) (< x size) (>= y 0) (< y size))
-        (-operator-over size vals x y r g b a)))))
+    (inside* (size (add xy (rnd-in-circ rad)) x y)
+      (-operator-over vals x y r g b a))))
 
 
 (defun -offset-rgba (new-vals old-vals size x y nxy i)
@@ -187,18 +181,15 @@
 (defun pix (sand vv)
   (with-struct (sandpaint- size vals r g b a) sand
     (loop for v in vv do
-      (destructuring-bind (x y)
-        v
-        (-draw-pix vals size (round x) (round y) r g b a)))))
+      (inside* (size v x y)
+        (-operator-over vals x y r g b a)))))
 
 
 (defun pix* (sand vv n)
   (with-struct (sandpaint- size vals r g b a) sand
     (loop for i from 0 below n do
-      (-draw-pix vals size
-                 (round (aref vv i 0))
-                 (round (aref vv i 1))
-                 r g b a))))
+      (inside* (size (get-as-list vv i) x y)
+        (-operator-over vals x y r g b a)))))
 
 
 (defun circ (sand vv rad n)
@@ -210,8 +201,7 @@
 (defun circ* (sand vv num rad grains)
   (with-struct (sandpaint- size vals r g b a) sand
     (loop for i from 0 below num do
-      (-draw-circ vals size (list (aref vv i 0)
-                                  (aref vv i 1))
+      (-draw-circ vals size (get-as-list vv i)
                   rad grains r g b a))))
 
 
