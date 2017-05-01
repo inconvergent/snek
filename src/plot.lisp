@@ -14,6 +14,8 @@
     :dst
     :get-as-list
     :half
+    :inside
+    :inside*
     :iscale
     :len
     :linspace
@@ -67,12 +69,9 @@
     (destructuring-bind (u v)
       line
       (loop for xy in (nrep num (rnd-on-line u v)) do
-        (destructuring-bind (x y)
-          (lround xy)
-          (if (and (>= x 0) (< x size) (>= y 0) (< y size))
-            (progn
-              (incf (aref coverage x y))
-              (vector-push-extend xy verts))))))))
+        (inside* (size xy x y)
+          (incf (aref coverage x y))
+          (vector-push-extend xy verts))))))
 
 
 (defun -ok-coverage (size coverage offset a b)
@@ -80,12 +79,9 @@
         (cov-count 0)
         (cov (make-vec)))
     (loop for s in (linspace 0.0 1.0 itt) do
-      (destructuring-bind (x y)
-        (lround (on-line s a b))
-        (if (and (>= x 0) (< x size) (>= y 0) (< y size))
-          (progn
-            (incf cov-count (if (> (aref coverage x y) 0) 1 0))
-            (vector-push-extend (list x y) cov)))))
+      (inside* (size (on-line s a b) x y)
+        (incf cov-count (if (> (aref coverage x y) 0) 1 0))
+        (vector-push-extend (list x y) cov)))
 
     (if (< cov-count (half itt))
       (progn
@@ -110,10 +106,8 @@
     do
       (let ((n (* 2 (round (dst a b)))))
         (loop for s in (linspace 0.0 1.0 n) do
-          (destructuring-bind (x y)
-            (lround (on-line s a b))
-            (if (and (>= x 0) (< x size) (>= y 0) (< y size))
-              (incf (aref coverage x y))))))))
+          (inside* (size (on-line s a b) x y)
+            (incf (aref coverage x y)))))))
 
 
 (defun path (plt path)
@@ -157,10 +151,9 @@
       line
       (let ((offset (-get-offset u v s perp)))
         (loop for xy in (nrep num (rnd-on-line u v)) do
-          (destructuring-bind (x y) (lround xy)
-            (if (and (>= x 0) (< x size) (>= y 0) (< y size))
-              (incf (plot-discards plt)
-                    (-stipple plt xy offset)))))))))
+          (inside (size xy)
+            (incf (plot-discards plt)
+                  (-stipple plt xy offset))))))))
 
 
 ; this wrapper is probably inefficient.

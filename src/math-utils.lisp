@@ -339,12 +339,24 @@
   (append p (list (nth 0 p))))
 
 
-;(defmacro inside ((size xy &optional x y) &body body)
-;  (with-gensyms (sname)
-;    `(let ((,sname ,size))
-;      (destructuring-bind (,x ,y)
-;        (lround ,xy)
-;        (if (and (>= ,x 0) (< ,x ,sname) (>= ,y 0) (< ,y ,sname))
-;          (progn
-;            ,@body))))))
+(defmacro inside ((size xy) &body body)
+  (with-gensyms (xname yname sname)
+    `(let ((,sname ,size))
+      (destructuring-bind (,xname ,yname)
+        (lround ,xy)
+        (if (and (>= ,xname 0) (< ,xname ,sname)
+                 (>= ,yname 0) (< ,yname ,sname))
+          (progn
+            ,@body))))))
+
+
+(defmacro inside* ((size xy x y) &body body)
+  (with-gensyms (sname)
+    `(let ((,sname ,size))
+      (destructuring-bind (,x ,y)
+        (lround ,xy)
+        (if (and (>= ,x 0) (< ,x ,sname)
+                 (>= ,y 0) (< ,y ,sname))
+          (progn
+            ,@body))))))
 
