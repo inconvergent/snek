@@ -7,31 +7,31 @@
     (apply #'dst (mapcar (lambda (v) (get-as-list verts v)) e))))
 
 
-(defun snek-init-circle (snk num rad &key (xy (list 0.0d0 0.0d0)) g)
-  (let ((vv (loop for v from 0 below num
-                  collect (insert-vert snk (on-circ v num rad :xy xy) :g g))))
+(defun snek-init-circ (snk num rad &key (xy (list 0.0d0 0.0d0)) g)
+  (let ((vv (loop for p in (linspace 0.0d0 1.0d0 num)
+                  collect (add-vert snk (on-circ p rad :xy xy) :g g))))
     (loop for a in vv
           for b in (-roll-once vv)
-          collect (insert-edge snk (list a b) :g g))))
+          collect (add-edge snk (list a b) :g g))))
 
 
 (defun snek-init-polygon (snk rad n &key (xy (list 0.0d0 0.0d0)) (rot (* 0.25 PI)) g)
   (let ((vv (loop for v in (polygon n rad :xy xy :rot rot)
-                  collect (insert-vert snk v :g g))))
+                  collect (add-vert snk v :g g))))
     (loop for a in vv
           for b in (-roll-once vv)
-          collect (insert-edge snk (list a b) :g g))))
+          collect (add-edge snk (list a b) :g g))))
 
 
 (defun snek-init-path (snk points &key g closed)
-  (let ((vv (insert-verts snk points :g g)))
+  (let ((vv (add-verts snk points :g g)))
     (if closed
       (loop for a in vv
             for b in (-roll-once vv)
-            collect (insert-edge snk (list a b) :g g))
+            collect (add-edge snk (list a b) :g g))
       (loop for a in vv
             for b in (cdr vv)
-            collect (insert-edge snk (list a b) :g g)))))
+            collect (add-edge snk (list a b) :g g)))))
 
 
 ; SANDPAINT
@@ -65,7 +65,8 @@
 ; EXPORT
 
 (defun snek-export-2obj (snk fn &key g)
-  (with-open-file (stream fn :direction :output :if-exists :supersede)
+  (with-open-file (stream (append-postfix fn ".2obj")
+                          :direction :output :if-exists :supersede)
     (format stream "o mesh~%")
     (dolist (ll (get-grp-vert-vals snk g))
       (destructuring-bind (a b)

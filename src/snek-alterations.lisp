@@ -47,9 +47,9 @@
   (with-struct (append-edge-alt- v xy rel) a
     (let ((g (get-vert-grp snk v)))
       (if rel
-        (insert-vert snk (add (get-vert snk v) xy) :g g)
-        (insert-vert snk xy :g g))
-      (insert-edge snk
+        (add-vert snk (add (get-vert snk v) xy) :g g)
+        (add-vert snk xy :g g))
+      (add-edge snk
         (list
           v
           (1- (snek-num-verts snk)))
@@ -68,7 +68,7 @@
   (with-struct (join-verts-alt- v1 v2) a
     (let ((g1 (get-vert-grp snk v1))
           (g2 (get-vert-grp snk v2)))
-      (insert-edge
+      (add-edge
         snk
         (list v1 v2))
         :g (val-if-eql g1 g2))))
@@ -91,12 +91,12 @@
           (let ((ga (get-vert-grp snk a))
                 (gb (get-vert-grp snk b)))
             (let ((g (val-if-eql ga gb)))
-              (let ((c (insert-vert snk
+              (let ((c (add-vert snk
                           (mid (get-as-list verts a)
                                (get-as-list verts b))
                           :g g)))
-                (insert-edge snk (list a c) :g g)
-                (insert-edge snk (list c b) :g g)))))))))
+                (add-edge snk (list a c) :g g)
+                (add-edge snk (list c b) :g g)))))))))
 
 
 (defun -get-force-alterations (u v f)

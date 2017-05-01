@@ -32,7 +32,7 @@
 
             (loop for k from 1 to itt
               do
-                (insert-vert snk (rnd-on-line p1 p2))
+                (add-vert snk (rnd-on-line p1 p2))
                 (with-snek (snk)
                   (with-rnd-vert (snk v)
                     (append-edge v va))

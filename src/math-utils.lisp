@@ -327,9 +327,7 @@
 
 (defun make-perspective-transform (A B C)
   (lambda (P a* b* u* d*)
-    (let ((PA (sub A P))
-          (PB (sub B P))
-          (PC (sub C P)))
+    (let ((PC (sub C P)))
       (let ((U (sub P (scale PC u*)))
             (D (add P (scale PC d*))))
         (append (-make-full-path A B U a* b*) (-make-full-path A B D a* b*))))))
@@ -339,4 +337,14 @@
 
 (defun close-path (p)
   (append p (list (nth 0 p))))
+
+
+;(defmacro inside ((size xy &optional x y) &body body)
+;  (with-gensyms (sname)
+;    `(let ((,sname ,size))
+;      (destructuring-bind (,x ,y)
+;        (lround ,xy)
+;        (if (and (>= ,x 0) (< ,x ,sname) (>= ,y 0) (< ,y ,sname))
+;          (progn
+;            ,@body))))))
 

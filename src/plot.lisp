@@ -118,7 +118,7 @@
 
 (defun path (plt path)
   (let ((n (length path)))
-  (with-struct (plot- size verts lines num-verts num-lines coverage) plt
+  (with-struct (plot- size verts lines num-verts coverage) plt
     ; todo: test if path is outside boundary
     (dolist (p path)
       (vector-push-extend p verts))
@@ -196,7 +196,7 @@
           (zpng:finish-png png))))
 
 
-(defun -write-2obj (size verts edges lines fn)
+(defun -write-2obj (verts edges lines fn)
   (with-open-file (stream fn :direction :output :if-exists :supersede)
     (format stream "o mesh~%")
     (dolist (ll (coerce verts 'list))
@@ -223,7 +223,7 @@
     (with-struct (plot- size verts edges lines coverage
                         num-verts num-edges num-lines discards) plt
       (-write-png coverage size fnimg)
-      (-write-2obj size verts edges lines fnobj)
+      (-write-2obj verts edges lines fnobj)
       (format t "~%~%num verts: ~a ~%" num-verts)
       (format t "num edges: ~a ~%" num-edges)
       (format t "num lines ~a ~%" num-lines)

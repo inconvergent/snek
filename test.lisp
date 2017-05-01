@@ -135,8 +135,8 @@
       (-binary-edge-insert-search edges '(1 6) 5)
       3)
 
-    (-insert-edge edges '(11 1) 5 5)
-    (-insert-edge edges '(11 0) 5 6)
+    (-add-edge edges '(11 1) 5 5)
+    (-add-edge edges '(11 0) 5 6)
 
     (-remove-edge edges 0 7)
 
@@ -152,83 +152,83 @@
 
 (defun test-snek (snk)
   (do-test
-    (insert-vert snk '(0 0))
+    (add-vert snk '(0 0))
     0)
 
   (do-test
-    (insert-vert snk '(10 0))
+    (add-vert snk '(10 0))
     1)
 
   (do-test
-    (insert-vert snk '(3 3))
+    (add-vert snk '(3 3))
     2)
 
   (do-test
-    (insert-vert snk '(4 3))
+    (add-vert snk '(4 3))
     3)
 
   (do-test
-    (insert-edge snk '(0 0))
+    (add-edge snk '(0 0))
     nil)
 
   (do-test
-    (insert-edge snk '(0 2))
+    (add-edge snk '(0 2))
     '(0 2))
 
   (do-test
-    (insert-edge snk '(0 1))
+    (add-edge snk '(0 1))
     '(0 1))
 
   (do-test
-    (insert-edge snk '(5 0))
+    (add-edge snk '(5 0))
     '(0 5))
 
   (do-test
-    (insert-edge snk '(1 0))
+    (add-edge snk '(1 0))
     nil)
 
   (do-test
-    (insert-edge snk '(5 0))
+    (add-edge snk '(5 0))
     nil)
 
   (do-test
-    (insert-edge snk '(0 2))
+    (add-edge snk '(0 2))
     nil)
 
   (do-test
-    (insert-edge snk '(5 2))
+    (add-edge snk '(5 2))
     '(2 5))
 
   (do-test
-    (insert-edge snk '(4 1))
+    (add-edge snk '(4 1))
     '(1 4))
 
   (do-test
-    (insert-edge snk '(4 0))
+    (add-edge snk '(4 0))
     '(0 4))
 
   (do-test
-    (insert-edge snk '(5 1))
+    (add-edge snk '(5 1))
     '(1 5))
 
   (do-test
-    (insert-edge snk '(100 100))
+    (add-edge snk '(100 100))
     nil)
 
   (do-test
-    (insert-edge snk '(3 100))
+    (add-edge snk '(3 100))
     '(3 100))
 
   (do-test
-    (insert-edge snk '(0 1))
+    (add-edge snk '(0 1))
     nil)
 
   (do-test
-    (insert-edge snk '(0 4))
+    (add-edge snk '(0 4))
     nil)
 
   (do-test
-    (insert-edge snk '(100 99))
+    (add-edge snk '(100 99))
     '(99 100))
 
   (do-test
@@ -236,15 +236,15 @@
     '(3.0 3.0))
 
   (do-test
-    (insert-vert snk '(0 1))
+    (add-vert snk '(0 1))
     4)
 
   (do-test
-    (insert-edge snk '(0 1))
+    (add-edge snk '(0 1))
     nil)
 
   (do-test
-    (insert-vert snk '(0 7))
+    (add-vert snk '(0 7))
     5)
 
   (do-test
@@ -270,31 +270,31 @@
 
 (defun test-snek-2 (snk)
   (do-test
-    (insert-vert snk '(0 0))
+    (add-vert snk '(0 0))
     0)
 
   (do-test
-    (insert-vert snk '(20 20))
+    (add-vert snk '(20 20))
     1)
 
   (do-test
-    (insert-vert snk '(30 30))
+    (add-vert snk '(30 30))
     2)
 
   (do-test
-    (insert-vert snk '(40 40))
+    (add-vert snk '(40 40))
     3)
 
   (do-test
-    (insert-edge snk '(0 1))
+    (add-edge snk '(0 1))
     '(0 1))
 
   (do-test
-    (insert-edge snk '(1 2))
+    (add-edge snk '(1 2))
     '(1 2))
 
   (do-test
-    (insert-edge snk '(2 3))
+    (add-edge snk '(2 3))
     '(2 3))
 
   (do-test
@@ -342,31 +342,31 @@
 
 (defun test-snek-3 (snk)
   (do-test
-    (insert-vert snk '(10 10))
+    (add-vert snk '(10 10))
     0)
   (do-test
-    (insert-vert snk '(20 10))
+    (add-vert snk '(20 10))
     1)
 
   (do-test
-    (insert-vert snk '(30 10))
+    (add-vert snk '(30 10))
     2)
 
   (do-test
-    (insert-vert snk '(40 10))
+    (add-vert snk '(40 10))
     3)
 
   (do-test
-    (insert-edge snk '(0 1))
+    (add-edge snk '(0 1))
     '(0 1))
   (do-test
-    (insert-edge snk '(1 2))
+    (add-edge snk '(1 2))
     '(1 2))
   (do-test
-    (insert-edge snk '(2 3))
+    (add-edge snk '(2 3))
     '(2 3))
   (do-test
-    (insert-edge snk '(2 3))
+    (add-edge snk '(2 3))
     nil)
 
   (do-test
@@ -394,22 +394,22 @@
   (let ((snk (make-snek
                 :max-verts 16
                 :max-main-grp-edges 16)))
-    (insert-vert snk '(0 2))
-    (insert-vert snk '(2 3))
-    (insert-vert snk '(3 4))
-    (insert-vert snk '(4 7))
-    (insert-vert snk '(5 4))
-    (insert-vert snk '(0 6))
-    (insert-vert snk '(-1 7))
-    (insert-vert snk '(0 8))
-    (insert-vert snk '(0 9))
-    (insert-vert snk '(10 1))
+    (add-vert snk '(0 2))
+    (add-vert snk '(2 3))
+    (add-vert snk '(3 4))
+    (add-vert snk '(4 7))
+    (add-vert snk '(5 4))
+    (add-vert snk '(0 6))
+    (add-vert snk '(-1 7))
+    (add-vert snk '(0 8))
+    (add-vert snk '(0 9))
+    (add-vert snk '(10 1))
 
-    (insert-edge snk '(1 2))
-    (insert-edge snk '(0 1))
-    (insert-edge snk '(3 1))
-    (insert-edge snk '(5 6))
-    (insert-edge snk '(7 3))
+    (add-edge snk '(1 2))
+    (add-edge snk '(0 1))
+    (add-edge snk '(3 1))
+    (add-edge snk '(5 6))
+    (add-edge snk '(7 3))
     snk))
 
 (defun test-snek-move ()
@@ -584,14 +584,14 @@
 (defun test-snek-zmap ()
   (let ((snk (make-snek)))
 
-    (insert-vert snk '(100 200))
-    (insert-vert snk '(200 300))
-    (insert-vert snk '(300 400))
-    (insert-vert snk '(400 500))
-    (insert-vert snk '(500 600))
-    (insert-vert snk '(600 700))
-    (insert-vert snk '(700 800))
-    (insert-vert snk '(800 900))
+    (add-vert snk '(100 200))
+    (add-vert snk '(200 300))
+    (add-vert snk '(300 400))
+    (add-vert snk '(400 500))
+    (add-vert snk '(500 600))
+    (add-vert snk '(600 700))
+    (add-vert snk '(700 800))
+    (add-vert snk '(800 900))
 
     (zmap-update snk 100.0d0)
 
@@ -627,15 +627,15 @@
     (let ((g1 (new-grp snk :type 'path :closed t))
           (g2 (new-grp snk))
           (g3 (new-grp snk :type 'path :closed t)))
-      (insert-vert snk '(100 200) :g g1)
-      (insert-vert snk '(200 300) :g g1)
-      (insert-vert snk '(300 400) :g (new-grp snk))
-      (insert-vert snk '(400 500) :g (new-grp snk))
-      (insert-vert snk '(600 700) :g g2)
-      (insert-vert snk '(700 800) :g g3)
-      (insert-vert snk '(800 900) :g g1)
-      (insert-vert snk '(500 600))
-      (insert-vert snk '(900 600))
+      (add-vert snk '(100 200) :g g1)
+      (add-vert snk '(200 300) :g g1)
+      (add-vert snk '(300 400) :g (new-grp snk))
+      (add-vert snk '(400 500) :g (new-grp snk))
+      (add-vert snk '(600 700) :g g2)
+      (add-vert snk '(700 800) :g g3)
+      (add-vert snk '(800 900) :g g1)
+      (add-vert snk '(500 600))
+      (add-vert snk '(900 600))
 
       (do-test
         (flatten (itr-verts (snk i :g g2) i))

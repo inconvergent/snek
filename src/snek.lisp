@@ -132,7 +132,7 @@
                                                  :right right))))))
 
 
-(defun -insert-edge (edges edge pos num)
+(defun -add-edge (edges edge pos num)
   (loop for i from 0 below (- num pos) do
     (let ((left (- num (1+ i)))
           (right (- num i)))
@@ -142,8 +142,8 @@
     (setf (aref edges pos 1) (second edge)))
 
 
-(defun -find-insert-edge (edges num e)
-  (-insert-edge
+(defun -find-add-edge (edges num e)
+  (-add-edge
     edges
     e
     (-binary-edge-insert-search edges e num)
@@ -177,7 +177,7 @@
         (incf (grp-num-verts grp))))))
 
 
-(defun insert-vert (snk xy &key g)
+(defun add-vert (snk xy &key g)
   (with-struct (snek- verts vert-to-grp grps num-verts) snk
     (-add-vert-to-grp num-verts vert-to-grp grps g)
     (destructuring-bind (x y)
@@ -187,9 +187,9 @@
       (- (incf (snek-num-verts snk)) 1))))
 
 
-(defun insert-verts (snk vv &key g)
+(defun add-verts (snk vv &key g)
   (loop for xy in vv collect
-    (insert-vert snk xy :g g)))
+    (add-vert snk xy :g g)))
 
 
 (defun get-vert (snk v)
@@ -208,12 +208,6 @@
     (mapcar (lambda (v) (get-as-list verts v)) vv)))
 
 
-; TODO: more efficient?
-(defun get-grp-vert-vals (snk g)
-  (get-verts snk
-    (get-grp-verts snk g)))
-
-
 ; TODO
 ;(defun get-edge-grp)
 
@@ -225,6 +219,12 @@
       (if exists
         (to-list (grp-verts grp))
         nil))))
+
+
+; TODO: more efficient?
+(defun get-grp-vert-vals (snk g)
+  (get-verts snk
+    (get-grp-verts snk g)))
 
 
 (defun get-num-edges (snk &key g)
@@ -243,7 +243,7 @@
   (grp-edges (gethash g (snek-grps snk))))
 
 
-(defun insert-edge (snk ee &key g)
+(defun add-edge (snk ee &key g)
   (with-grp (snk grp g)
     (with-struct (grp- edges num-edges) grp
       (destructuring-bind (a b)
@@ -253,9 +253,9 @@
           ((eql a b) nil)
           (t
             (setf (grp-num-edges grp) (2+ num-edges))
-            (-find-insert-edge edges num-edges ee)
+            (-find-add-edge edges num-edges ee)
             (sort
-              (-find-insert-edge edges (1+ num-edges) (reverse ee))
+              (-find-add-edge edges (1+ num-edges) (reverse ee))
               #'<)))))))
 
 
