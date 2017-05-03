@@ -54,6 +54,8 @@ Notice that the resulting image will end up in `res`.
   - http://moment.inconvergent.net/
   - https://twitter.com/sandpaintbot
   - https://twitter.com/scratchpaintbot
+  - https://twitter.com/cronianrings
+  
 
 ![lines](img/ex-lines.png?raw=true "lines")
 
