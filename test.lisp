@@ -31,7 +31,7 @@
           (format t "~%~a ~%--> ok" ',a))
         (progn
           (incf *fails*)
-          (format t "~%~a ~%--> not ok. ~%--  wanted: ~% ~a ~%--  got: ~% ~a"
+          (format t "~%~a ~%#-> not ok. #################################### ~%--  wanted: ~% ~a ~%--  got: ~% ~a"
             ',a
             ',b
             ,aname)))
@@ -168,6 +168,34 @@
     3)
 
   (do-test
+    (add-vert snk '(7 200))
+    4)
+
+  (do-test
+    (add-vert snk '(2 10))
+    5)
+
+  (do-test
+    (add-vert snk '(4 11))
+    6)
+
+  (do-test
+    (add-vert snk '(3 10))
+    7)
+
+  (do-test
+    (add-vert snk '(0 0.5))
+    8)
+
+  (do-test
+    (add-vert snk '(2 1.0d0))
+    9)
+
+  (do-test
+    (add-vert snk '(3.0d0 10))
+    10)
+
+  (do-test
     (add-edge snk '(0 0))
     nil)
 
@@ -212,12 +240,12 @@
     '(1 5))
 
   (do-test
-    (add-edge snk '(100 100))
+    (add-edge snk '(9 9))
     nil)
 
   (do-test
-    (add-edge snk '(3 100))
-    '(3 100))
+    (add-edge snk '(3 9))
+    '(3 9))
 
   (do-test
     (add-edge snk '(0 1))
@@ -228,8 +256,8 @@
     nil)
 
   (do-test
-    (add-edge snk '(100 99))
-    '(99 100))
+    (add-edge snk '(10 9))
+    '(9 10))
 
   (do-test
     (get-vert snk 2)
@@ -237,7 +265,7 @@
 
   (do-test
     (add-vert snk '(0 1))
-    4)
+    11)
 
   (do-test
     (add-edge snk '(0 1))
@@ -245,7 +273,7 @@
 
   (do-test
     (add-vert snk '(0 7))
-    5)
+    12)
 
   (do-test
     (get-one-ring snk 5)
@@ -257,11 +285,11 @@
 
   (do-test
     (edge-length snk '(0 4))
-    1.0)
+    200.12246250733574d0)
 
   (do-test
     (edge-length snk '(2 5))
-    5.0)
+    7.0710678118654755d0)
 
   (do-test
     (edge-length snk '(1 2))
@@ -404,6 +432,7 @@
     (add-vert snk '(0 8))
     (add-vert snk '(0 9))
     (add-vert snk '(10 1))
+    (add-vert snk '(3 1))
 
     (add-edge snk '(1 2))
     (add-edge snk '(0 1))
@@ -471,7 +500,7 @@
 
   (do-test
     (snek-num-verts snk)
-    13)
+    14)
 
   (do-test
     (get-edge-arr snk)
@@ -489,8 +518,9 @@
       :adjustable nil
       :initial-contents
         '((0.0 2.0) (2.0 3.0) (3.0 4.0) (4.0 7.0) (5.0 4.0) (0.0 6.0)
-          (-1.0 7.0) (0.0 8.0) (0.0 9.0) (10.0 1.0) (7.0 11.0) (8.0 5.0)
-          (1.0 10.0) (0.0 0.0) (0.0 0.0) (0.0 0.0))))))
+          (-1.0 7.0) (0.0 8.0) (0.0 9.0) (10.0 1.0) (3.0 1.0) (7.0 11.0)
+          (8.0 5.0) (1.0 10.0) (0.0 0.0) (0.0 0.0))
+        ))))
 
 
 (defun test-snek-split ()
@@ -506,7 +536,7 @@
 
   (do-test
     (snek-num-verts snk)
-    12)
+    13)
 
   (do-test
     (get-edge-arr snk)
@@ -514,8 +544,8 @@
       (list 16 2)
       :adjustable nil
       :initial-contents
-        '((0 1) (1 0) (1 3) (1 10) (2 10) (3 1) (3 7) (5 11) (6 11)
-          (7 3) (10 1) (10 2) (11 5) (11 6) (0 0) (0 0))))
+        '((0 1) (1 0) (1 3) (1 11) (2 11) (3 1) (3 7) (5 12) (6 12)
+          (7 3) (11 1) (11 2) (12 5) (12 6) (0 0) (0 0))))
 
   (do-test
     (snek-verts snk)
@@ -524,8 +554,8 @@
       :adjustable nil
       :initial-contents
         '((0.0 2.0) (2.0 3.0) (3.0 4.0) (4.0 7.0) (5.0 4.0) (0.0 6.0)
-          (-1.0 7.0) (0.0 8.0) (0.0 9.0) (10.0 1.0) (2.5 3.5) (-0.5 6.5)
-          (0.0 0.0) (0.0 0.0) (0.0 0.0) (0.0 0.0))))))
+          (-1.0 7.0) (0.0 8.0) (0.0 9.0) (10.0 1.0) (3.0 1.0) (2.5 3.5)
+          (-0.5 6.5) (0.0 0.0) (0.0 0.0) (0.0 0.0))))))
 
 
 (defun test-snek-withs ()
@@ -541,7 +571,7 @@
 
     (do-test
       (snek-num-verts snk)
-      11)
+      12)
 
     (do-test
       (snek-wc snk)
@@ -553,7 +583,7 @@
 
     (do-test
       (itr-verts (snk i) i)
-      '((0) (1) (2) (3) (4) (5) (6) (7) (8) (9) (10)))
+      '((0) (1) (2) (3) (4) (5) (6) (7) (8) (9) (10) (11)))
 
     (do-test
       (itr-edges (snk e) e)
@@ -563,7 +593,7 @@
       (itr-edges (snk e) (edge-length snk e))
       '((2.23606797749979d0) (1.4142135623730951d0)
         (4.47213595499958d0) (4.123105625617661d0)
-        (3.1622776601683795d0) (1.0d0)))
+        (3.1622776601683795d0) (8.246211251235321d0)))
 
     (do-test
       (snek-wc snk)
@@ -579,7 +609,7 @@
 
     (do-test
       (snek-num-verts snk)
-      12)))
+      13)))
 
 (defun test-snek-zmap ()
   (let ((snk (make-snek)))
@@ -678,16 +708,8 @@
         '(5))
 
       (do-test
-        (get-grp-verts snk 200)
-        nil)
-
-      (do-test
         (length (get-grp-verts snk nil))
         2)
-
-      (do-test
-        (get-grp-verts snk -1)
-        nil)
 
       (do-test
         (length (itr-grps (snk g) g))
@@ -720,7 +742,6 @@
 
 
 (defun main ()
-
   (title (test-utils))
   (title (test-bin))
   (title (test-snek (make-snek)))

@@ -65,15 +65,24 @@
 ; EXPORT
 
 (defun snek-export-2obj (snk fn &key g)
-  (with-open-file (stream (append-postfix fn ".2obj")
-                          :direction :output :if-exists :supersede)
-    (format stream "o mesh~%")
-    (dolist (ll (get-grp-vert-vals snk g))
-      (destructuring-bind (a b)
-        ll
-        (format stream "v ~f ~f~%" a b)))
-    (dolist (ll (get-edges snk :g g))
-      (destructuring-bind (a b)
-        (add ll '(1 1))
-        (format stream "e ~d ~d~%" a b)))))
+  (let ((verts (get-grp-vert-vals snk g))
+        (edges (get-edges snk :g g))
+        (fnobj (append-postfix fn ".2obj")))
+    (with-open-file (stream
+                      fnobj
+                      :direction :output
+                      :if-exists :supersede)
+      (format stream "o mesh~%")
+      (dolist (ll verts)
+        (destructuring-bind (a b)
+          ll
+          (format stream "v ~f ~f~%" a b)))
+      (dolist (ll edges)
+        (destructuring-bind (a b)
+          (add ll '(1 1))
+          (format stream "e ~d ~d~%" a b))))
+
+    (format t "~%num verts: ~a ~%" (length verts))
+    (format t "num edges: ~a ~%" (length edges))
+    (format t "~%file: ~a" fnobj)))
 

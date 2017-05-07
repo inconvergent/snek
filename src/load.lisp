@@ -16,6 +16,7 @@
 (load "./src/snek-macros")
 (load "./src/snek")
 (load "./src/snek-alterations")
+(load "./src/snek-alterations-mutate")
 (load "./src/snek-utils")
 (load "./src/snek-zmap")
 

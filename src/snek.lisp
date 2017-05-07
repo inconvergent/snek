@@ -1,6 +1,6 @@
 
 ; TODO: make an actual package?
-(defpackage :snek (:use :common-lisp))
+;(defpackage :snek (:use :common-lisp))
 
 
 (defstruct (snek (:constructor -make-snek))
@@ -89,6 +89,14 @@
       (setf (gethash nil (snek-grps snk)) main-grp)
       (setf (snek-main-grp snk) main-grp)
       snk)))
+
+
+(defmacro -valid-vert ((num vv &key (err t)) &body body)
+  (with-gensyms (v)
+    `(let ((,v ,vv))
+      (if (and (> ,v -1) (< ,v ,num))
+        (progn ,@body)
+        (if ,err (error "vert does not exist: ~a" ,v))))))
 
 
 (defun -edge-compare (a b c d)
@@ -192,20 +200,29 @@
     (add-vert snk xy :g g)))
 
 
+; TODO: add set-vert fun to guard changes to snek structure.
+
+
 (defun get-vert (snk v)
-  (with-struct (snek- verts) snk
-    (list (aref verts v 0)
-          (aref verts v 1))))
+  (with-struct (snek- verts num-verts) snk
+    (-valid-vert (num-verts v)
+      (list (aref verts v 0)
+            (aref verts v 1)))))
+
 
 
 (defun get-vert-grp (snk v)
-  (with-struct (snek- vert-to-grp) snk
-    (aref vert-to-grp v)))
+  (with-struct (snek- vert-to-grp num-verts) snk
+    (-valid-vert (num-verts v)
+      (aref vert-to-grp v))))
 
 
 (defun get-verts (snk vv)
-  (let ((verts (snek-verts snk)))
-    (mapcar (lambda (v) (get-as-list verts v)) vv)))
+  (with-struct (snek- verts num-verts) snk
+    (mapcar (lambda (v)
+              (-valid-vert (num-verts v)
+                (get-as-list verts v)))
+            vv)))
 
 
 ; TODO
@@ -218,7 +235,7 @@
       (gethash g grps)
       (if exists
         (to-list (grp-verts grp))
-        nil))))
+        (error "grp does not exist: ~a" grp)))))
 
 
 ; TODO: more efficient?
@@ -245,18 +262,20 @@
 
 (defun add-edge (snk ee &key g)
   (with-grp (snk grp g)
-    (with-struct (grp- edges num-edges) grp
-      (destructuring-bind (a b)
-        ee
-        (cond
-          ((-binary-edge-search edges ee num-edges) nil)
-          ((eql a b) nil)
-          (t
-            (setf (grp-num-edges grp) (2+ num-edges))
-            (-find-add-edge edges num-edges ee)
-            (sort
-              (-find-add-edge edges (1+ num-edges) (reverse ee))
-              #'<)))))))
+    (with-struct (snek- num-verts) snk
+      (with-struct (grp- edges num-edges) grp
+        (destructuring-bind (a b)
+          ee
+          (if (and (< a num-verts) (< b num-verts))
+            (cond
+              ((-binary-edge-search edges ee num-edges) nil)
+              ((eql a b) nil)
+              (t
+                (setf (grp-num-edges grp) (2+ num-edges))
+                (-find-add-edge edges num-edges ee)
+                (sort
+                  (-find-add-edge edges (1+ num-edges) (reverse ee))
+                  #'<)))))))))
 
 
 (defun remove-edge (snk ee &key g)

@@ -15,15 +15,16 @@
 
 
 (defun do-move-vert-alt (snk a)
-  (let ((verts (snek-verts snk)))
+  (with-struct (snek- verts num-verts) snk
     (with-struct (move-vert-alt- v xy rel) a
-      (let ((fxy (to-dfloat* xy)))
-        (set-from-list
-          verts
-          v
-          (if rel
-            (add (get-as-list verts v) fxy)
-            fxy))))))
+      (-valid-vert (num-verts v :err nil)
+        (let ((fxy (to-dfloat* xy)))
+          (set-from-list
+            verts
+            v
+            (if rel
+              (add (get-as-list verts v) fxy)
+              fxy)))))))
 
 
 ; TODO: consider making macros similar to this instead of current
@@ -44,34 +45,39 @@
 
 
 (defun do-append-edge-alt (snk a)
-  (with-struct (append-edge-alt- v xy rel) a
-    (let ((g (get-vert-grp snk v)))
-      (if rel
-        (add-vert snk (add (get-vert snk v) xy) :g g)
-        (add-vert snk xy :g g))
-      (add-edge snk
-        (list
-          v
-          (1- (snek-num-verts snk)))
-        :g g))))
+  (with-struct (snek- num-verts) snk
+    (with-struct (append-edge-alt- v xy rel) a
+      (-valid-vert (num-verts v :err nil)
+        (let ((g (get-vert-grp snk v)))
+          (if rel
+            (add-vert snk (add (get-vert snk v) xy) :g g)
+            (add-vert snk xy :g g))
+          (add-edge snk
+            (list
+              v
+              (1- num-verts))
+            :g g))))))
 
 
 ; JOIN VERTS
 
 (defstruct (join-verts-alt
-    (:constructor join-verts (v1 v2)))
-  (v1 nil :type integer :read-only t)
-  (v2 nil :type integer :read-only t))
+    (:constructor join-verts (v w)))
+  (v nil :type integer :read-only t)
+  (w nil :type integer :read-only t))
 
 
 (defun do-join-verts-alt (snk a)
-  (with-struct (join-verts-alt- v1 v2) a
-    (let ((g1 (get-vert-grp snk v1))
-          (g2 (get-vert-grp snk v2)))
-      (add-edge
-        snk
-        (list v1 v2))
-        :g (val-if-eql g1 g2))))
+  (with-struct (snek- num-verts) snk
+    (with-struct (join-verts-alt- v w) a
+      (-valid-vert (num-verts v :err nil)
+        (-valid-vert (num-verts w :err nil)
+          (let ((ga (get-vert-grp snk v))
+                (gb (get-vert-grp snk w)))
+            (add-edge
+              snk
+              (list v w))
+              :g (val-if-eql ga gb)))))))
 
 
 ; SPLIT EDGE
