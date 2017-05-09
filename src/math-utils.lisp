@@ -184,7 +184,8 @@
   (with-gensyms (xy stp)
     `(let ((,xy (to-dfloat* ,init)))
       (lambda (,stp)
-        (add ,xy (rnd-in-circ ,stp))))))
+        (setf ,xy
+              (add ,xy (rnd-in-circ ,stp)))))))
 
 
 (defmacro get-acc-rnd-circ-stp* (&optional (init '(list 0.0d0 0.0d0))
