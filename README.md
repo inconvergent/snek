@@ -15,6 +15,11 @@ is a change that will be applied to the structure at the end of a given
 context. `alterations` are further described in
 http://inconvergent.net/snek-is-not-an-acronym/.
 
+I have also written about things related to `snek` at
+
+  - http://inconvergent.net/a-propensity-for-mistakes (indirectly about `snek`)
+  - http://inconvergent.net/a-method-for-mistakes
+
 Here is and example of manipulating a `snek` instance called `snk` using
 `alterations`. Alteration constructors are postfixed with ?.
 
@@ -55,6 +60,7 @@ Notice that the resulting image will end up in `res`.
   - https://twitter.com/sandpaintbot
   - https://twitter.com/scratchpaintbot
   - https://twitter.com/cronianrings
+
 
 
 ![lines](img/ex-lines.png?raw=true "lines")
