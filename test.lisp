@@ -444,24 +444,24 @@
 (defun test-snek-add ()
   (let ((snk (init-snek)))
     (with-snek (snk)
-      (add-vert '(10 3)))
+      (add-vert? '(10 3)))
 
     (do-test
       (get-vert snk 11)
       '(10 3))
 
     (with-snek (snk)
-      (add-vert '(80 3))
-      (add-vert '(70 3)))
+      (add-vert? '(80 3))
+      (add-vert? '(70 3)))
 
     (do-test
       (snek-num-verts snk)
       14)
 
     (with-snek (snk)
-      (add-edge '(4 3))
-      (add-edge '(4 3))
-      (add-edge '(2 3))
+      (add-edge? '(4 3))
+      (add-edge? '(4 3))
+      (add-edge? '(2 3))
       )
 
     (do-test
@@ -472,10 +472,10 @@
 (defun test-snek-move ()
   (let ((snk (init-snek)))
     (with-snek (snk)
-      (move-vert 0 '(3 3))
-      (move-vert 1 '(1 3))
-      (move-vert 3 '(2 3) :rel nil)
-      (move-vert 2 '(3 4)))
+      (move-vert? 0 '(3 3))
+      (move-vert? 1 '(1 3))
+      (move-vert? 3 '(2 3) :rel nil)
+      (move-vert? 2 '(3 4)))
 
     (do-test
       (get-vert snk 0)
@@ -496,10 +496,10 @@
 (defun test-snek-join ()
   (let ((snk (init-snek)))
     (with-snek (snk)
-      (join-verts 3 3)
-      (join-verts 3 3)
-      (join-verts 3 6)
-      (join-verts 7 1))
+      (join-verts? 3 3)
+      (join-verts? 3 3)
+      (join-verts? 3 6)
+      (join-verts? 7 1))
 
   (do-test
     (get-num-edges snk)
@@ -518,9 +518,9 @@
 (defun test-snek-append ()
   (let ((snk (init-snek)))
     (with-snek (snk)
-      (append-edge 3 '(3 4))
-      (append-edge 3 '(8 5) :rel nil)
-      (append-edge 7 '(1 2)))
+      (append-edge? 3 '(3 4))
+      (append-edge? 3 '(8 5) :rel nil)
+      (append-edge? 7 '(1 2)))
 
   (do-test
     (get-num-edges snk)
@@ -554,9 +554,9 @@
 (defun test-snek-split ()
   (let ((snk (init-snek)))
     (with-snek (snk)
-      (split-edge '(1 2))
-      (split-edge '(1 2))
-      (split-edge '(5 6)))
+      (split-edge? '(1 2))
+      (split-edge? '(1 2))
+      (split-edge? '(5 6)))
 
   (do-test
     (get-num-edges snk)
@@ -590,8 +590,8 @@
   (let ((snk (init-snek)))
     (with-snek (snk)
       (with-rnd-vert (snk v)
-        (append-edge v (list 3 2))
-        (move-vert v (list 2 2))))
+        (append-edge? v (list 3 2))
+        (move-vert? v (list 2 2))))
 
     (do-test
       (get-num-edges snk)
@@ -607,7 +607,7 @@
 
     (with-snek (snk)
       (itr-verts (snk v)
-        (move-vert v (list 2 2))))
+        (move-vert? v (list 2 2))))
 
     (do-test
       (itr-verts (snk i) i)
@@ -629,7 +629,7 @@
 
     (with-snek (snk)
       (with-rnd-edge (snk e)
-        (split-edge e)))
+        (split-edge? e)))
 
     (do-test
       (get-num-edges snk)

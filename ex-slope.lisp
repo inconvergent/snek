@@ -33,12 +33,12 @@
             (loop for k from 1 to itt
               do
                 (with-snek (snk)
-                  (add-vert (rnd-on-line p1 p2))
+                  (add-vert? (rnd-on-line p1 p2))
                   (with-rnd-vert (snk v)
-                    (append-edge v va))
+                    (append-edge? v va))
                   (with-rnd-vert (snk v)
                     (with-rnd-vert (snk w)
-                      (join-verts w v)))))
+                      (join-verts? w v)))))
               (snek-draw-edges snk sand grains)))
 
 

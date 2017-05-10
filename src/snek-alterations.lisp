@@ -8,7 +8,7 @@
 ; ADD VERT
 
 (defstruct (add-vert-alt
-    (:constructor add-vert (xy &optional g)))
+    (:constructor add-vert? (xy &optional g)))
   (xy nil :type list :read-only t)
   (g nil :type symbol :read-only t))
 
@@ -21,7 +21,7 @@
 ; ADD EDGE
 
 (defstruct (add-edge-alt
-    (:constructor add-edge (e &optional g)))
+    (:constructor add-edge? (e &optional g)))
   (e nil :type list :read-only t)
   (g nil :type symbol :read-only t))
 
@@ -34,7 +34,7 @@
 ; MOVE VERT
 
 (defstruct (move-vert-alt
-    (:constructor move-vert (v xy &key (rel t))))
+    (:constructor move-vert? (v xy &key (rel t))))
   (rel t :type boolean :read-only t)
   (xy nil :type list :read-only t)
   (v nil :type integer :read-only t))
@@ -58,13 +58,13 @@
 ;(defmacro move-grp ((snk g &key (rel t)) &body body)
 ;  (with-gensyms (v)
 ;  `(itr-verts (,snk ,v :g ,g)
-;    (move-vert ,v ,@body :rel ,rel))))
+;    (move-vert? ,v ,@body :rel ,rel))))
 
 
 ; APPEND EDGE
 
 (defstruct (append-edge-alt
-    (:constructor append-edge (v xy &key (rel t))))
+    (:constructor append-edge? (v xy &key (rel t))))
   (xy nil :type list :read-only t)
   (v nil :type integer :read-only t)
   (rel t :type boolean :read-only t))
@@ -88,7 +88,7 @@
 ; JOIN VERTS
 
 (defstruct (join-verts-alt
-    (:constructor join-verts (v w)))
+    (:constructor join-verts? (v w)))
   (v nil :type integer :read-only t)
   (w nil :type integer :read-only t))
 
@@ -109,7 +109,7 @@
 ; SPLIT EDGE
 
 (defstruct (split-edge-alt
-    (:constructor split-edge (e)))
+    (:constructor split-edge? (e)))
   (e nil :type list :read-only t))
 
 
@@ -133,11 +133,11 @@
 
 (defun -get-force-alterations (u v f)
   (list
-    (move-vert v f)
-    (move-vert u (scale f -1.0d0))))
+    (move-vert? v f)
+    (move-vert? u (scale f -1.0d0))))
 
 
-(defmacro force (snk v1 v2 r)
+(defmacro force? (snk v1 v2 r)
   (with-gensyms (vname v1name v2name rname)
     `(let ((,vname (snek-verts ,snk))
            (,v1name ,v1)

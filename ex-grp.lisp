@@ -41,7 +41,7 @@
           (itr-grps (snk g)
             (let ((ns (funcall (gethash g grp-states) noise)))
               (itr-verts (snk v :g g)
-                (move-vert v
+                (move-vert? v
                   (add ns
                     (rnd-in-circ 0.05)))))))
 

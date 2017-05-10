@@ -34,8 +34,8 @@
 
             (with-snek (snk)
               (itr-verts (snk v)
-                (move-vert v (add (rnd-in-circ 0.1) vb)))
-              (join-verts v1 v2))
+                (move-vert? v (add (rnd-in-circ 0.1) vb)))
+              (join-verts? v1 v2))
 
             (snek-draw-edges snk sand grains)
             (snek-draw-verts snk sand)))))

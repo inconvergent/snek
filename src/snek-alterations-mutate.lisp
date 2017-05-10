@@ -52,10 +52,10 @@
 
 (defun mutate-append-edge-alt (a o)
   (with-struct (append-edge-alt- v xy rel) a
-    (append-edge (change-ind v o) xy :rel rel)))
+    (append-edge? (change-ind v o) xy :rel rel)))
 
 
 (defun mutate-join-verts-alt (a o)
   (with-struct (join-verts-alt- v w) a
-    (join-verts (change-ind v o) w)))
+    (join-verts? (change-ind v o) w)))
 

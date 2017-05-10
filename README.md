@@ -16,7 +16,7 @@ context. `alterations` are further described in
 http://inconvergent.net/snek-is-not-an-acronym/.
 
 Here is and example of manipulating a `snek` instance called `snk` using
-`alterations`:
+`alterations`. Alteration constructors are postfixed with ?.
 
 ```lisp
 ; context start
@@ -24,14 +24,14 @@ Here is and example of manipulating a `snek` instance called `snk` using
   ; iterate vertices
   (itr-verts (snk v)
     ; move alteration
-    (move-vert v (rnd-in-circ))
+    (move-vert? v (rnd-in-circ))
     ; w will be an arbitrary
     ; vertex in snk
     (with-rnd-vert (snk w)
       ; join v and w if they are closer than d
       (if (< (edge-length snk (list v w)) d)
         ; join vertices alteration
-        (join-verts v w))))
+        (join-verts? v w))))
 ; context end
 ; alterations have been applied
 ```
@@ -55,7 +55,7 @@ Notice that the resulting image will end up in `res`.
   - https://twitter.com/sandpaintbot
   - https://twitter.com/scratchpaintbot
   - https://twitter.com/cronianrings
-  
+
 
 ![lines](img/ex-lines.png?raw=true "lines")
 
