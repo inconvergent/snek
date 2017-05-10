@@ -9,7 +9,7 @@
 (defun init (snk rep rad)
   (loop for x in (linspace 200 800 rep) for i from 0 do
     (loop for y in (linspace 200 800 rep) for j from 0 do
-      (let ((g (new-grp snk :type 'path :closed t)))
+      (let ((g (add-grp! snk :type 'path :closed t)))
         (print (snek-init-polygon snk rad (rndi 3 6)
                            :xy (list x y)
                            :g g))))))

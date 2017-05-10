@@ -28,7 +28,7 @@
   (closed nil :read-only t))
 
 
-(defun new-grp (snk &key (type nil) (closed nil))
+(defun add-grp! (snk &key (type nil) (closed nil))
   "
   constructor for grp instances.
 
@@ -66,7 +66,8 @@
   "
   (let ((alt-names (make-hash-table :test #'equal)))
 
-    (dolist (a '(move-vert-alt join-verts-alt append-edge-alt split-edge-alt))
+    (dolist (a '(add-edge-alt add-vert-alt move-vert-alt
+                 join-verts-alt append-edge-alt split-edge-alt))
       (setf (gethash a alt-names) (symb 'do- a)))
 
     (dolist (pair alts)
@@ -159,18 +160,18 @@
   e)
 
 
-(defun -remove-edge (edges pos num)
+(defun -del-edge (edges pos num)
   (loop for i from pos to (- num 2) do
     (setf (aref edges i 0) (aref edges (1+ i) 0))
     (setf (aref edges i 1) (aref edges (1+ i) 1)))
   (set-from-list edges (1- num) (list 0 0)))
 
 
-(defun -find-remove-edge (edges num e)
+(defun -find-del-edge (edges num e)
   (let ((p (-binary-edge-search edges e num)))
     (if p
       (progn
-        (-remove-edge edges p num)
+        (-del-edge edges p num)
         1)
       0)))
 
@@ -185,7 +186,7 @@
         (incf (grp-num-verts grp))))))
 
 
-(defun add-vert (snk xy &key g)
+(defun add-vert! (snk xy &key g)
   (with-struct (snek- verts vert-to-grp grps num-verts) snk
     (-add-vert-to-grp num-verts vert-to-grp grps g)
     (destructuring-bind (x y)
@@ -195,9 +196,9 @@
       (- (incf (snek-num-verts snk)) 1))))
 
 
-(defun add-verts (snk vv &key g)
+(defun add-verts! (snk vv &key g)
   (loop for xy in vv collect
-    (add-vert snk xy :g g)))
+    (add-vert! snk xy :g g)))
 
 
 ; TODO: add set-vert fun to guard changes to snek structure.
@@ -260,7 +261,7 @@
   (grp-edges (gethash g (snek-grps snk))))
 
 
-(defun add-edge (snk ee &key g)
+(defun add-edge! (snk ee &key g)
   (with-grp (snk grp g)
     (with-struct (snek- num-verts) snk
       (with-struct (grp- edges num-edges) grp
@@ -278,15 +279,15 @@
                   #'<)))))))))
 
 
-(defun remove-edge (snk ee &key g)
+(defun del-edge! (snk ee &key g)
   (with-grp (snk grp g)
     (with-struct (grp- edges num-edges) grp
       (setf (grp-num-edges grp)
             (- num-edges
               (loop for i in
                 (list
-                  (-find-remove-edge edges num-edges ee)
-                  (-find-remove-edge edges
+                  (-find-del-edge edges num-edges ee)
+                  (-find-del-edge edges
                                      (1- num-edges)
                                      (reverse ee)))
                 sum i)))

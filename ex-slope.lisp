@@ -32,8 +32,8 @@
 
             (loop for k from 1 to itt
               do
-                (add-vert snk (rnd-on-line p1 p2))
                 (with-snek (snk)
+                  (add-vert (rnd-on-line p1 p2))
                   (with-rnd-vert (snk v)
                     (append-edge v va))
                   (with-rnd-vert (snk v)

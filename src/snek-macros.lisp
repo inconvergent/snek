@@ -49,8 +49,7 @@
             (,edges (grp-edges ,grp)))
         (if (> ,num-edges 0)
           (let ((,i (get-as-list ,edges (random ,num-edges))))
-            (list ,@body))
-          nil)))))
+            (list ,@body)))))))
 
 
 (defmacro with-rnd-vert ((snk i &key g) &body body)
@@ -61,11 +60,13 @@
   if a grp is supplied it will select a vert from g, otherwise it will
   use the main grp.
   "
-  (with-gensyms (grp tmp)
+  (with-gensyms (grp num-verts tmpv)
     `(with-grp (,snk ,grp ,g)
-      (let ((,tmp (random (length (grp-verts ,grp)))))
-        (let ((,i (aref (grp-verts ,grp) ,tmp)))
-          (list ,@body))))))
+      (let ((,num-verts (length (grp-verts ,grp))))
+        (if (> ,num-verts 0)
+          (let ((,tmpv (random ,num-verts)))
+            (let ((,i (aref (grp-verts ,grp) ,tmpv)))
+              (list ,@body))))))))
 
 
 (defmacro itr-verts ((snk i &key g) &body body)

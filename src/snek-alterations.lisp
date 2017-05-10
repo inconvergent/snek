@@ -5,6 +5,32 @@
       (funcall (gethash (type-of a) alt-names) snk a))))
 
 
+; ADD VERT
+
+(defstruct (add-vert-alt
+    (:constructor add-vert (xy &optional g)))
+  (xy nil :type list :read-only t)
+  (g nil :type symbol :read-only t))
+
+
+(defun do-add-vert-alt (snk a)
+  (with-struct (add-vert-alt- xy g) a
+    (add-vert! snk xy :g g)))
+
+
+; ADD EDGE
+
+(defstruct (add-edge-alt
+    (:constructor add-edge (e &optional g)))
+  (e nil :type list :read-only t)
+  (g nil :type symbol :read-only t))
+
+
+(defun do-add-edge-alt (snk a)
+  (with-struct (add-edge-alt- e g) a
+    (add-edge! snk e :g g)))
+
+
 ; MOVE VERT
 
 (defstruct (move-vert-alt
@@ -50,9 +76,9 @@
       (-valid-vert (num-verts v :err nil)
         (let ((g (get-vert-grp snk v)))
           (if rel
-            (add-vert snk (add (get-vert snk v) xy) :g g)
-            (add-vert snk xy :g g))
-          (add-edge snk
+            (add-vert! snk (add (get-vert snk v) xy) :g g)
+            (add-vert! snk xy :g g))
+          (add-edge! snk
             (list
               v
               (1- num-verts))
@@ -74,7 +100,7 @@
         (-valid-vert (num-verts w :err nil)
           (let ((ga (get-vert-grp snk v))
                 (gb (get-vert-grp snk w)))
-            (add-edge
+            (add-edge!
               snk
               (list v w))
               :g (val-if-eql ga gb)))))))
@@ -89,7 +115,7 @@
 
 (defun do-split-edge-alt (snk a)
   (with-struct (split-edge-alt- e) a
-    (let ((res (remove-edge snk e))
+    (let ((res (del-edge! snk e))
           (verts (snek-verts snk)))
       (destructuring-bind (a b) e
         (if (> res 1)
@@ -97,12 +123,12 @@
           (let ((ga (get-vert-grp snk a))
                 (gb (get-vert-grp snk b)))
             (let ((g (val-if-eql ga gb)))
-              (let ((c (add-vert snk
+              (let ((c (add-vert! snk
                           (mid (get-as-list verts a)
                                (get-as-list verts b))
                           :g g)))
-                (add-edge snk (list a c) :g g)
-                (add-edge snk (list c b) :g g)))))))))
+                (add-edge! snk (list a c) :g g)
+                (add-edge! snk (list c b) :g g)))))))))
 
 
 (defun -get-force-alterations (u v f)
