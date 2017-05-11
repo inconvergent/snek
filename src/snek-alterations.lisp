@@ -31,6 +31,23 @@
     (add-edge! snk e :g g)))
 
 
+; ADD EDGE
+
+(defstruct (add-edge*-alt
+    (:constructor add-edge*? (xya xyb &optional g)))
+  (xya nil :type list :read-only t)
+  (xyb nil :type list :read-only t)
+  (g nil :type symbol :read-only t))
+
+
+(defun do-add-edge*-alt (snk a)
+  (with-struct (add-edge*-alt- xya xyb g) a
+    (add-edge! snk
+               (list (add-vert! snk xya :g g)
+                     (add-vert! snk xyb :g g))
+               :g g)))
+
+
 ; MOVE VERT
 
 (defstruct (move-vert-alt

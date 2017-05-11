@@ -67,7 +67,8 @@
   (let ((alt-names (make-hash-table :test #'equal)))
 
     (dolist (a '(add-edge-alt add-vert-alt move-vert-alt
-                 join-verts-alt append-edge-alt split-edge-alt))
+                 join-verts-alt append-edge-alt split-edge-alt
+                 add-edge*-alt))
       (setf (gethash a alt-names) (symb 'do- a)))
 
     (dolist (pair alts)
