@@ -65,7 +65,7 @@
 ; EXPORT
 
 (defun snek-export-2obj (snk fn &key g)
-  (let ((verts (get-grp-vert-vals snk g))
+  (let ((verts (get-grp-vert-vals snk :g g))
         (edges (get-edges snk :g g))
         (fnobj (append-postfix fn ".2obj")))
     (with-open-file (stream

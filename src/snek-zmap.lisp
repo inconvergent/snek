@@ -31,9 +31,9 @@
         (zmap-add-v-to-zone
           zmap
           (zmap-v-to-zone verts v (to-dfloat width))
-          v)
-        (setf (snek-zmap snk) zmap)
-        (setf (snek-zwidth snk) width)))))
+          v))
+    (setf (snek-zmap snk) zmap)
+    (setf (snek-zwidth snk) width))))
 
 
 (defmacro -extend (x y &body body)

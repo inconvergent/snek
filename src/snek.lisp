@@ -231,7 +231,7 @@
 ;(defun get-edge-grp)
 
 
-(defun get-grp-verts (snk g)
+(defun get-grp-verts (snk &key g)
   (with-struct (snek- grps) snk
     (multiple-value-bind (grp exists)
       (gethash g grps)
@@ -241,9 +241,9 @@
 
 
 ; TODO: more efficient?
-(defun get-grp-vert-vals (snk g)
+(defun get-grp-vert-vals (snk &key g)
   (get-verts snk
-    (get-grp-verts snk g)))
+    (get-grp-verts snk :g g)))
 
 
 (defun get-num-edges (snk &key g)

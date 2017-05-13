@@ -730,15 +730,15 @@
         nil)
 
       (do-test
-        (get-grp-verts snk g1)
+        (get-grp-verts snk :g g1)
         '(0 1 6))
 
       (do-test
-        (get-grp-verts snk g3)
+        (get-grp-verts snk :g g3)
         '(5))
 
       (do-test
-        (length (get-grp-verts snk nil))
+        (length (get-grp-verts snk))
         2)
 
       (do-test

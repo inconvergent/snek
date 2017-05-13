@@ -13,10 +13,10 @@
         (if ,zname
           (zmap-update ,sname (to-dfloat ,zname)))
         (do-alts
-           (remove-if-not
-             (lambda (x) (gethash (type-of x) ,alt-names))
-             (flatten (list ,@body)))
-           ,sname)))))
+          (remove-if-not
+            (lambda (x) (gethash (type-of x) ,alt-names))
+            (flatten (list ,@body)))
+          ,sname)))))
 
 
 (defmacro with-grp ((snk grp g) &body body)
