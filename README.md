@@ -3,6 +3,14 @@
 ![head](img/img.png?raw=true "head")
 
 
+## About the Name
+
+A while back someone on twitter suggested that if Python 3 was named "snek" it
+would avoid naming confusion. I found that amusing at the time, and picked snek
+as the placeholder name for this project. I've been looking for a better name,
+but I haven't found one yet.
+
+
 ## About
 
 `snek` is a simple data structure for working with vertices and edges. More
