@@ -653,29 +653,30 @@
     (add-vert! snk '(700 800))
     (add-vert! snk '(800 900))
 
-    (zmap-update snk 100.0d0)
+    (zmap:make (snek-verts snk) (snek-num-verts snk) 100.0d0)
 
-    (do-test
-      (sort (verts-in-rad snk (list 500 500) 50.0d0) #'<)
-      #())
+    (with-snek (snk :zwidth 50.0d0)
+      (do-test
+        (sort (verts-in-rad snk (list 500 500) 50.0d0) #'<)
+        #())
 
-    (do-test
-      (sort (verts-in-rad snk (list 800 800) 200.0d0) #'<)
-      #(6 7))
+      (do-test
+        (sort (verts-in-rad snk (list -500 500) 50.0d0) #'<)
+        #()))
 
-    (do-test
-      (sort (verts-in-rad snk (list -500 500) 50.0d0) #'<)
-      #())
+    (with-snek (snk :zwidth 200.0d0)
+      (do-test
+        (sort (verts-in-rad snk (list 800 800) 200.0d0) #'<)
+        #(6 7))
 
-    (zmap-update snk 1000.0d0)
+      (do-test
+        (sort (verts-in-rad snk (list 500 500) 200.0d0) #'<)
+        #(3 4)))
 
-    (do-test
-      (sort (verts-in-rad snk (list 500 500) 1000.0d0) #'<)
-      #(0 1 2 3 4 5 6 7))
-
-    (do-test
-      (sort (verts-in-rad snk (list 500 500) 200.0d0) #'<)
-      #(3 4))))
+    (with-snek (snk :zwidth 1000.0d0)
+      (do-test
+        (sort (verts-in-rad snk (list 500 500) 1000.0d0) #'<)
+        #(0 1 2 3 4 5 6 7)))))
 
 
 (defun test-snek-grp ()

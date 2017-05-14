@@ -295,6 +295,11 @@
       (- num-edges (grp-num-edges grp)))))
 
 
+(defun verts-in-rad (snk xy rad)
+  (with-struct (snek- verts zmap zwidth) snk
+    (zmap:verts-in-rad verts zmap zwidth xy rad)))
+
+
 ; TODO: binary search
 (defun get-one-ring (snk v &key g)
   "

@@ -13,10 +13,10 @@
 (load "./src/inv-dst-path")
 (load "./src/sandpaint")
 (load "./src/plot")
+(load "./src/zmap")
 (load "./src/snek-macros")
 (load "./src/snek")
 (load "./src/snek-alterations")
 (load "./src/snek-alterations-mutate")
 (load "./src/snek-utils")
-(load "./src/snek-zmap")
 

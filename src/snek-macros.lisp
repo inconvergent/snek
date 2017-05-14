@@ -5,13 +5,18 @@
   all alterations created in this context will be flattened
   and applied to snk at the end of the context.
   "
-  (with-gensyms (sname zname alt-names)
+  (with-gensyms (sname zw alt-names)
     `(let ((,sname ,snk)
-           (,zname ,zwidth))
+           (,zw ,zwidth))
       (let ((,alt-names (snek-alt-names ,sname)))
         (incf (snek-wc ,sname))
-        (if ,zname
-          (zmap-update ,sname (to-dfloat ,zname)))
+        (if ,zw
+          (progn
+            (setf (snek-zwidth ,sname) ,zw)
+            (setf (snek-zmap ,sname)
+                  (zmap:make (snek-verts ,sname)
+                             (snek-num-verts ,sname)
+                             (to-dfloat ,zw)))))
         (do-alts
           (remove-if-not
             (lambda (x) (gethash (type-of x) ,alt-names))
