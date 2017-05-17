@@ -519,38 +519,42 @@
 
 (defun test-snek-append ()
   (let ((snk (init-snek)))
+
+    (do-test
+      (snek-num-verts snk)
+      11)
+
     (with-snek (snk)
       (append-edge? 3 '(3 4))
       (append-edge? 3 '(8 5) :rel nil)
       (append-edge? 7 '(1 2)))
 
-  (do-test
-    (get-num-edges snk)
-    16)
+    (do-test
+      (get-num-edges snk)
+      16)
 
-  (do-test
-    (snek-num-verts snk)
-    14)
+    (do-test
+      (snek-num-verts snk)
+      14)
 
-  (do-test
-    (get-edge-arr snk)
-    (make-array
-      (list 16 2)
-      :adjustable nil
-      :initial-contents
-        '((0 1) (1 0) (1 2) (1 3) (2 1) (3 1) (3 7) (3 10)
-          (3 11) (5 6) (6 5) (7 3) (7 12) (10 3) (11 3) (12 7))))
+    (do-test
+      (get-edge-arr snk)
+      (make-array
+        (list 16 2)
+        :adjustable nil
+        :initial-contents
+          '((0 1) (1 0) (1 2) (1 3) (2 1) (3 1) (3 7) (3 11)
+            (3 12) (5 6) (6 5) (7 3) (7 13) (11 3) (12 3) (13 7))))
 
-  (do-test
-    (snek-verts snk)
-    (make-array
-      (list 16 2)
-      :adjustable nil
-      :initial-contents
-        '((0.0 2.0) (2.0 3.0) (3.0 4.0) (4.0 7.0) (5.0 4.0) (0.0 6.0)
-          (-1.0 7.0) (0.0 8.0) (0.0 9.0) (10.0 1.0) (3.0 1.0) (7.0 11.0)
-          (8.0 5.0) (1.0 10.0) (0.0 0.0) (0.0 0.0))
-        ))))
+    (do-test
+      (snek-verts snk)
+      (make-array
+        (list 16 2)
+        :adjustable nil
+        :initial-contents
+          '((0.0 2.0) (2.0 3.0) (3.0 4.0) (4.0 7.0) (5.0 4.0) (0.0 6.0)
+            (-1.0 7.0) (0.0 8.0) (0.0 9.0) (10.0 1.0) (3.0 1.0) (7.0 11.0)
+            (8.0 5.0) (1.0 10.0) (0.0 0.0) (0.0 0.0))))))
 
 
 (defun test-snek-split ()
@@ -612,18 +616,21 @@
         (move-vert? v (list 2 2))))
 
     (do-test
-      (itr-verts (snk i) i)
+      (itr-verts (snk i)
+        i)
       '((0) (1) (2) (3) (4) (5) (6) (7) (8) (9) (10) (11)))
 
     (do-test
-      (itr-edges (snk e) e)
-      '(((0 1)) ((1 2)) ((1 3)) ((3 7)) ((5 6)) ((6 10))))
+      (itr-edges (snk e)
+        e)
+      '(((0 1)) ((1 2)) ((1 3)) ((3 7)) ((5 6)) ((6 11))))
 
     (do-test
-      (itr-edges (snk e) (edge-length snk e))
+      (itr-edges (snk e)
+        (edge-length snk e))
       '((2.23606797749979d0) (1.4142135623730951d0)
         (4.47213595499958d0) (4.123105625617661d0)
-        (3.1622776601683795d0) (8.246211251235321d0)))
+        (3.1622776601683795d0) (1.0d0)))
 
     (do-test
       (snek-wc snk)
