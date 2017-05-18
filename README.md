@@ -27,8 +27,9 @@ http://inconvergent.net/snek-is-not-an-acronym/.
 
 I have also written about things related to `snek` at
 
-  - http://inconvergent.net/a-propensity-for-mistakes (indirectly about `snek`)
-  - http://inconvergent.net/a-method-for-mistakes
+  - http://inconvergent.net/a-propensity-for-mistakes/ (indirectly about `snek`)
+  - http://inconvergent.net/a-method-for-mistakes/
+  - http://inconvergent.net/arbitrary-alterations/
 
 Here is and example of manipulating a `snek` instance called `snk` using
 `alterations`. Alteration constructors are postfixed with ?.
@@ -55,7 +56,8 @@ Here is and example of manipulating a `snek` instance called `snk` using
 ### Custom alterations
 
 You can define your own arbitrary alterations. There is an example of this in
-`ex-custom-alt.lisp`.
+`ex-custom-alt.lisp`. I have also written about it here:
+http://inconvergent.net/arbitrary-alterations/
 
 
 ## Examples
