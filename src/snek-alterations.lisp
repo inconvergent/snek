@@ -92,13 +92,11 @@
     (with-struct (append-edge-alt- v xy rel) a
       (-valid-vert (num-verts v :err nil)
         (let ((g (get-vert-grp snk v)))
-          (add-edge! snk
-                     (list
-                       v
-                       (if rel
+          (let ((w (if rel
                          (add-vert! snk (add (get-vert snk v) xy) :g g)
-                         (add-vert! snk xy :g g)))
-                     :g g))))))
+                         (add-vert! snk xy :g g))))
+            (add-edge! snk (list v w) :g g)
+            w))))))
 
 
 ; JOIN VERTS

@@ -1,5 +1,13 @@
 # SNEK is Not an Acronym
 
+
+## About
+
+`snek` is a simple data structure for working with vertices and edges. More
+importantly it is a programming pattern for applying changes to the structure.
+It is specifically written to be useful for a broad range of ways in which I
+usually write generative algorithms for creating art.
+
 ![head](img/img.png?raw=true "head")
 
 
@@ -10,13 +18,7 @@ would avoid naming confusion. I found that amusing at the time, and picked snek
 as the placeholder name for this project. I've been looking for a better name,
 but I haven't found one yet.
 
-
-## About
-
-`snek` is a simple data structure for working with vertices and edges. More
-importantly it is a programming pattern for applying changes to the structure.
-It is specifically written to be useful for a broad range of ways in which I
-usually write generative algorithms for creating art.
+## Alterations
 
 The pattern depends on the concept of `alterations`. In short: an `alteration`
 is a change that will be applied to the structure at the end of a given
@@ -49,11 +51,21 @@ Here is and example of manipulating a `snek` instance called `snk` using
 ; alterations have been applied
 ```
 
+
+### Custom alterations
+
+You can define your own arbitrary alterations. There is an example of this in
+`ex-custom-alt.lisp`.
+
+
+## Examples
+
 There are some examples included. They can be executed like this:
 
     ./ex-slope.lisp res/slope
     ./ex-lines.lisp res/lines
     ./ex-grp.lisp res/grp
+    ./ex-custom-alt.lisp res/custom
 
 There is also and example of how to use the plotting functionality. This will
 export a simple vector file and an image to indicate the result
@@ -62,13 +74,15 @@ export a simple vector file and an image to indicate the result
 
 Notice that the resulting image will end up in `res`.
 
+
+## Usage
+
 `snek` is used in
 
   - http://moment.inconvergent.net/
   - https://twitter.com/sandpaintbot
   - https://twitter.com/scratchpaintbot
   - https://twitter.com/cronianrings
-
 
 
 ![lines](img/ex-lines.png?raw=true "lines")
@@ -83,7 +97,7 @@ This code requires `Quicklisp` and `zpng`. The path to quicklisp must be set in
  - https://www.quicklisp.org/beta/
 
 
-## Run tests
+## Tests
 
 There are some tests included. Run them like this:
 

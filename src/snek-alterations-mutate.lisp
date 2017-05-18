@@ -3,10 +3,16 @@
 (defstruct (mutate (:constructor -make-mutate))
   (rules nil)
   (xy nil :type list)
+  (p 0.0d0 :type double-float)
+  (noise 0.0d0 :type double-float)
   (ind nil :type integer))
 
 
-(defun make-mutate (&key (xy '(0.0d0 0.0d0)) (ind 0))
+(defun make-mutate (&key
+                     (p 0.1d0)
+                     (noise 100.0d0)
+                     (xy '(0.0d0 0.0d0))
+                     (ind 0))
   (let ((rules (make-hash-table :test #'equal)))
 
     (setf (gethash 'append-edge-alt rules)
@@ -22,7 +28,9 @@
           'mutate-add-vert-alt)
 
     (-make-mutate :rules rules
+                  :p p
                   :ind ind
+                  :noise noise
                   :xy xy)))
 
 
@@ -61,12 +69,12 @@
 
 (defun mutate-add-vert-alt (a mut)
   (with-struct (add-vert-alt- xy) a
-    (add-vert? (add xy (rnd-in-circ (rnd 100.0d0))))))
+    (add-vert? (add xy (rnd-in-circ (rnd 600.0d0))))))
 
 
 (defun mutate-move-vert-alt (a mut)
   (with-struct (move-vert-alt- v xy rel) a
-    (move-vert? v (add xy (rnd-in-circ (rnd 100.0d0))) :rel rel)))
+    (move-vert? v (add xy (rnd-in-circ (rnd 600.0d0))) :rel rel)))
 
 
 (defun mutate-append-edge-alt (a mut)
