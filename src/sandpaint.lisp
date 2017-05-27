@@ -6,29 +6,32 @@
     :circ
     :circ*
     :make
-    :path
     :pix
     :pix*
     :pixel-hack
     :save
+    :lin-path
     :set-rgba
     :stroke
     :strokes)
   (:import-from :common-lisp-user
     :add
     :append-postfix
+    :dst
     :get-as-list
-    :iscale
     :inside
     :inside*
+    :linspace
+    :iscale
     :lround
+    :rep
+    :on-line
     :range
-    :rnd-in-circ
-    :rnd-on-line
     :square-loop
     :sub
     :to-dfloat
     :to-dfloat*
+    :to-int
     :with-struct))
 
 (in-package :sandpaint)
@@ -69,7 +72,7 @@
 (defun -draw-stroke (vals size grains v1 v2 r g b a)
   (loop for i from 1 to grains
     do
-      (inside* (size (rnd-on-line v1 v2) x y)
+      (inside* (size (rnd:on-line v1 v2) x y)
         (-operator-over vals x y r g b a))))
 
 
@@ -89,9 +92,9 @@
   (a 1.0d0 :type double-float :read-only nil))
 
 
-(defun -draw-circ (vals size xy rad n r g b a)
-  (loop for i below n do
-    (inside* (size (add xy (rnd-in-circ rad)) x y)
+(defun -draw-circ (vals size xy rad grains r g b a)
+  (loop for i below grains do
+    (inside* (size (add xy (rnd:in-circ rad)) x y)
       (-operator-over vals x y r g b a))))
 
 
@@ -110,7 +113,7 @@
         (let* ((xy (list x y))
                (dx (iscale
                      (sub
-                       (add (rnd-in-circ noise) xy)
+                       (add (rnd:in-circ noise) xy)
                        center)
                      scale)))
           (-offset-rgba new-vals vals size x y (add xy dx) 0)
@@ -198,6 +201,7 @@
       (-draw-circ vals size v rad n r g b a))))
 
 
+; draw circ from array
 (defun circ* (sand vv num rad grains)
   (with-struct (sandpaint- size vals r g b a) sand
     (loop for i from 0 below num do
@@ -220,15 +224,15 @@
       (-draw-stroke vals size grains u v r g b a))))
 
 
-(defun path (sand path grains &optional closed)
+(defun lin-path (sand path rad grains &key (dens 1))
   (with-struct (sandpaint- size vals r g b a) sand
     (loop
       for u in path
       for w in (cdr path)
       do
-        (-draw-stroke vals size grains u w r g b a))
-    (if closed
-      (-draw-stroke vals size grains (first path) (last path) r g b a))))
+        (let ((stps (to-int (floor (+ 1 (* dens (dst u w)))))))
+          (rep (p (linspace 0 1 stps :end nil))
+            (-draw-circ vals size (on-line p u w) rad grains r g b a))))))
 
 
 (defun save (sand fn &key (gamma 1.0))

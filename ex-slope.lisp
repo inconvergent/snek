@@ -8,14 +8,14 @@
 
 (defun main (size fn)
 
-  (let ((p1 (rnd-in-circ 100 :xy (list 800.0 200.0)))
-        (p2 (rnd-in-circ 100 :xy (list 200.0 800.0))))
+  (let ((p1 (rnd:in-circ 100 :xy (list 800.0 200.0)))
+        (p2 (rnd:in-circ 100 :xy (list 200.0 800.0))))
     (let ((va (add
                 (scale
                    (norm
                      (mult (reverse (sub p1 p2)) (list -1.0 1.0)))
                    40.0)
-                 (rnd-on-circ 20 :xy (list 0.0 0.0))))
+                 (rnd:on-circ 20 :xy (list 0.0 0.0))))
          (repeat 10)
          (noise (random 4.0))
          (grains 70)
@@ -28,12 +28,12 @@
         do
           (print-every j 2)
           (let ((snk (make-snek)))
-            (setf va (add va (rnd-in-circ noise :xy (list 0.0 0.0))))
+            (setf va (add va (rnd:in-circ noise :xy (list 0.0 0.0))))
 
             (loop for k from 1 to itt
               do
                 (with-snek (snk)
-                  (add-vert? (rnd-on-line p1 p2))
+                  (add-vert? (rnd:on-line p1 p2))
                   (with-rnd-vert (snk v)
                     (append-edge? v va))
                   (with-rnd-vert (snk v)

@@ -58,7 +58,7 @@
                                   rad)))))
             (loop for s in (linspace 0.0 1.0 box-rep :end nil) do
               (plot:path plt (funcall stepper s))))
-          (incf angle (rnd 0.01d0))
+          (incf angle (rnd:rnd 0.01d0))
         ))
 
       (plot:save plt fn)))

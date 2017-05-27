@@ -13,20 +13,18 @@
     (labels ((init (snk n)
                (loop for i from 0 below n do
                  (setf (gethash
-                         (add-vert! snk (rnd-in-box 250 250 :xy '(250 250)))
+                         (add-vert! snk (rnd:in-box 250 250 :xy '(250 250)))
                          curr)
                        0)))
 
-             (circ-stroke (vv)
-               (sandpaint:circ sand
-                 (lin-path:pos* (lin-path:make vv) (linspace 0 0.99 100))
-                 1 20))
-
              (draw (snk a w)
-               (sandpaint:set-rgba sand (list 0.0 0.7 0.7 0.01))
-               (sandpaint:circ sand (list (append-edge-alt-xy a)) 4 3000)
-               (sandpaint:set-rgba sand (list 0.0 0.0 0.0 0.01))
-               (circ-stroke (get-verts snk (list w (append-edge-alt-v a)))))
+               (sandpaint:set-rgba sand (list 0.0 0.7 0.7 0.1))
+               (sandpaint:circ sand (list (append-edge-alt-xy a)) 4 300)
+               (sandpaint:set-rgba sand (list 0.0 0.0 0.0 0.1))
+               (sandpaint:lin-path sand
+                 (get-verts snk (list w (append-edge-alt-v a)))
+                 2.0
+                 50))
 
              (count-control (v)
                (multiple-value-bind (c exists)
@@ -39,7 +37,7 @@
              (do-append-edge-alt* (snk a)
                (let ((v (append-edge-alt-v a)))
                  (count-control v)
-                 (inside (size (append-edge-alt-xy a))
+                 (inside-border (size (append-edge-alt-xy a) 10)
                    (if (<= (length (verts-in-rad snk (append-edge-alt-xy a) rad)) 1)
                      (aif (do-append-edge-alt snk a)
                        (progn
@@ -61,7 +59,7 @@
                 collect
               (append-edge? k
                 (add (get-vert snk k)
-                     (rnd-in-circ rad))
+                     (rnd:in-circ rad))
                 :rel nil))
             (sandpaint:save sand (format nil "~a-~6,'0d" fn hits))))))))
 

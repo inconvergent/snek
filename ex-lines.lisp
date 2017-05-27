@@ -29,12 +29,12 @@
           (let ((v1 (add-vert! snk (on-line s p1 p2)))
                 (v2 (add-vert! snk (add va (on-line s p1 p2)))))
 
-            (setf va (add va (rnd-in-circ (* 0.7 j))))
-            (setf vb (add vb (rnd-in-circ (* 0.001 j))))
+            (setf va (add va (rnd:in-circ (* 0.7 j))))
+            (setf vb (add vb (rnd:in-circ (* 0.001 j))))
 
             (with-snek (snk)
               (itr-verts (snk v)
-                (move-vert? v (add (rnd-in-circ 0.1) vb)))
+                (move-vert? v (add (rnd:in-circ 0.1) vb)))
               (join-verts? v1 v2))
 
             (snek-draw-edges snk sand grains)

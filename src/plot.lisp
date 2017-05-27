@@ -25,7 +25,6 @@
     :nsub
     :on-line
     :range
-    :rnd-on-line
     :scale
     :square-loop
     :sub
@@ -68,7 +67,7 @@
   (with-struct (plot- size verts coverage) plt
     (destructuring-bind (u v)
       line
-      (loop for xy in (nrep num (rnd-on-line u v)) do
+      (loop for xy in (nrep num (rnd:on-line u v)) do
         (inside* (size xy x y)
           (incf (aref coverage x y))
           (vector-push-extend xy verts))))))
@@ -150,7 +149,7 @@
     (destructuring-bind (u v)
       line
       (let ((offset (-get-offset u v s perp)))
-        (loop for xy in (nrep num (rnd-on-line u v)) do
+        (loop for xy in (nrep num (rnd:on-line u v)) do
           (inside (size xy)
             (incf (plot-discards plt)
                   (-stipple plt xy offset))))))))

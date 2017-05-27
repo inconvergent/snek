@@ -28,10 +28,10 @@
           'mutate-add-vert-alt)
 
     (-make-mutate :rules rules
-                  :p p
+                  :p (to-dfloat p)
                   :ind ind
-                  :noise noise
-                  :xy xy)))
+                  :noise (to-dfloat noise)
+                  :xy (to-dfloat* xy))))
 
 
 (defun -ok-ind (i)
@@ -51,30 +51,30 @@
     `(let ((,bd (flatten (list ,@body)))
            (,mut ,mutate))
        (mapcar (lambda (,a)
-                 (if (< (rnd) 0.2)
+                 (if (< (rnd:rnd) 0.2)
                    (progn
                      (setf (mutate-ind ,mut)
                            (-ok-ind (+ (mutate-ind ,mut)
-                                      (rndi -1 2))))
+                                      (rnd:rndi -1 2))))
                      ;(setf (mutate-xy ,mut)
-                     ;      (add (mutate-xy ,mut) (rnd-in-circ 2.0)))
+                     ;      (add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0)))
                      (do-mutate (mutate-rules ,mut) ,a ,mut))
                    ,a))
                ,bd))))
 
 
 ;(defun change-ind (i &optional (o 1))
-;  (let ((ii (+ i (rndi (* -1 o) (+ 1 o)))))
+;  (let ((ii (+ i (rnd:rndi (* -1 o) (+ 1 o)))))
 ;    (if (> ii -1) ii 0)))
 
 (defun mutate-add-vert-alt (a mut)
   (with-struct (add-vert-alt- xy) a
-    (add-vert? (add xy (rnd-in-circ (rnd 600.0d0))))))
+    (add-vert? (add xy (rnd:in-circ (rnd:rnd (mutate-noise mut)))))))
 
 
 (defun mutate-move-vert-alt (a mut)
   (with-struct (move-vert-alt- v xy rel) a
-    (move-vert? v (add xy (rnd-in-circ (rnd 600.0d0))) :rel rel)))
+    (move-vert? v (add xy (rnd:in-circ (mutate-noise mut))) :rel rel)))
 
 
 (defun mutate-append-edge-alt (a mut)

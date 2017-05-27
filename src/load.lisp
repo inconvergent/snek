@@ -8,7 +8,8 @@
 
 (load "./src/pg-utils")
 (load "./src/utils")
-(load "./src/math-utils")
+(load "./src/math")
+(load "./src/rnd")
 (load "./src/linear-path")
 (load "./src/inv-dst-path")
 (load "./src/sandpaint")

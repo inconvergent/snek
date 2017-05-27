@@ -10,7 +10,7 @@
   (loop for x in (linspace 200 800 rep) for i from 0 do
     (loop for y in (linspace 200 800 rep) for j from 0 do
       (let ((g (add-grp! snk :type 'path :closed t)))
-        (print (snek-init-polygon snk rad (rndi 3 6)
+        (print (snek-init-polygon snk rad (rnd:rndi 3 6)
                            :xy (list x y)
                            :g g))))))
 
@@ -32,7 +32,7 @@
 
     (let ((grp-states (make-hash-table :test #'equal)))
       (itr-grps (snk g)
-        (setf (gethash g grp-states) (get-acc-rnd-circ-stp*)))
+        (setf (gethash g grp-states) (rnd:get-acc-circ-stp*)))
 
       (loop for i from 0 to itt do
         (print-every i 1000)
@@ -43,7 +43,7 @@
               (itr-verts (snk v :g g)
                 (move-vert? v
                   (add ns
-                    (rnd-in-circ 0.05)))))))
+                    (rnd:in-circ 0.05)))))))
 
         (itr-grps (snk g)
           (snek-draw-edges snk sand grains :g g))))

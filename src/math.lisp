@@ -1,3 +1,4 @@
+
 (defmacro cos-sin (a)
   (with-gensyms (aname)
     `(let ((,aname ,a))
@@ -15,6 +16,9 @@
       (loop for ,x from 0 below ,sname do
         (loop for ,y from 0 below ,sname do
           ,@body)))))
+
+
+; VEC
 
 
 (defun diff-scale (a b s) (/ (- b a) s))
@@ -111,15 +115,20 @@
   (mapcar (lambda (i) (nth i a)) ii))
 
 
-(defun lgetrnd (l)
-  (nth (random (length l)) l))
-
-
-(defun agetrnd (l)
-  (aref l (random (length l))))
-
-
 ; RANGES
+
+
+(defmacro rep ((i itt) &body body)
+  `(loop for ,i in ,itt
+    collect ,@body))
+
+
+(defmacro nrep (n &body body)
+  (with-gensyms (i nname)
+    `(let ((,nname ,n))
+      (loop for ,i from 0 below ,nname
+            collect ,@body))))
+
 
 (defun range (a &optional (b nil))
   (if (not b)
@@ -127,76 +136,7 @@
     (loop for x from a below b collect x)))
 
 
-(defun rndi (a &optional (b nil))
-  (let ((a (to-int a)))
-    (if (not b)
-      (random a)
-      (+ a (random (- (to-int b) a))))))
-
-
-(defun rnd (&optional (x 1.0d0))
-  (random (to-dfloat x)))
-
-
-(defun rnd* (&optional (x 1.0d0))
-  (- x (* 2.0d0 (random (to-dfloat x)))))
-
-
-(defmacro nrep (n &body body)
-  (with-gensyms (i nname)
-    `(let ((,nname ,n))
-      (loop for ,i from 0 below ,nname collect ,@body))))
-
-
 (defun inc (x stp) (mod (+ x stp) 1.0d0))
-
-
-(defmacro get-rnd-lin-stp (&optional (init 0.0d0))
-  (with-gensyms (x stp)
-    `(let ((,x (to-dfloat ,init)))
-      (lambda (,stp)
-        (setf ,x (inc ,x (rnd* ,stp)))))))
-
-(defmacro get-rnd-lin-stp* (&optional (init 0.0d0))
-  (with-gensyms (x stp)
-    `(let ((,x (to-dfloat ,init)))
-      (lambda (,stp)
-        (incf ,x (rnd* ,stp))))))
-
-
-(defmacro get-acc-rnd-lin-stp (&optional (init-x 0.0d0) (init-a 0.0d0))
-  (with-gensyms (x a s)
-    `(let ((,a (to-dfloat ,init-a))
-           (,x (to-dfloat ,init-x)))
-      (lambda (,s)
-        (setf ,x (inc ,x (incf ,a (rnd* ,s))))))))
-
-
-(defmacro get-acc-rnd-lin-stp* (&optional (init-x 0.0d0) (init-a 0.0d0))
-  (with-gensyms (x a s)
-    `(let ((,a (to-dfloat ,init-a))
-           (,x (to-dfloat ,init-x)))
-      (lambda (,s)
-        (incf ,x (incf ,a (rnd* ,s)))))))
-
-
-(defmacro get-rnd-circ-stp* (&optional (init '(list 0.0d0 0.0d0)))
-  (with-gensyms (xy stp)
-    `(let ((,xy (to-dfloat* ,init)))
-      (lambda (,stp)
-        (setf ,xy
-              (add ,xy (rnd-in-circ ,stp)))))))
-
-
-(defmacro get-acc-rnd-circ-stp* (&optional (init '(list 0.0d0 0.0d0))
-                                           (init-a '(list 0.0d0 0.0d0)))
-  (with-gensyms (xy stp a)
-    `(let ((,a (to-dfloat* ,init-a))
-           (,xy (to-dfloat* ,init)))
-      (lambda (,stp)
-        (setf ,xy
-              (add ,xy
-                   (setf ,a (add ,a (rnd-in-circ ,stp)))))))))
 
 
 (defun linspace (a b n &key (end t))
@@ -207,16 +147,6 @@
     (list (to-dfloat a))))
 
 
-(defun rndspace (a b n)
-  (let ((d (to-dfloat (- b a))))
-    (sort (nrep n (+ a (random d))) #'<)))
-
-
-(defun rndspace* (a b n)
-  (let ((d (to-dfloat (- b a))))
-    (nrep n (+ a (random d)))))
-
-
 (defun range (a &optional (b nil))
   (if (not b)
     (loop for x from 0 below a collect x)
@@ -224,6 +154,7 @@
 
 
 ; GET SET
+
 
 (defun get-as-list (arr row &optional (dims (range 2)))
   (mapcar
@@ -263,45 +194,6 @@
     (scale (sub x2 x1) p)))
 
 
-(defun rnd-on-circ (rad &key (xy (list 0.0d0 0.0d0)))
-  (add
-    xy
-    (scale
-      (cos-sin (random (* PI 2.0d0)))
-      rad)))
-
-
-(defun rnd-in-circ (rad &key (xy (list 0.0d0 0.0d0)))
-  (let ((ab (sort (list (random 1.0d0) (random 1.0d0)) #'<)))
-    (add
-      xy
-      (scale
-        (cos-sin (* 2 PI (apply #'/ ab)))
-        (* (second ab) rad)))))
-
-
-(defun rnd-in-box (sx sy &key (xy (list 0.0d0 0.0d0)))
-  (add
-    (list (rnd* (to-dfloat sx))
-          (rnd* (to-dfloat sy)))
-    xy))
-
-
-(defun rnd-on-line (x1 x2)
-  (add
-    x1
-    (scale (sub x2 x1) (random 1.0d0))))
-
-
-(defun rnd-on-spiral (rad &key (xy (list 0.0d0 0.0d0)) (rot 1.0d0))
-  (let ((i (random 1.0)))
-    (add
-      xy
-      (scale
-        (cos-sin (* i (* PI rot)))
-        (* i rad)))))
-
-
 (defun polygon (n rad &key (xy (list 0.0d0 0.0d0)) (rot 0.0d0))
   (loop for i from 0 below n
     collect
@@ -310,6 +202,9 @@
         (scale
           (cos-sin (+ rot (* (/ i n) 2.0d0 PI)))
           rad))))
+
+
+; THREE POINT
 
 
 (defun -make-front-path (aa bb cc as bs)
@@ -324,8 +219,6 @@
     (list p1 cc p2 (add p2 (scale (sub aa p2) as)) p1)))
 
 
-; three point perspective
-
 (defun make-perspective-transform (A B C)
   (lambda (P a* b* u* d*)
     (let ((PC (sub C P)))
@@ -336,10 +229,25 @@
 
 ; OTHER
 
+
 (defun close-path (p)
   (append p (list (nth 0 p))))
 
 
+(defmacro inside-border ((size xy b) &body body)
+  (with-gensyms (xname yname sname small large)
+    `(let* ((,sname ,size)
+            (,small ,b)
+            (,large (- ,sname ,small)))
+      (destructuring-bind (,xname ,yname)
+        ,xy
+        (if (and (>= ,xname ,small) (< ,xname ,large)
+                 (>= ,yname ,small) (< ,yname ,large))
+          (progn
+            ,@body))))))
+
+
+; TODO: remove external use where lround does not make sense.
 (defmacro inside ((size xy) &body body)
   (with-gensyms (xname yname sname)
     `(let ((,sname ,size))

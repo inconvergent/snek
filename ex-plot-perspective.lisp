@@ -17,9 +17,9 @@
         (plt (plot:make size)))
 
     (let ((ddd (make-perspective-transform
-                 (rnd-in-box 500 500 :xy (list -500 500))
-                 (rnd-in-box 500 500 :xy (list 1500 500))
-                 (rnd-in-box 500 500 :xy (list 500 1500)))))
+                 (rnd:in-box 500 500 :xy (list -500 500))
+                 (rnd:in-box 500 500 :xy (list 1500 500))
+                 (rnd:in-box 500 500 :xy (list 500 1500)))))
       (loop for x in (linspace left right rep) do
         (loop for y in (linspace left right rep) do
           (let ((points (funcall ddd

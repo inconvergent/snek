@@ -40,7 +40,7 @@ Here is and example of manipulating a `snek` instance called `snk` using
   ; iterate vertices
   (itr-verts (snk v)
     ; move alteration
-    (move-vert? v (rnd-in-circ))
+    (move-vert? v (rnd:in-circ))
     ; w will be an arbitrary
     ; vertex in snk
     (with-rnd-vert (snk w)
@@ -105,6 +105,7 @@ This code requires `Quicklisp` and `zpng`. The path to quicklisp must be set in
 There are some tests included. Run them like this:
 
     ./test.lisp
+    ./test-snek.lisp
 
 
 ## Stability, Changes and Versioning

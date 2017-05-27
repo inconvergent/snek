@@ -39,7 +39,7 @@
           (with-snek (snk :zwidth rad)
             (append-edge?
               curr (add (get-vert snk curr)
-                        (rnd-in-circ rad))
+                        (rnd:in-circ rad))
               :rel nil)))))))
 
 
