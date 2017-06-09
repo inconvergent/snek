@@ -15,6 +15,7 @@
     :in-circ
     :rndi
     :lget
+    :mixed
     :on-circ
     :on-line
     :on-spiral
@@ -62,20 +63,32 @@
   (random (to-dfloat x)))
 
 
+
 (defun rnd* (&optional (x 1.0d0))
   (- x (* 2.0d0 (random (to-dfloat x)))))
 
 
+(defun mixed (x f)
+  (let ((x* (to-dfloat x)))
+    (+
+      (random (* (to-dfloat f) x*))
+      (- x* (* 2.0d0 (random x*))))))
+
+
 (defun rndspace (a b n &key order)
-  (let ((d (to-dfloat (- b a))))
-    (let ((res (nrep n (+ a (random d)))))
-      (if order (sort res #'<) res))))
+  (destructuring-bind (a b)
+    (sort (list a b) #'<)
+      (let ((d (to-dfloat (- b a))))
+        (let ((res (nrep n (+ a (random d)))))
+          (if order (sort res #'<) res)))))
 
 
 (defun rndspacei (a b n &key order)
-  (let ((d (to-int (- b a))))
-    (let ((res (nrep n (+ a (random d)))))
-      (if order (sort res #'<) res))))
+  (destructuring-bind (a b)
+    (sort (list a b) #'<)
+      (let ((d (to-int (- b a))))
+        (let ((res (nrep n (+ a (random d)))))
+          (if order (sort res #'<) res)))))
 
 
 ; SHAPES

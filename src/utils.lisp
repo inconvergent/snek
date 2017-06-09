@@ -95,6 +95,10 @@
   `(list 0.2d0 0.2d0 0.2d0 ,alpha))
 
 
+(defmacro vdark (&optional (alpha 1.0d0))
+  `(list 0.1d0 0.1d0 0.1d0 ,alpha))
+
+
 (defmacro gray (v &optional (alpha 1.0d0))
   `(list ,v ,v ,v ,alpha))
 

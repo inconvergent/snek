@@ -4,6 +4,7 @@
   (:export
     :pos
     :pos*
+    :rndpos
     :make
     :move)
   (:import-from :common-lisp-user
@@ -24,15 +25,16 @@
 (defstruct path
   (n nil :type integer :read-only t)
   (lens nil)
-  (points nil))
+  (closed nil :type boolean)
+  (pts nil))
 
 
-(defun -set-path-lens (points lens n)
+(defun -set-path-lens (pts lens n)
   (let ((total (loop
                   for i from 0 below (1- n)
                   sum (dst
-                        (get-as-list points i)
-                        (get-as-list points (1+ i))) into total
+                        (get-as-list pts i)
+                        (get-as-list pts (1+ i))) into total
                   do
                     (setf (aref lens (1+ i) 0) total)
                   finally
@@ -53,10 +55,10 @@
     finally (return ind)))
 
 
-(defun -calc-pos (points lens n f)
+(defun -calc-pos (pts lens n f)
   (let ((ind (-find-seg-ind lens f n)))
-        (let ((pb (get-as-list points ind))
-              (pa (get-as-list points (1- ind)))
+        (let ((pb (get-as-list pts ind))
+              (pa (get-as-list pts (1- ind)))
               (s (diff-scale
                    (aref lens (1- ind) 0)
                    f
@@ -68,57 +70,61 @@
 
 
 (defun pos (path f)
-  (with-struct (path- lens points n) path
-    (-calc-pos points lens n (mod (to-dfloat f) 1.0d0))))
+  (with-struct (path- lens pts n) path
+    (-calc-pos pts lens n (mod (to-dfloat f) 1.0d0))))
 
 
 (defun pos* (path ff)
-  (with-struct (path- lens points n) path
+  (with-struct (path- lens pts n) path
     (mapcar
-      (lambda (f) (-calc-pos points lens n (mod f 1.0d0)))
+      (lambda (f) (-calc-pos pts lens n (mod f 1.0d0)))
       (to-dfloat* ff))))
 
 
-(defun make (points)
-  (let ((n (length points)))
+(defmacro rndpos (path n)
+  `(pos* ,path (rnd:rndspace 0.0d0 1.0d0 ,n)))
+
+
+(defun make (pts &key closed)
+  (let ((n (length pts)))
     (let ((p (make-dfloat-array n))
           (l (make-dfloat-array n :cols 1)))
       (loop
-        for d in points
+        for d in pts
         for i from 0
         do
           (set-from-list p i (to-dfloat* d)))
       (-set-path-lens p l n)
-      (make-path :n n :points p :lens l))))
+      (make-path :n n :pts p :lens l :closed closed))))
 
 
-(defun -move-rel (points i xy)
+(defun -move-rel (pts i xy)
   (destructuring-bind (x y)
     xy
-    (incf (aref points i 0) x)
-    (incf (aref points i 1) y)))
+    (incf (aref pts i 0) x)
+    (incf (aref pts i 1) y)))
 
 
-(defun -move (points i xy)
+(defun -move (pts i xy)
   (destructuring-bind (x y)
     xy
-    (setf (aref points i 0) x)
-    (setf (aref points i 1) y)))
+    (setf (aref pts i 0) x)
+    (setf (aref pts i 1) y)))
 
 
-(defun move (path pos &key rel closed)
-  (let ((do-move (if rel '-move-rel '-move)))
-    (with-struct (path- points lens n) path
+(defun move (path pos &key rel)
+  (let ((do-move (if rel #'-move-rel #'-move)))
+    (with-struct (path- pts lens n closed) path
       (loop
         for xy in pos
         for i from 0
         do
-          (funcall do-move points i xy))
+          (funcall do-move pts i xy))
 
       (if closed
         (progn
-          (setf (aref points (1- n) 0) (aref points 0 0))
-          (setf (aref points (1- n) 1) (aref points 0 1))))
+          (setf (aref pts (1- n) 0) (aref pts 0 0))
+          (setf (aref pts (1- n) 1) (aref pts 0 1))))
 
-      (-set-path-lens points lens n))))
+      (-set-path-lens pts lens n))))
 

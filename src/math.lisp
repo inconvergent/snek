@@ -126,7 +126,7 @@
 (defmacro nrep (n &body body)
   (with-gensyms (i nname)
     `(let ((,nname ,n))
-      (loop for ,i from 0 below ,nname
+      (loop for ,i from 1 to ,nname
             collect ,@body))))
 
 

@@ -11,7 +11,7 @@
 (load "./src/math")
 (load "./src/rnd")
 (load "./src/linear-path")
-(load "./src/inv-dst-path")
+(load "./src/bzspline")
 (load "./src/sandpaint")
 (load "./src/plot")
 (load "./src/zmap")
