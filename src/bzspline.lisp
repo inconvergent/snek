@@ -76,10 +76,14 @@
 
 
 (defun -get-seg-open (n x)
-  (let ((s (/ 1.0d0 (to-dfloat (- n 2)))))
+  (if (>= x 1.0d0)
     (list
-      (/ (mod x s) s)
-      (floor (/ x s)))))
+      1.0d0
+      4)
+    (let ((s (/ 1.0d0 (to-dfloat (- n 2)))))
+      (list
+        (/ (mod x s) s)
+        (floor (/ x s))))))
 
 
 (defun -get-seg-closed (n x)

@@ -10,6 +10,7 @@
 (load "./src/utils")
 (load "./src/math")
 (load "./src/rnd")
+(load "./src/color")
 (load "./src/linear-path")
 (load "./src/bzspline")
 (load "./src/sandpaint")

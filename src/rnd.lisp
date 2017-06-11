@@ -14,6 +14,7 @@
     :in-box
     :in-circ
     :rndi
+    :rndbtwn
     :lget
     :mixed
     :on-circ
@@ -62,6 +63,9 @@
 (defun rnd (&optional (x 1.0d0))
   (random (to-dfloat x)))
 
+
+(defun rndbtwn (&optional a b)
+  (+ a (random (to-dfloat (- b a)))))
 
 
 (defun rnd* (&optional (x 1.0d0))

@@ -7,6 +7,14 @@
        nil))
 
 
+(defun append-postfix (fn postfix)
+  (concatenate 'string fn postfix))
+
+
+(defmacro print-every (i n)
+  `(if (= 0 (mod ,i ,n)) (print ,i)))
+
+
 (defun 2* (l) (* l 2))
 
 
@@ -14,10 +22,6 @@
 
 
 (defun half (l) (/ l 2))
-
-
-(defmacro print-every (i n)
-  `(if (= 0 (mod ,i ,n)) (print ,i)))
 
 
 (defun make-dfloat-array (rows &key (cols 2) (initial 0.0d0))
@@ -81,28 +85,4 @@
   (with-gensyms (aname)
     `(let ((,aname ,a))
       (if (eql ,aname ,b) ,aname nil))))
-
-
-(defmacro white (&optional (alpha 1.0d0))
-  `(list 1.0d0 1.0d0 1.0d0 ,alpha))
-
-
-(defmacro black (&optional (alpha 1.0d0))
-  `(list 0.0d0 0.0d0 0.0d0 ,alpha))
-
-
-(defmacro dark (&optional (alpha 1.0d0))
-  `(list 0.2d0 0.2d0 0.2d0 ,alpha))
-
-
-(defmacro vdark (&optional (alpha 1.0d0))
-  `(list 0.1d0 0.1d0 0.1d0 ,alpha))
-
-
-(defmacro gray (v &optional (alpha 1.0d0))
-  `(list ,v ,v ,v ,alpha))
-
-
-(defun append-postfix (fn postfix)
-  (concatenate 'string fn postfix))
 

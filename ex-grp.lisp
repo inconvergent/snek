@@ -25,8 +25,8 @@
                :max-verts 10000
                :max-main-grp-edges 10))
         (sand (sandpaint:make size
-                :active (white 0.005)
-                :bg (gray 0.1d0))))
+                :active (color:white 0.005)
+                :bg (color:gray 0.1d0))))
 
     (init snk rep rad)
 
