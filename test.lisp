@@ -1,4 +1,4 @@
-#!/usr/bin/sbcl --script
+#!/usr/bin/env sbcl --script
 
 (load "src/load")
 (load "./src/test-utils")
