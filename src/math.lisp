@@ -120,14 +120,14 @@
 
 (defmacro rep ((i itt) &body body)
   `(loop for ,i in ,itt
-    collect ,@body))
+    collect (progn ,@body)))
 
 
 (defmacro nrep (n &body body)
   (with-gensyms (i nname)
     `(let ((,nname ,n))
       (loop for ,i from 1 to ,nname
-            collect ,@body))))
+            collect (progn ,@body)))))
 
 
 (defun range (a &optional (b nil))

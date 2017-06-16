@@ -3,32 +3,32 @@
 (defstruct (mutate (:constructor -make-mutate))
   (rules nil)
   (xy nil :type list)
-  (p 0.0d0 :type double-float)
+  (prob 0.0d0 :type double-float)
   (noise 0.0d0 :type double-float)
   (ind nil :type integer))
 
 
 (defun make-mutate (&key
-                     (p 0.1d0)
+                     (prob 0.1d0)
                      (noise 100.0d0)
                      (xy '(0.0d0 0.0d0))
                      (ind 0))
   (let ((rules (make-hash-table :test #'equal)))
 
     (setf (gethash 'append-edge-alt rules)
-          'mutate-append-edge-alt)
+          #'mutate-append-edge-alt)
 
     (setf (gethash 'join-verts-alt rules)
-          'mutate-join-verts-alt)
+          #'mutate-join-verts-alt)
 
     (setf (gethash 'move-vert-alt rules)
-          'mutate-move-vert-alt)
+          #'mutate-move-vert-alt)
 
     (setf (gethash 'add-vert-alt rules)
-          'mutate-add-vert-alt)
+          #'mutate-add-vert-alt)
 
     (-make-mutate :rules rules
-                  :p (to-dfloat p)
+                  :prob (to-dfloat prob)
                   :ind ind
                   :noise (to-dfloat noise)
                   :xy (to-dfloat* xy))))
@@ -51,14 +51,14 @@
     `(let ((,bd (flatten (list ,@body)))
            (,mut ,mutate))
        (mapcar (lambda (,a)
-                 (if (< (rnd:rnd) 0.2)
+                 (if (< (rnd:rnd) (mutate-prob ,mut))
                    (progn
-                     (setf (mutate-ind ,mut)
-                           (-ok-ind (+ (mutate-ind ,mut)
-                                      (rnd:rndi -1 2))))
+                     ;(setf (mutate-ind ,mut)
+                     ;      (-ok-ind (+ (mutate-ind ,mut)
+                     ;                 (rnd:rndi -1 2))))
                      ;(setf (mutate-xy ,mut)
                      ;      (add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0)))
-                     (do-mutate (mutate-rules ,mut) ,a ,mut))
+                     (print (do-mutate (mutate-rules ,mut) ,a ,mut)))
                    ,a))
                ,bd))))
 
