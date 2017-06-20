@@ -12,7 +12,7 @@
 
 
 (defmacro print-every (i n)
-  `(if (= 0 (mod ,i ,n)) (print ,i)))
+  `(if (= 0 (mod ,i ,n)) (format t "~%itt: ~a~%" ,i)))
 
 
 (defun 2* (l) (* l 2))
@@ -79,6 +79,12 @@
 
 (defun x-or-large (x &optional (l 100000.0d0) (lim 0.00001d0))
   (if (> x lim) x l))
+
+
+(defun rep-list (colors)
+  (let ((n (length colors))
+        (i 0))
+    (lambda () (nth (setf i (mod (+ 1 i) n)) colors))))
 
 
 (defmacro val-if-eql (a b)

@@ -76,7 +76,7 @@
 
 (defmacro itr-verts ((snk i &key g) &body body)
   "
-  iterates over all verts in snk, or all verts in grp g of snek.
+  iterates over all verts in grp g (either nil or a specific grp).
   the current vert is named i.
   "
   (with-gensyms (k gv grp num-verts sname)
@@ -91,6 +91,21 @@
               (setf ,i (aref ,gv ,k))
             collect
               (list ,@body)))))))
+
+
+(defmacro itr-all-verts ((snk i) &body body)
+  "
+  iterates over all verts in snk regardless of their grp.
+  the current vert is named i.
+  "
+  (with-gensyms (k verts num-verts sname)
+    `(let ((,sname ,snk))
+      (let ((,num-verts (snek-num-verts ,sname))
+            (,verts (snek-verts ,sname)))
+        (loop
+          for ,i from 0 below ,num-verts
+          collect
+            (list ,@body))))))
 
 
 (defmacro itr-edges ((snk i &key g) &body body)
