@@ -58,7 +58,7 @@
                      ;                 (rnd:rndi -1 2))))
                      ;(setf (mutate-xy ,mut)
                      ;      (add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0)))
-                     (print (do-mutate (mutate-rules ,mut) ,a ,mut)))
+                     (do-mutate (mutate-rules ,mut) ,a ,mut))
                    ,a))
                ,bd))))
 

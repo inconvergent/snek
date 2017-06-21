@@ -84,6 +84,7 @@
 
     (if (< cov-count (half itt))
       (progn
+        ; todo: avoid coerce?
         (loop for xy in (coerce cov 'list) do
           (destructuring-bind (x y)
             xy

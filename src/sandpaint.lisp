@@ -124,11 +124,13 @@
 
 (defun -png-tuple (vals x y gamma)
   (let ((a (aref vals x y 3)))
-    (list
-      (-unsigned-256 (-scale-convert (aref vals x y 0) :s a :gamma gamma))
-      (-unsigned-256 (-scale-convert (aref vals x y 1) :s a :gamma gamma))
-      (-unsigned-256 (-scale-convert (aref vals x y 2) :s a :gamma gamma))
-      (-unsigned-256 (-scale-convert a :gamma gamma)))))
+    (if (> a 0.0d0)
+      (list
+        (-unsigned-256 (-scale-convert (aref vals x y 0) :s a :gamma gamma))
+        (-unsigned-256 (-scale-convert (aref vals x y 1) :s a :gamma gamma))
+        (-unsigned-256 (-scale-convert (aref vals x y 2) :s a :gamma gamma))
+        (-unsigned-256 (-scale-convert a :gamma gamma)))
+      (list 0 0 0 0))))
 
 
 (defun make
@@ -173,7 +175,7 @@
   (let ((vals (sandpaint-vals sand)))
     (destructuring-bind (r g b a)
       (mapcar (lambda (i) (aref vals 0 0 i)) (range 4))
-      (if (>= 1.0d0 a)
+      (if (>= a 1.0d0)
         (let ((na (* a (to-dfloat sa))))
           (setf (aref vals 0 0 0) (* (/ r a) na))
           (setf (aref vals 0 0 1) (* (/ g a) na))
