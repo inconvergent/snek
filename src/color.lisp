@@ -6,7 +6,9 @@
     :dark
     :gray
     :hsv
+    :mdark
     :rgb
+    :transparent
     :vdark
     :white)
   (:import-from :common-lisp-user

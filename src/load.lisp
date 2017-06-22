@@ -2,23 +2,35 @@
 (proclaim '(inline last1 single append1 conc1 mklist))
 (proclaim '(optimize speed))
 
-(load "../quicklisp/setup")
+; TODO: restructure this while file more once i know it works.
 
-(ql:quickload "ZPNG")
+(load "~/quicklisp/setup.lisp")
 
-(load "./src/pg-utils")
-(load "./src/utils")
-(load "./src/math")
-(load "./src/rnd")
-(load "./src/color")
-(load "./src/linear-path")
-(load "./src/bzspline")
-(load "./src/sandpaint")
-(load "./src/plot")
-(load "./src/zmap")
-(load "./src/snek-macros")
-(load "./src/snek")
-(load "./src/snek-alterations")
-(load "./src/snek-alterations-mutate")
-(load "./src/snek-utils")
+(ql:quickload "zpng")
+
+
+(asdf:defsystem "snek"
+  :description "SNEK - A Generative System for Writing Generative Systems"
+  :version "1.4.0"
+  :author "inconvergent"
+  :licence "MIT"
+  :serial t
+  :depends-on ("zpng")
+  :components ((:file "pg-utils")
+               (:file "utils")
+               (:file "math")
+               (:file "rnd")
+               (:file "color")
+               (:file "linear-path")
+               (:file "bzspline")
+               (:file "sandpaint")
+               (:file "plot")
+               (:file "zmap")
+               (:file "snek-macros")
+               (:file "snek")
+               (:file "snek-alterations")
+               (:file "snek-alterations-mutate")
+               (:file "snek-utils")))
+
+(asdf:load-system "snek")
 

@@ -112,7 +112,8 @@ There are some tests included. Run them like this:
 ## Stability, Changes and Versioning
 
 This code is highly experimental on my part. It is likely to change with no
-warning or explanation. I will keep a note of the version number in `VERSION`.
+warning or explanation. I will keep a note of the version number in
+`src/load.lisp`.
 
 
 ## On Use and Contributions
@@ -123,10 +124,21 @@ collaboration/Open Source project. As such I am unlikely to accept PRs, reply
 to issues, or take requests.
 
 
-## Wanted Changes
+## Planned Changes
 
  - math utils as package?
  - snek as package?
  - Randomized order of alteration apply
  - Maintain list of singly-connected vertices?
+
+
+## THANKS
+
+I would like to thank
+
+  - https://twitter.com/RainerJoswig
+  - https://twitter.com/paulg
+  - https://twitter.com/jackrusher
+
+Who have provided me with useful hints and code feedback.
 

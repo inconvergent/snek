@@ -147,12 +147,6 @@
     (list (to-dfloat a))))
 
 
-(defun range (a &optional (b nil))
-  (if (not b)
-    (loop for x from 0 below a collect x)
-    (loop for x from a below b collect x)))
-
-
 ; GET SET
 
 
