@@ -69,6 +69,7 @@ There are some examples included. They can be executed like this:
     ./ex-grp.lisp res/grp
     ./ex-custom-alt.lisp res/custom
     ./ex-hyphae.lisp res/hyphae
+    ./ex-bzspl.lisp res/bzspl
 
 There is also and example of how to use the plotting functionality. This will
 export a simple vector file and an image to indicate the result

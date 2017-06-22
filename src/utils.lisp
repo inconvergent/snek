@@ -77,10 +77,6 @@
   (mapcar (lambda (x) (coerce x 'double-float)) xx))
 
 
-(defun x-or-large (x &optional (l 100000.0d0) (lim 0.00001d0))
-  (if (> x lim) x l))
-
-
 (defun rep-list (colors)
   (let ((n (length colors))
         (i 0))

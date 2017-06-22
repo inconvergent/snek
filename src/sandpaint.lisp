@@ -16,6 +16,7 @@
     :strokes)
   (:import-from :common-lisp-user
     :add
+    :aif
     :append-postfix
     :dst
     :get-as-list
@@ -237,9 +238,14 @@
             (-draw-circ vals size (on-line p u w) rad grains r g b a))))))
 
 
+; TODO: 16 bit?
 (defun save (sand fn &key (gamma 1.0))
-  (if (not fn) (error "missing result file name."))
-  (let ((fnimg (append-postfix fn ".png")))
+  (let ((fnimg (append-postfix
+                 (aif fn fn
+                      (progn
+                        (warn "missing file name, using: tmp.png")
+                        "tmp"))
+                 ".png")))
     (with-struct (sandpaint- size vals) sand
       (let ((png (make-instance
                    'zpng::pixel-streamed-png

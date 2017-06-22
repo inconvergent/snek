@@ -14,21 +14,11 @@
 
 
 (defun do-add-vert-alt (snk a)
+  "
+  add vert at xy.
+  "
   (with-struct (add-vert-alt- xy g) a
     (add-vert! snk xy :g g)))
-
-
-; ADD EDGE
-
-(defstruct (add-edge-alt
-    (:constructor add-edge? (e &optional g)))
-  (e nil :type list :read-only t)
-  (g nil :type symbol :read-only t))
-
-
-(defun do-add-edge-alt (snk a)
-  (with-struct (add-edge-alt- e g) a
-    (add-edge! snk e :g g)))
 
 
 ; ADD EDGE
@@ -41,6 +31,9 @@
 
 
 (defun do-add-edge*-alt (snk a)
+  "
+  add verts xya and xyb, and create an edge between them.
+  "
   (with-struct (add-edge*-alt- xya xyb g) a
     (add-edge! snk
                (list (add-vert! snk xya :g g)
@@ -58,6 +51,11 @@
 
 
 (defun do-move-vert-alt (snk a)
+  "
+  move vert v.
+  if rel: move relative to original position.
+  else: move to xy.
+  "
   (with-struct (snek- verts num-verts) snk
     (with-struct (move-vert-alt- v xy rel) a
       (-valid-vert (num-verts v :err nil)
@@ -88,6 +86,9 @@
 
 
 (defun do-append-edge-alt (snk a)
+  "
+
+  "
   (with-struct (snek- num-verts) snk
     (with-struct (append-edge-alt- v xy rel) a
       (-valid-vert (num-verts v :err nil)
@@ -108,6 +109,9 @@
 
 
 (defun do-join-verts-alt (snk a)
+  "
+  create edge between valid verts v and w.
+  "
   (with-struct (snek- num-verts) snk
     (with-struct (join-verts-alt- v w) a
       (-valid-vert (num-verts v :err nil)
@@ -128,6 +132,10 @@
 
 
 (defun do-split-edge-alt (snk a)
+  "
+  insert a vert, v, at the middle of edge e = (a b)
+  such that we get edges (a v) and (v b).
+  "
   (with-struct (split-edge-alt- e) a
     (let ((res (del-edge! snk e))
           (verts (snek-verts snk)))
@@ -152,6 +160,10 @@
 
 
 (defmacro force? (snk v1 v2 r)
+  "
+  creates relative movement (move-vert alteration) between verts
+  v1 and v2.
+  "
   (with-gensyms (vname v1name v2name rname)
     `(let ((,vname (snek-verts ,snk))
            (,v1name ,v1)
