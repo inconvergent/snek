@@ -10,6 +10,7 @@
     :stipple-strokes)
   (:import-from :common-lisp-user
     :add
+    :aif
     :append-postfix
     :dst
     :get-as-list
@@ -85,10 +86,8 @@
     (if (< cov-count (half itt))
       (progn
         ; todo: avoid coerce?
-        (loop for xy in (coerce cov 'list) do
-          (destructuring-bind (x y)
-            xy
-            (incf (aref coverage x y))))
+        (loop for (x y) in (coerce cov 'list) do
+          (incf (aref coverage x y)))
         t)
       nil)))
 
@@ -101,17 +100,14 @@
 
 (defun -coverage-path (size coverage path)
   (loop
-    for a in path
-    for b in (cdr path)
-    do
+    for a in path and b in (cdr path) do
       (let ((n (* 2 (round (dst a b)))))
         (loop for s in (linspace 0.0 1.0 n) do
           (inside* (size (on-line s a b) x y)
             (incf (aref coverage x y)))))))
 
 
-(defun path (plt path)
-  (let ((n (length path)))
+(defun path (plt path &aux (n (length path)))
   (with-struct (plot- size verts lines num-verts coverage) plt
     ; todo: test if path is outside boundary
     (dolist (p path)
@@ -120,7 +116,7 @@
       (range num-verts (+ num-verts n)) lines)
     (incf (plot-num-verts plt) n)
     (incf (plot-num-lines plt))
-    (-coverage-path size coverage path))))
+    (-coverage-path size coverage path)))
 
 
 (defun -stipple (plt xy offset)
@@ -210,17 +206,20 @@
 
 
 (defun save (plt fn)
-  (if (not fn) (error "missing result file name."))
-  (let ((fnimg (append-postfix fn ".png"))
-        (fnobj (append-postfix fn ".2obj")))
-    (with-struct (plot- size verts edges lines coverage
-                        num-verts num-edges num-lines discards) plt
-      (-write-png coverage size fnimg)
-      (-write-2obj verts edges lines fnobj)
-      (format t "~%~%num verts: ~a ~%" num-verts)
-      (format t "num edges: ~a ~%" num-edges)
-      (format t "num lines ~a ~%" num-lines)
-      (format t "num discards: ~a ~%" discards))
-    (format t "~%files ~a" fnimg)
-    (format t "~%      ~a~%~%" fnobj)))
+  (let ((fn* (aif fn fn
+                     (progn
+                        (warn "missing file name, using: tmp.png")
+                        "tmp"))))
+    (let ((fnimg (append-postfix fn* ".png"))
+          (fnobj (append-postfix fn* ".2obj")))
+      (with-struct (plot- size verts edges lines coverage
+                          num-verts num-edges num-lines discards) plt
+        (-write-png coverage size fnimg)
+        (-write-2obj verts edges lines fnobj)
+        (format t "~%~%num verts: ~a ~%" num-verts)
+        (format t "num edges: ~a ~%" num-edges)
+        (format t "num lines ~a ~%" num-lines)
+        (format t "num discards: ~a ~%" discards))
+      (format t "~%files ~a" fnimg)
+      (format t "~%      ~a~%~%" fnobj))))
 

@@ -71,17 +71,17 @@
 
 
 (defun -draw-stroke (vals size grains v1 v2 r g b a)
-  (loop for i from 1 to grains
-    do
-      (inside* (size (rnd:on-line v1 v2) x y)
-        (-operator-over vals x y r g b a))))
+  (loop for i from 1 to grains do
+    (inside* (size (rnd:on-line v1 v2) x y)
+      (-operator-over vals x y r g b a))))
 
 
 (defun copy-rgba-array-to-from (target source size)
   (square-loop (x y size)
-    (loop for i from 0 to 3 do
-      (setf (aref target x y i) (aref source x y i)))))
-
+    (setf (aref target x y 0) (aref source x y 0)
+          (aref target x y 1) (aref source x y 1)
+          (aref target x y 2) (aref source x y 2)
+          (aref target x y 3) (aref source x y 3))))
 
 
 (defstruct sandpaint
@@ -146,10 +146,10 @@
 
     (let ((vals (make-rgba-array size)))
       (square-loop (x y size)
-        (setf (aref vals x y 0) (* ba br))
-        (setf (aref vals x y 1) (* ba bg))
-        (setf (aref vals x y 2) (* ba bb))
-        (setf (aref vals x y 3) ba))
+        (setf (aref vals x y 0) (* ba br)
+              (aref vals x y 1) (* ba bg)
+              (aref vals x y 2) (* ba bb)
+              (aref vals x y 3) ba))
 
       (make-sandpaint
         :size size
@@ -163,10 +163,10 @@
 (defun set-rgba (sand rgba)
   (destructuring-bind (r g b a)
     (to-dfloat* rgba)
-    (setf (sandpaint-r sand) (* r a))
-    (setf (sandpaint-g sand) (* g a))
-    (setf (sandpaint-b sand) (* b a))
-    (setf (sandpaint-a sand) a)))
+    (setf (sandpaint-r sand) (* r a)
+          (sandpaint-g sand) (* g a)
+          (sandpaint-b sand) (* b a)
+          (sandpaint-a sand) a)))
 
 
 (defun pixel-hack (sand &optional (sa 0.9d0))
@@ -178,10 +178,10 @@
       (mapcar (lambda (i) (aref vals 0 0 i)) (range 4))
       (if (>= a 1.0d0)
         (let ((na (* a (to-dfloat sa))))
-          (setf (aref vals 0 0 0) (* (/ r a) na))
-          (setf (aref vals 0 0 1) (* (/ g a) na))
-          (setf (aref vals 0 0 2) (* (/ b a) na))
-          (setf (aref vals 0 0 3) na))))))
+          (setf (aref vals 0 0 0) (* (/ r a) na)
+                (aref vals 0 0 1) (* (/ g a) na)
+                (aref vals 0 0 2) (* (/ b a) na)
+                (aref vals 0 0 3) na))))))
 
 
 (defun pix (sand vv)
@@ -214,10 +214,8 @@
 
 (defun strokes (sand lines grains)
   (with-struct (sandpaint- size vals r g b a) sand
-    (loop for line in lines do
-      (destructuring-bind (u v)
-        line
-        (-draw-stroke vals size grains u v r g b a)))))
+    (loop for (u v) in lines do
+      (-draw-stroke vals size grains u v r g b a))))
 
 
 (defun stroke (sand line grains)
@@ -229,13 +227,10 @@
 
 (defun lin-path (sand path rad grains &key (dens 1))
   (with-struct (sandpaint- size vals r g b a) sand
-    (loop
-      for u in path
-      for w in (cdr path)
-      do
-        (let ((stps (to-int (floor (+ 1 (* dens (dst u w)))))))
-          (rep (p (linspace 0 1 stps :end nil))
-            (-draw-circ vals size (on-line p u w) rad grains r g b a))))))
+    (loop for u in path and w in (cdr path) do
+      (let ((stps (to-int (floor (+ 1 (* dens (dst u w)))))))
+        (rep (p (linspace 0 1 stps :end nil))
+          (-draw-circ vals size (on-line p u w) rad grains r g b a))))))
 
 
 ; TODO: 16 bit?

@@ -77,9 +77,8 @@
   (mapcar (lambda (x) (coerce x 'double-float)) xx))
 
 
-(defun rep-list (colors)
-  (let ((n (length colors))
-        (i 0))
+(defun rep-list (colors &aux (n (length colors)))
+  (let ((i 0))
     (lambda () (nth (setf i (mod (+ 1 i) n)) colors))))
 
 

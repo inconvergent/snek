@@ -39,12 +39,9 @@
                     (setf (aref lens (1+ i) 0) total)
                   finally
                     (return total))))
-    (loop
-      for i from 1 below n
-      do
-        (setf
-          (aref lens i 0)
-          (/ (aref lens i 0) total)))))
+    (loop for i from 1 below n do
+      (setf (aref lens i 0)
+            (/ (aref lens i 0) total)))))
 
 
 ; TODO: binary search
@@ -85,17 +82,13 @@
   `(pos* ,path (rnd:rndspace 0.0d0 1.0d0 ,n)))
 
 
-(defun make (pts &key closed)
-  (let ((n (length pts)))
-    (let ((p (make-dfloat-array n))
-          (l (make-dfloat-array n :cols 1)))
-      (loop
-        for d in pts
-        for i from 0
-        do
-          (set-from-list p i (to-dfloat* d)))
-      (-set-path-lens p l n)
-      (make-path :n n :pts p :lens l :closed closed))))
+(defun make (pts &key closed &aux (n (length pts)))
+  (let ((p (make-dfloat-array n))
+        (l (make-dfloat-array n :cols 1)))
+    (loop for d in pts and i from 0 do
+      (set-from-list p i (to-dfloat* d)))
+    (-set-path-lens p l n)
+    (make-path :n n :pts p :lens l :closed closed)))
 
 
 (defun -move-rel (pts i xy)
@@ -108,23 +101,19 @@
 (defun -move (pts i xy)
   (destructuring-bind (x y)
     xy
-    (setf (aref pts i 0) x)
-    (setf (aref pts i 1) y)))
+    (setf (aref pts i 0) x
+          (aref pts i 1) y)))
 
 
 (defun move (path pos &key rel)
   (let ((do-move (if rel #'-move-rel #'-move)))
     (with-struct (path- pts lens n closed) path
-      (loop
-        for xy in pos
-        for i from 0
-        do
-          (funcall do-move pts i xy))
+      (loop for xy in pos and i from 0 do
+        (funcall do-move pts i xy))
 
       (if closed
-        (progn
-          (setf (aref pts (1- n) 0) (aref pts 0 0))
-          (setf (aref pts (1- n) 1) (aref pts 0 1))))
+        (setf (aref pts (1- n) 0) (aref pts 0 0)
+              (aref pts (1- n) 1) (aref pts 0 1)))
 
       (-set-path-lens pts lens n))))
 

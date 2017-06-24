@@ -88,8 +88,8 @@
                       :type 'main
                       :edges (make-int-array max-main-grp-edges))))
 
-      (setf (gethash nil (snek-grps snk)) main-grp)
-      (setf (snek-main-grp snk) main-grp)
+      (setf (gethash nil (snek-grps snk)) main-grp
+            (snek-main-grp snk) main-grp)
       snk)))
 
 
@@ -146,10 +146,10 @@
   (loop for i from 0 below (- num pos) do
     (let ((left (- num (1+ i)))
           (right (- num i)))
-      (setf (aref edges right 0) (aref edges left 0))
-      (setf (aref edges right 1) (aref edges left 1))))
-    (setf (aref edges pos 0) (first edge))
-    (setf (aref edges pos 1) (second edge)))
+      (setf (aref edges right 0) (aref edges left 0)
+            (aref edges right 1) (aref edges left 1))))
+    (setf (aref edges pos 0) (first edge)
+          (aref edges pos 1) (second edge)))
 
 
 (defun -find-add-edge (edges num e)
@@ -163,8 +163,8 @@
 
 (defun -del-edge (edges pos num)
   (loop for i from pos to (- num 2) do
-    (setf (aref edges i 0) (aref edges (1+ i) 0))
-    (setf (aref edges i 1) (aref edges (1+ i) 1)))
+    (setf (aref edges i 0) (aref edges (1+ i) 0)
+          (aref edges i 1) (aref edges (1+ i) 1)))
   (set-from-list edges (1- num) (list 0 0)))
 
 
@@ -192,8 +192,8 @@
     (-add-vert-to-grp num-verts vert-to-grp grps g)
     (destructuring-bind (x y)
       (to-dfloat* xy)
-      (setf (aref verts num-verts 0) x)
-      (setf (aref verts num-verts 1) y)
+      (setf (aref verts num-verts 0) x
+            (aref verts num-verts 1) y)
       (- (incf (snek-num-verts snk)) 1))))
 
 

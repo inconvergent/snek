@@ -11,12 +11,10 @@
       (let ((,alt-names (snek-alt-names ,sname)))
         (incf (snek-wc ,sname))
         (if ,zw
-          (progn
-            (setf (snek-zwidth ,sname) ,zw)
-            (setf (snek-zmap ,sname)
-                  (zmap:make (snek-verts ,sname)
-                             (snek-num-verts ,sname)
-                             (to-dfloat ,zw)))))
+          (setf (snek-zwidth ,sname) ,zw
+                (snek-zmap ,sname) (zmap:make (snek-verts ,sname)
+                                              (snek-num-verts ,sname)
+                                              (to-dfloat ,zw))))
         (do-alts
           (remove-if-not
             (lambda (x) (gethash (type-of x) ,alt-names))
