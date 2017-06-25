@@ -1,6 +1,6 @@
 #!/usr/bin/sbcl --script
 
-(load "src/load.lisp")
+(load "../src/load.lisp")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))

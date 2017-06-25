@@ -1,7 +1,7 @@
 #!/usr/bin/sbcl --script
 
-(load "src/load")
-(load "./src/test-utils")
+(load "../src/load")
+(load "../src/test-utils")
 
 (setf *print-pretty* t)
 ;(setf *random-state* (make-random-state t))

@@ -57,13 +57,13 @@ Here is and example of manipulating a `snek` instance called `snk` using
 ### Custom alterations
 
 You can define your own arbitrary alterations. There is an example of this in
-`ex-custom-alt.lisp`. I have also written about it here:
+`ex/custom-alt.lisp`. I have also written about it here:
 http://inconvergent.net/arbitrary-alterations/
 
 
 ## Examples
 
-There are some examples included. All examples are named like this: `ex-*.lisp`.
+There are some examples included. All examples are in the `ex` folder.
 
 if you don't provide a result name as the first argument, then the resulting
 file will be named `tmp.png`.
@@ -96,10 +96,7 @@ This code requires `Quicklisp` and `zpng`. The path to quicklisp must be set in
 
 ## Tests
 
-There are some tests included. Run them like this:
-
-    ./test.lisp
-    ./test-snek.lisp
+There are some tests included, see the `test` folder.
 
 
 ## Stability, Changes and Versioning
