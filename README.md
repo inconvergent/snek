@@ -30,6 +30,7 @@ I have also written about things related to `snek` at
   - http://inconvergent.net/a-propensity-for-mistakes/ (indirectly about `snek`)
   - http://inconvergent.net/a-method-for-mistakes/
   - http://inconvergent.net/arbitrary-alterations/
+  - http://inconvergent.net/grains-of-sand/ (about "sandpainting", see `src/sandpaint.lisp`)
 
 Here is and example of manipulating a `snek` instance called `snk` using
 `alterations`. Alteration constructors are postfixed with ?.
@@ -62,21 +63,13 @@ http://inconvergent.net/arbitrary-alterations/
 
 ## Examples
 
-There are some examples included. They can be executed like this:
+There are some examples included. All examples are named like this: `ex-*.lisp`.
 
-    ./ex-slope.lisp res/slope
-    ./ex-lines.lisp res/lines
-    ./ex-grp.lisp res/grp
-    ./ex-custom-alt.lisp res/custom
-    ./ex-hyphae.lisp res/hyphae
-    ./ex-bzspl.lisp res/bzspl
+if you don't provide a result name as the first argument, then the resulting
+file will be named `tmp.png`.
 
-There is also and example of how to use the plotting functionality. This will
-export a simple vector file and an image to indicate the result
-
-    ./ex-plot-perspective.lisp res/perspective
-
-Notice that the resulting image will end up in `res`.
+This includes a few samples of how to use the plotting functionality. This will
+export a simple vector file and an image to indicate the result.
 
 
 ## Usage
