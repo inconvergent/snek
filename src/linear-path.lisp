@@ -8,9 +8,8 @@
     :make
     :move)
   (:import-from :common-lisp-user
-    :diff-scale
-    :get-as-list
-    :set-from-list
+    :get-atup
+    :set-atup
     :add
     :dst
     :scale
@@ -29,12 +28,15 @@
   (pts nil))
 
 
+(defun -diff-scale (a b s) (/ (- b a) s))
+
+
 (defun -set-path-lens (pts lens n)
   (let ((total (loop
                   for i from 0 below (1- n)
                   sum (dst
-                        (get-as-list pts i)
-                        (get-as-list pts (1+ i))) into total
+                        (get-atup pts i)
+                        (get-atup pts (1+ i))) into total
                   do
                     (setf (aref lens (1+ i) 0) total)
                   finally
@@ -54,9 +56,9 @@
 
 (defun -calc-pos (pts lens n f)
   (let ((ind (-find-seg-ind lens f n)))
-        (let ((pb (get-as-list pts ind))
-              (pa (get-as-list pts (1- ind)))
-              (s (diff-scale
+        (let ((pb (get-atup pts ind))
+              (pa (get-atup pts (1- ind)))
+              (s (-diff-scale
                    (aref lens (1- ind) 0)
                    f
                    (- (aref lens ind 0)
@@ -86,7 +88,7 @@
   (let ((p (make-dfloat-array n))
         (l (make-dfloat-array n :cols 1)))
     (loop for d in pts and i from 0 do
-      (set-from-list p i (to-dfloat* d)))
+      (set-atup p i (to-dfloat* d)))
     (-set-path-lens p l n)
     (make-path :n n :pts p :lens l :closed closed)))
 

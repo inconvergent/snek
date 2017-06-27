@@ -4,7 +4,7 @@
 
 (defun edge-length (snk e)
   (with-struct (snek- verts) snk
-    (apply #'dst (mapcar (lambda (v) (get-as-list verts v)) e))))
+    (apply #'dst (mapcar (lambda (v) (get-atup verts v)) e))))
 
 
 (defun snek-init-circ (snk num rad &key (xy (list 0.0d0 0.0d0)) g)
@@ -40,8 +40,8 @@
         for (a b) in (get-edges snk :g g)
         collect
           (list
-            (get-as-list verts a)
-            (get-as-list verts b)))
+            (get-atup verts a)
+            (get-atup verts b)))
         grains)))
 
 

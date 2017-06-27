@@ -61,7 +61,7 @@
                 (add (get-vert snk k)
                      (rnd:in-circ rad))
                 :rel nil))
-            (sandpaint:save sand (format nil "~a-~6,'0d" fn hits))))))))
+            (sandpaint:save sand (append-number fn hits))))))))
 
 
 (defun main (size fn)

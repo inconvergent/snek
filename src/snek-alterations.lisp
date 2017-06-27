@@ -60,12 +60,10 @@
     (with-struct (move-vert-alt- v xy rel) a
       (-valid-vert (num-verts v :err nil)
         (let ((fxy (to-dfloat* xy)))
-          (set-from-list
-            verts
-            v
-            (if rel
-              (add (get-as-list verts v) fxy)
-              fxy)))))))
+          (destructuring-bind (x y)
+            (if rel (add (get-atup verts v) fxy) fxy)
+            (setf (aref verts v 0) x
+                  (aref verts v 1) y)))))))
 
 
 ; TODO: consider making macros similar to this instead of current
@@ -146,8 +144,8 @@
                 (gb (get-vert-grp snk b)))
             (let ((g (val-if-eql ga gb)))
               (let ((c (add-vert! snk
-                          (mid (get-as-list verts a)
-                               (get-as-list verts b))
+                          (mid (get-atup verts a)
+                               (get-atup verts b))
                           :g g)))
                 (add-edge! snk (list a c) :g g)
                 (add-edge! snk (list c b) :g g)))))))))
@@ -173,7 +171,7 @@
         ,v1 ,v2
         (scale
           (nsub
-            (get-as-list ,vname ,v1name)
-            (get-as-list ,vname ,v2name))
+            (get-atup ,vname ,v1name)
+            (get-atup ,vname ,v2name))
           ,rname)))))
 

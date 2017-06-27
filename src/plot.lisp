@@ -13,7 +13,6 @@
     :aif
     :append-postfix
     :dst
-    :get-as-list
     :half
     :inside
     :inside*

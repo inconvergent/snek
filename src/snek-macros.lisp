@@ -22,6 +22,15 @@
           ,sname)))))
 
 
+(defmacro with-dx ((snk vv dx d) &body body)
+  (with-gensyms (sname)
+    `(let ((,sname ,snk))
+       (let* ((,dx (apply #'isub (get-verts ,sname ,vv)))
+              (,d (len ,dx)))
+         (if (> d 0.0d0)
+           (list ,@body))))))
+
+
 (defmacro with-grp ((snk grp g) &body body)
   "
   select a grp from a snek instance. the grp will be available
@@ -51,7 +60,7 @@
       (let ((,num-edges (grp-num-edges ,grp))
             (,edges (grp-edges ,grp)))
         (if (> ,num-edges 0)
-          (let ((,i (get-as-list ,edges (random ,num-edges))))
+          (let ((,i (get-atup ,edges (random ,num-edges))))
             (list ,@body)))))))
 
 
@@ -119,7 +128,7 @@
           with ,i
           for ,k from 0 below ,num-edges
           do
-            (setf ,i (get-as-list ,edges ,k))
+            (setf ,i (get-atup ,edges ,k))
           if (< (first ,i) (second ,i))
           collect (list ,@body))))))
 

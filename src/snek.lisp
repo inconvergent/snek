@@ -165,7 +165,8 @@
   (loop for i from pos to (- num 2) do
     (setf (aref edges i 0) (aref edges (1+ i) 0)
           (aref edges i 1) (aref edges (1+ i) 1)))
-  (set-from-list edges (1- num) (list 0 0)))
+  (setf (aref edges (1- num) 0) 0
+        (aref edges (1- num) 1) 0))
 
 
 (defun -find-del-edge (edges num e)
@@ -223,7 +224,7 @@
   (with-struct (snek- verts num-verts) snk
     (mapcar (lambda (v)
               (-valid-vert (num-verts v)
-                (get-as-list verts v)))
+                (get-atup verts v)))
             vv)))
 
 
@@ -255,7 +256,7 @@
   (with-grp (snk grp g)
     (with-struct (grp- edges num-edges) grp
       (loop for i from 0 below num-edges collect
-        (get-as-list edges i)))))
+        (get-atup edges i)))))
 
 
 (defun get-edge-arr (snk &key g)
@@ -312,5 +313,5 @@
     (with-struct (grp- edges num-edges) grp
       (loop for i from 0 below num-edges
         if (eql v (aref edges i 0))
-        collect (get-as-list edges i)))))
+        collect (get-atup edges i)))))
 

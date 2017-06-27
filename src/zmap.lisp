@@ -7,7 +7,7 @@
   (:import-from :common-lisp-user
     :dst2
     :to-dfloat
-    :get-as-list
+    :get-atup
     :to-dfloat*
     :with-struct))
 
@@ -29,11 +29,8 @@
   (multiple-value-bind (vals exists)
     (gethash z zmap)
     (if (not exists)
-      (progn
-        (setf
-          vals
-          (make-array 20 :fill-pointer 0 :element-type 'integer))
-        (setf (gethash z zmap) vals)))
+      (setf vals (make-array 20 :fill-pointer 0 :element-type 'integer)
+            (gethash z zmap) vals))
     (vector-push-extend v vals)))
 
 
@@ -58,7 +55,7 @@
 (defun nearby-zones (z)
   (destructuring-bind (a b)
     z
-    (let ((zs (make-array 9 :fill-pointer 0)))
+    (let ((zs (make-array 9 :fill-pointer 0 :element-type 'integer)))
       (-extend i j (vector-push (list (+ a i) (+ b j)) zs))
       zs)))
 
@@ -73,11 +70,9 @@
           (multiple-value-bind (vals exists)
           (gethash (aref zs i) zmap)
           (if exists
-            (loop for j from 0 below (length vals)
-              do
+            (loop for j from 0 below (length vals) do
               (let ((zj (aref vals j)))
-                (if
-                  (< (dst2 xy (get-as-list verts zj)) rad2)
+                (if (< (dst2 xy (get-atup verts zj)) rad2)
                   (vector-push-extend zj inds)))))))
         inds))
 

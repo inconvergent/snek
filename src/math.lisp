@@ -21,13 +21,6 @@
 ; VEC
 
 
-(defun diff-scale (a b s) (/ (- b a) s))
-
-
-(defun lexpt (xx p)
-  (mapcar (lambda (x) (expt x p)) xx))
-
-
 (defun scale (a s)
   (mapcar (lambda (x) (* x s)) a))
 
@@ -94,17 +87,11 @@
 
 (defun norm (a)
   (let ((l (len a)))
-    (cond
-      ((<= l 0d0) a)
-      (t (scale a (/ 1.0d0 l))))))
+    (if (> l 0.0d0) (iscale a l) a)))
 
 
 (defun nsub (a b)
   (norm (sub a b)))
-
-
-(defun nadd (a b)
-  (norm (add a b)))
 
 
 (defun lround (l)
@@ -145,22 +132,6 @@
       (loop for i from 0 below n
           collect (to-dfloat (+ a (* i (/ (- b a) nn))))))
     (list (to-dfloat a))))
-
-
-; GET SET
-
-
-(defun get-as-list (arr row &optional (dims (range 2)))
-  (mapcar
-    (lambda (d) (aref arr row d))
-    dims))
-
-
-(defun set-from-list (arr row vals)
-  (mapcar
-    (lambda (d v) (setf (aref arr row d) v))
-    (list 0 1)
-    vals))
 
 
 ; SHAPES

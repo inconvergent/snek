@@ -9,7 +9,7 @@
     :move)
   (:import-from :common-lisp-user
     :add
-    :get-as-list
+    :get-atup
     :iscale
     :make-dfloat-array
     :scale
@@ -89,33 +89,33 @@
 
 (defun -mean (pts a b)
   (scale
-    (add (get-as-list pts a)
-         (get-as-list pts b))
+    (add (get-atup pts a)
+         (get-atup pts b))
     0.5d0))
 
 
 (defun -select-pts-open (n pts seg)
   (cond ((< seg 1)
           (list
-            (get-as-list pts 0)
-            (get-as-list pts 1)
+            (get-atup pts 0)
+            (get-atup pts 1)
             (-mean pts 1 2)))
         ((< seg (- n 3))
           (list
             (-mean pts seg (+ seg 1))
-            (get-as-list pts (+ seg 1))
+            (get-atup pts (+ seg 1))
             (-mean pts (+ seg 1) (+ seg 2))))
         (t
           (list
             (-mean pts (- n 3) (- n 2))
-            (get-as-list pts (- n 2))
-            (get-as-list pts (- n 1))))))
+            (get-atup pts (- n 2))
+            (get-atup pts (- n 1))))))
 
 
 (defun -select-pts-closed (n pts seg)
   (list
     (-mean pts (mod seg n) (mod (+ seg 1) n))
-    (get-as-list pts (mod (+ seg 1) n))
+    (get-atup pts (mod (+ seg 1) n))
     (-mean pts (mod (+ seg 1) n) (mod (+ seg 2) n))))
 
 

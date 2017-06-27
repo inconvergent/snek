@@ -5,6 +5,7 @@
     :chromatic-aberration
     :circ
     :circ*
+    :clear
     :make
     :pix
     :pix*
@@ -19,7 +20,7 @@
     :aif
     :append-postfix
     :dst
-    :get-as-list
+    :get-atup
     :inside
     :inside*
     :linspace
@@ -134,15 +135,22 @@
       (list 0 0 0 0))))
 
 
-(defun make
-    (size
-     &key
-       (active '(0.0d0 0.0d0 0.0d0 1.0d0))
-       (bg '(1.0d0 1.0d0 1.0d0 1.0d0)))
+(defun clear (sand rgba)
+  (destructuring-bind (r g b a)
+    rgba
+    (with-struct (sandpaint- size vals) sand
+      (square-loop (x y size)
+        (setf (aref vals x y 0) (* a r)
+              (aref vals x y 1) (* a g)
+              (aref vals x y 2) (* a b)
+              (aref vals x y 3) a)))))
+
+
+(defun make (size &key (active '(0.0d0 0.0d0 0.0d0 1.0d0))
+                       (bg '(1.0d0 1.0d0 1.0d0 1.0d0)))
   (destructuring-bind (ar ag ab aa br bg bb ba)
-    (mapcar
-      (lambda (x) (to-dfloat x))
-      (append active bg))
+    (mapcar (lambda (x) (to-dfloat x))
+            (append active bg))
 
     (let ((vals (make-rgba-array size)))
       (square-loop (x y size)
@@ -194,7 +202,7 @@
 (defun pix* (sand vv n)
   (with-struct (sandpaint- size vals r g b a) sand
     (loop for i from 0 below n do
-      (inside* (size (get-as-list vv i) x y)
+      (inside* (size (get-atup vv i) x y)
         (-operator-over vals x y r g b a)))))
 
 
@@ -208,7 +216,7 @@
 (defun circ* (sand vv num rad grains)
   (with-struct (sandpaint- size vals r g b a) sand
     (loop for i from 0 below num do
-      (-draw-circ vals size (get-as-list vv i)
+      (-draw-circ vals size (get-atup vv i)
                   rad grains r g b a))))
 
 

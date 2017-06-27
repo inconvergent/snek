@@ -11,6 +11,10 @@
   (concatenate 'string fn postfix))
 
 
+(defun append-number (fn i)
+  (format nil "~a-~8,'0d" fn i))
+
+
 (defmacro print-every (i n)
   `(if (= 0 (mod ,i ,n)) (format t "~%itt: ~a~%" ,i)))
 
@@ -28,7 +32,7 @@
   (make-array
     (list rows cols)
     :initial-element initial
-    :element-type 'double-float ))
+    :element-type 'double-float))
 
 
 (defun make-symb-array (rows &key (initial nil))
@@ -75,6 +79,19 @@
 
 (defun to-dfloat* (xx)
   (mapcar (lambda (x) (coerce x 'double-float)) xx))
+
+
+(defun get-atup (arr row)
+  (list
+    (aref arr row 0)
+    (aref arr row 1)))
+
+
+(defun set-atup (arr row ab)
+  (destructuring-bind (a b)
+    ab
+    (setf (aref arr row 0) a
+          (aref arr row 1) b)))
 
 
 (defun rep-list (colors &aux (n (length colors)))
