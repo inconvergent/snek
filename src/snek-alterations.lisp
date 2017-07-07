@@ -1,10 +1,4 @@
 
-(defun do-alts (alts snk)
-  (let ((alt-names (snek-alt-names snk)))
-    (dolist (a alts)
-      (funcall (gethash (type-of a) alt-names) snk a))))
-
-
 ; ADD VERT
 
 (defstruct (add-vert-alt

@@ -299,6 +299,31 @@
     (add-edge! snk '(7 3))
     snk))
 
+
+(defun test-snek-with ()
+  (let ((snk (init-snek)))
+    (with-snek (snk)
+
+      (add-vert? '(11 3))
+      (list
+        4.5
+        (move-vert? 0 '(1 0))
+        nil
+        t
+        (list
+          5
+          (add-vert? '(12 3))
+          (add-vert? '(13 3)))
+        (list nil)
+        (list (list))))
+
+    (do-test
+      (get-grp-vert-vals snk)
+      '((1.0d0 2.0d0) (2.0d0 3.0d0) (3.0d0 4.0d0) (4.0d0 7.0d0) (5.0d0 4.0d0)
+        (0.0d0 6.0d0) (-1.0d0 7.0d0) (0.0d0 8.0d0) (0.0d0 9.0d0) (10.0d0 1.0d0)
+        (3.0d0 1.0d0) (11.0d0 3.0d0) (12.0d0 3.0d0) (13.0d0 3.0d0)))))
+
+
 (defun test-snek-add ()
   (let ((snk (init-snek)))
     (with-snek (snk)
@@ -631,6 +656,7 @@
   (test-title (test-snek (make-snek)))
   (test-title (test-snek-2 (make-snek)))
   (test-title (test-snek-3 (make-snek)))
+  (test-title (test-snek-with))
   (test-title (test-snek-add))
   (test-title (test-snek-move))
   (test-title (test-snek-join))

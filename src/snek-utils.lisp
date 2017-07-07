@@ -1,82 +1,252 @@
 
-(defun -roll-once (aa)
-  (butlast (append (last aa) aa) 1))
+(defun add-grp! (snk &key (type nil) (closed nil))
+  "
+  constructor for grp instances.
 
-(defun edge-length (snk e)
-  (with-struct (snek- verts) snk
-    (apply #'dst (mapcar (lambda (v) (get-atup verts v)) e))))
-
-
-(defun snek-init-circ (snk num rad &key (xy (list 0.0d0 0.0d0)) g)
-  (let ((vv (loop for p in (linspace 0.0d0 1.0d0 num)
-                  collect (add-vert! snk (on-circ p rad :xy xy) :g g))))
-    (loop for a in vv and b in (-roll-once vv)
-          collect (add-edge! snk (list a b) :g g))))
-
-
-(defun snek-init-polygon (snk rad n &key (xy (list 0.0d0 0.0d0)) (rot (* 0.25 PI)) g)
-  (let ((vv (loop for v in (polygon n rad :xy xy :rot rot)
-                  collect (add-vert! snk v :g g))))
-    (loop for a in vv and b in (-roll-once vv)
-          collect (add-edge! snk (list a b) :g g))))
-
-
-(defun snek-init-path (snk points &key g closed)
-  (let ((vv (add-verts! snk points :g g)))
-    (if closed
-      (loop for a in vv and b in (-roll-once vv)
-            collect (add-edge! snk (list a b) :g g))
-      (loop for a in vv and b in (cdr vv)
-            collect (add-edge! snk (list a b) :g g)))))
+  at the moment type and closed are not used for anything in particular, but
+  they are there to indicate what kind of a group it is. eventually they will
+  be used to indicate that a grp is eg a path, or a NURBS etc.
+  "
+  (with-struct (snek- max-grp-edges grps) snk
+    ; TODO: probably not use gensym. that won't work when exporting structures?
+    (let ((name (gensym)))
+      (setf
+        (gethash name grps)
+        (make-grp
+          :name name
+          :closed closed
+          :type type
+          :edges (make-int-array max-grp-edges)))
+      name)))
 
 
-; SANDPAINT
+(defmacro -valid-vert ((num vv &key (err t)) &body body)
+  (with-gensyms (v)
+    `(let ((,v ,vv))
+      (if (and (> ,v -1) (< ,v ,num))
+        (progn ,@body)
+        (if ,err (error "vert does not exist: ~a" ,v))))))
 
-(defun snek-draw-edges (snk sand grains &key g)
-  (with-struct (snek- verts) snk
-    (sandpaint:strokes
-      sand
-      (loop
-        for (a b) in (get-edges snk :g g)
+
+(defmacro -valid-verts ((num vv v) &body body)
+  (with-gensyms (vv*)
+    `(let ((,vv* ,vv))
+      (loop for ,v in ,vv*
+        if
+          (and (> ,v -1) (< ,v ,num))
         collect
-          (list
-            (get-atup verts a)
-            (get-atup verts b)))
-        grains)))
+          (progn ,@body)))))
 
 
-; TODO: grp
-(defun snek-draw-verts (snk sand)
+(defun -edge-compare (a b c d)
+  (or
+    (and (>= a b) (>= c d))
+    (> a b)))
+
+
+(defun -binary-edge-insert-search (arr target num)
+  (let ((left 0)
+        (right (1- num)))
+    (do () ((< right left) left)
+      (let ((mid (floor (+ left right) 2)))
+        (cond
+          ((not (-edge-compare
+                  (first target)
+                  (aref arr mid 0)
+                  (second target)
+                  (aref arr mid 1)))
+            (setf right (1- mid)))
+          (t
+            (setf left (1+ mid))))))))
+
+
+;TODO: is this tail recursive?
+(defun -binary-edge-search (arr target num &key (left 0) (right nil))
+  (destructuring-bind (a c) target
+    (if (eql right nil)
+      (setf right (1- num)))
+    (let ((mid (floor (+ left right) 2)))
+        (cond
+          ((< right left) nil)
+          ((and
+             (eql a (aref arr mid 0))
+             (eql c (aref arr mid 1)))
+            mid)
+          ((not (-edge-compare a (aref arr mid 0) c (aref arr mid 1)))
+            (-binary-edge-search arr target num :left left
+                                                :right (1- mid)))
+          (t (-binary-edge-search arr target num :left (1+ mid)
+                                                 :right right))))))
+
+
+(defun -add-edge (edges edge pos num)
+  (loop for i from 0 below (- num pos) do
+    (let ((left (- num (1+ i)))
+          (right (- num i)))
+      (setf (aref edges right 0) (aref edges left 0)
+            (aref edges right 1) (aref edges left 1))))
+    (setf (aref edges pos 0) (first edge)
+          (aref edges pos 1) (second edge)))
+
+
+(defun -find-add-edge (edges num e)
+  (-add-edge
+    edges
+    e
+    (-binary-edge-insert-search edges e num)
+    num)
+  e)
+
+
+(defun -del-edge (edges pos num)
+  (loop for i from pos to (- num 2) do
+    (setf (aref edges i 0) (aref edges (1+ i) 0)
+          (aref edges i 1) (aref edges (1+ i) 1)))
+  (setf (aref edges (1- num) 0) 0
+        (aref edges (1- num) 1) 0))
+
+
+(defun -find-del-edge (edges num e)
+  (let ((p (-binary-edge-search edges e num)))
+    (if p
+      (progn
+        (-del-edge edges p num)
+        1)
+      0)))
+
+
+(defun -add-vert-to-grp (v vert-to-grp grps g)
+  (setf (aref vert-to-grp v) g)
+  (multiple-value-bind (grp exists)
+    (gethash g grps)
+    (if exists
+      (with-struct (grp- verts) grp
+        (vector-push-extend v verts)
+        (incf (grp-num-verts grp))))))
+
+
+(defun add-vert! (snk xy &key g)
+  (with-struct (snek- verts vert-to-grp grps num-verts) snk
+    (-add-vert-to-grp num-verts vert-to-grp grps g)
+    (destructuring-bind (x y)
+      (to-dfloat* xy)
+      (setf (aref verts num-verts 0) x
+            (aref verts num-verts 1) y)
+      (- (incf (snek-num-verts snk)) 1))))
+
+
+(defun add-verts! (snk vv &key g)
+  (loop for xy in vv collect
+    (add-vert! snk xy :g g)))
+
+
+; TODO: add set-vert fun to guard changes to snek structure.
+
+
+(defun get-vert (snk v)
   (with-struct (snek- verts num-verts) snk
-    (sandpaint:pix* sand verts num-verts)))
+    (-valid-vert (num-verts v)
+      (list (aref verts v 0)
+            (aref verts v 1)))))
 
 
-(defun snek-draw-circ (snk sand rad grains)
+
+(defun get-vert-grp (snk v)
+  (with-struct (snek- vert-to-grp num-verts) snk
+    (-valid-vert (num-verts v)
+      (aref vert-to-grp v))))
+
+
+(defun get-verts (snk vv)
   (with-struct (snek- verts num-verts) snk
-    (sandpaint:circ* sand verts num-verts rad grains)))
+    (-valid-verts (num-verts vv v)
+      (get-atup verts v))))
 
 
-; EXPORT
+; TODO
+;(defun get-edge-grp)
 
-(defun snek-export-2obj (snk fn &key g)
-  (let ((verts (get-grp-vert-vals snk :g g))
-        (edges (get-edges snk :g g))
-        (fnobj (append-postfix fn ".2obj")))
-    (with-open-file (stream
-                      fnobj
-                      :direction :output
-                      :if-exists :supersede)
-      (format stream "o mesh~%")
-      (dolist (ll verts)
+
+(defun get-grp-verts (snk &key g)
+  (with-struct (snek- grps) snk
+    (multiple-value-bind (grp exists)
+      (gethash g grps)
+      (if exists
+        (to-list (grp-verts grp))
+        (error "grp does not exist: ~a" grp)))))
+
+
+; TODO: more efficient?
+(defun get-grp-vert-vals (snk &key g)
+  (get-verts snk
+    (get-grp-verts snk :g g)))
+
+
+(defun get-num-edges (snk &key g)
+  (with-grp (snk grp g)
+    (grp-num-edges grp)))
+
+
+(defun get-edges (snk &key g)
+  (with-grp (snk grp g)
+    (with-struct (grp- edges num-edges) grp
+      (loop for i from 0 below num-edges collect
+        (get-atup edges i)))))
+
+
+(defun get-edge-arr (snk &key g)
+  (grp-edges (gethash g (snek-grps snk))))
+
+
+(defun add-edge! (snk ee &key g)
+  (with-grp (snk grp g)
+    (with-struct (snek- num-verts) snk
+      (with-struct (grp- edges num-edges) grp
         (destructuring-bind (a b)
-          ll
-          (format stream "v ~f ~f~%" a b)))
-      (dolist (ll edges)
-        (destructuring-bind (a b)
-          (add ll '(1 1))
-          (format stream "e ~d ~d~%" a b))))
+          ee
+          (if (and (< a num-verts) (< b num-verts))
+            (cond
+              ((-binary-edge-search edges ee num-edges) nil)
+              ((eql a b) nil)
+              (t
+                (setf (grp-num-edges grp) (2+ num-edges))
+                (-find-add-edge edges num-edges ee)
+                (sort
+                  (-find-add-edge edges (1+ num-edges) (reverse ee))
+                  #'<)))))))))
 
-    (format t "~%num verts: ~a ~%" (length verts))
-    (format t "num edges: ~a ~%" (length edges))
-    (format t "~%file: ~a" fnobj)))
+
+(defun del-edge! (snk ee &key g)
+  (with-grp (snk grp g)
+    (with-struct (grp- edges num-edges) grp
+      (setf (grp-num-edges grp)
+            (- num-edges
+              (loop for i in
+                (list
+                  (-find-del-edge edges num-edges ee)
+                  (-find-del-edge edges
+                                     (1- num-edges)
+                                     (reverse ee)))
+                sum i)))
+      (- num-edges (grp-num-edges grp)))))
+
+
+(defun verts-in-rad (snk xy rad)
+  (with-struct (snek- verts zmap zwidth) snk
+    (zmap:verts-in-rad verts zmap zwidth xy rad)))
+
+
+; TODO: binary search
+(defun get-one-ring (snk v &key g)
+  "
+  returns all edges connected to vert v.
+
+  if a grp g is supplied, it will select edges from g, otherwise
+  it will use the main grp.
+  "
+  (with-grp (snk grp g)
+    (with-struct (grp- edges num-edges) grp
+      (loop for i from 0 below num-edges
+        if (eql v (aref edges i 0))
+        collect (get-atup edges i)))))
 

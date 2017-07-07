@@ -5,21 +5,40 @@
   all alterations created in this context will be flattened
   and applied to snk at the end of the context.
   "
-  (with-gensyms (sname zw alt-names)
+  (with-gensyms (sname zw aname recursive-do-alts x)
     `(let ((,sname ,snk)
            (,zw ,zwidth))
-      (let ((,alt-names (snek-alt-names ,sname)))
+      (let ((,aname (snek-alt-names ,sname)))
         (incf (snek-wc ,sname))
+
         (if ,zw
           (setf (snek-zwidth ,sname) ,zw
                 (snek-zmap ,sname) (zmap:make (snek-verts ,sname)
                                               (snek-num-verts ,sname)
                                               (to-dfloat ,zw))))
-        (do-alts
-          (remove-if-not
-            (lambda (x) (gethash (type-of x) ,alt-names))
-            (flatten (list ,@body)))
-          ,sname)))))
+
+        ; below code is akin to this, but it avoids the double-pass:
+        ; (defun do-alts (alts snk)
+        ;   (let ((alt-names (snek-alt-names snk)))
+        ;     (dolist (a alts)
+        ;       (funcall (gethash (type-of a) alt-names) snk a))))
+
+        ; (do-alts
+        ;   (remove-if-not
+        ;     (lambda (x) (gethash (type-of x) ,alt-names))
+        ;     (flatten (list ,@body)))
+        ;   ,sname)))))
+
+        (labels ((,recursive-do-alts (,x)
+                   (cond ((null ,x))
+                   ((atom ,x)
+                      (if (gethash (type-of ,x) ,aname)
+                        ; if atom is also alteration (else ignore):
+                        (funcall (gethash (type-of ,x) ,aname) ,sname ,x)))
+                   (t (,recursive-do-alts (car ,x))
+                      (,recursive-do-alts (cdr ,x))))))
+
+          (,recursive-do-alts (list ,@body)))))))
 
 
 (defmacro with-dx ((snk vv dx d) &body body)
@@ -149,11 +168,10 @@
 
 (defmacro with-prob (p &body body)
   "
-  executes the form body with probability p.
+  executes body with probability p.
   "
   (with-gensyms (pname)
     `(let ((,pname ,p))
        (if (< (random 1.0) ,p)
          (list ,@body)))))
-
 
