@@ -8,8 +8,8 @@
 (defun make-stepper (ll)
   (destructuring-bind (a1 a2 b1 b2)
     ll
-    (lambda (p) (list (on-line p a1 a2)
-                      (on-line p b1 b2)))))
+    (lambda (p) (list (math:on-line p a1 a2)
+                      (math:on-line p b1 b2)))))
 
 (defun perp (v)
   (destructuring-bind (a b)
@@ -18,10 +18,10 @@
 
 (defun box (xy vec)
   (list
-    (add (sub xy vec) (perp vec))
-    (add (add xy vec) (perp vec))
-    (sub (sub xy vec) (perp vec))
-    (sub (add xy vec) (perp vec))))
+    (math:add (math:sub xy vec) (perp vec))
+    (math:add (math:add xy vec) (perp vec))
+    (math:sub (math:sub xy vec) (perp vec))
+    (math:sub (math:add xy vec) (perp vec))))
 
 
 (defun main (size fn)
@@ -39,24 +39,24 @@
         (plt (plot:make size)))
 
     (let ((stepper (make-stepper (box (list 500 499) (list 0 480)))))
-      (loop for s in (linspace 0.0 1.0 192) do
+      (loop for s in (math:linspace 0.0 1.0 192) do
         (plot:path plt (funcall stepper s))))
 
 
     (loop
-      for xs in (linspace 0.0 1.0 rep)
-      for x in (linspace left right rep)
+      for xs in (math:linspace 0.0 1.0 rep)
+      for x in (math:linspace left right rep)
       do
       (loop
-        for ys in (linspace 0.0 1.0 rep)
-        for y in (linspace left right rep)
+        for ys in (math:linspace 0.0 1.0 rep)
+        for y in (math:linspace left right rep)
         do
           (let ((stepper (make-stepper
                            (box (list x y)
-                                (scale
-                                  (cos-sin (+ (* pi 0.5) angle))
+                                (math:scale
+                                  (math:cos-sin (+ (* pi 0.5) angle))
                                   rad)))))
-            (loop for s in (linspace 0.0 1.0 box-rep :end nil) do
+            (loop for s in (math:linspace 0.0 1.0 box-rep :end nil) do
               (plot:path plt (funcall stepper s))))
           (incf angle (rnd:rnd 0.01d0))
         ))

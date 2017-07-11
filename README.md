@@ -37,18 +37,18 @@ Here is and example of manipulating a `snek` instance called `snk` using
 
 ```lisp
 ; context start
-(with-snek (snk)
+(snek:with (snk)
   ; iterate vertices
-  (itr-verts (snk v)
+  (snek:itr-verts (snk v)
     ; move alteration
-    (move-vert? v (rnd:in-circ))
+    (snek:move-vert? v (rnd:in-circ))
     ; w will be an arbitrary
     ; vertex in snk
-    (with-rnd-vert (snk w)
+    (snek:with-rnd-vert (snk w)
       ; join v and w if they are closer than d
-      (if (< (edge-length snk (list v w)) d)
+      (if (< (snek:edge-length snk (list v w)) d)
         ; join vertices alteration
-        (join-verts? v w))))
+        (snek:join-verts? v w))))
 ; context end
 ; alterations have been applied
 ```
@@ -116,10 +116,8 @@ to issues, or take requests.
 
 ## Planned Changes
 
- - math utils as package?
- - snek as package?
  - Randomized order of alteration apply
- - Maintain list of singly-connected vertices?
+ - one-ring/ incident edges
 
 
 ## THANKS

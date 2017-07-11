@@ -1,8 +1,12 @@
 
+(in-package :math)
+
+
 (defmacro cos-sin (a)
   (with-gensyms (aname)
     `(let ((,aname ,a))
         (list (cos ,aname) (sin ,aname)))))
+
 
 (defmacro sin-cos (a)
   (with-gensyms (aname)
@@ -10,16 +14,25 @@
         (list (sin ,aname) (cos ,aname)))))
 
 
-(defmacro square-loop ((x y s) &body body)
-  (with-gensyms (sname)
-    `(let ((,sname ,s))
-      (loop for ,x from 0 below ,sname do
-        (loop for ,y from 0 below ,sname do
-          ,@body)))))
+; TYPES
+
+(defun int (x)
+  (coerce x 'integer))
+
+
+(defun int* (xx)
+  (mapcar (lambda (x) (coerce x 'integer)) xx))
+
+
+(defun dfloat (x)
+  (coerce x 'double-float))
+
+
+(defun dfloat* (xx)
+  (mapcar (lambda (x) (coerce x 'double-float)) xx))
 
 
 ; VEC
-
 
 (defun scale (a s)
   (mapcar (lambda (x) (* x s)) a))
@@ -98,23 +111,17 @@
   (mapcar #'round l))
 
 
-(defun lget (a ii)
-  (mapcar (lambda (i) (nth i a)) ii))
-
-
 ; RANGES
 
 
 (defmacro rep ((i itt) &body body)
-  `(loop for ,i in ,itt
-    collect (progn ,@body)))
+  `(loop for ,i in ,itt collect (progn ,@body)))
 
 
 (defmacro nrep (n &body body)
   (with-gensyms (i nname)
     `(let ((,nname ,n))
-      (loop for ,i from 1 to ,nname
-            collect (progn ,@body)))))
+      (loop for ,i from 1 to ,nname collect (progn ,@body)))))
 
 
 (defun range (a &optional (b nil))
@@ -123,50 +130,38 @@
     (loop for x from a below b collect x)))
 
 
-(defun inc (x stp) (mod (+ x stp) 1.0d0))
+(defun inc (x stp)
+  (mod (+ x stp) 1.0d0))
 
 
 (defun linspace (a b n &key (end t))
   (if (> n 1)
     (let ((nn (if end (1- n) n)))
       (loop for i from 0 below n
-          collect (to-dfloat (+ a (* i (/ (- b a) nn))))))
-    (list (to-dfloat a))))
+        collect (dfloat (+ a (* i (/ (- b a) nn))))))
+    (list (dfloat a))))
 
 
 ; SHAPES
 
 
 (defun on-spiral (p rad &key (xy (list 0.0d0 0.0d0)) (rot 1.0d0))
-  (add
-    xy
-    (scale
-      (cos-sin (* p PI rot))
-      (* p rad))))
+  (add xy (scale (cos-sin (* p PI rot)) (* p rad))))
 
 
 (defun on-circ (p rad &key (xy (list 0.0d0 0.0d0)))
-  (add
-    xy
-    (scale
-      (cos-sin (* p PI 2.0d0))
-      rad)))
+  (add xy (scale (cos-sin (* p PI 2.0d0)) rad)))
 
 
 (defun on-line (p x1 x2)
-  (add
-    x1
-    (scale (sub x2 x1) p)))
+  (add x1 (scale (sub x2 x1) p)))
 
 
 (defun polygon (n rad &key (xy (list 0.0d0 0.0d0)) (rot 0.0d0))
-  (loop for i from 0 below n
-    collect
-      (add
-        xy
-        (scale
-          (cos-sin (+ rot (* (/ i n) 2.0d0 PI)))
-          rad))))
+  (loop for i from 0 below n collect (add xy
+    (scale
+      (cos-sin (+ rot (* (/ i n) 2.0d0 PI)))
+      rad))))
 
 
 ; THREE POINT
@@ -190,47 +185,4 @@
       (let ((U (sub P (scale PC u*)))
             (D (add P (scale PC d*))))
         (append (-make-full-path A B U a* b*) (-make-full-path A B D a* b*))))))
-
-
-; OTHER
-
-
-(defun close-path (p)
-  (append p (list (nth 0 p))))
-
-
-(defmacro inside-border ((size xy b) &body body)
-  (with-gensyms (xname yname sname small large)
-    `(let* ((,sname ,size)
-            (,small ,b)
-            (,large (- ,sname ,small)))
-      (destructuring-bind (,xname ,yname)
-        ,xy
-        (if (and (>= ,xname ,small) (< ,xname ,large)
-                 (>= ,yname ,small) (< ,yname ,large))
-          (progn
-            ,@body))))))
-
-
-; TODO: remove external use where lround does not make sense.
-(defmacro inside ((size xy) &body body)
-  (with-gensyms (xname yname sname)
-    `(let ((,sname ,size))
-      (destructuring-bind (,xname ,yname)
-        (lround ,xy)
-        (if (and (>= ,xname 0) (< ,xname ,sname)
-                 (>= ,yname 0) (< ,yname ,sname))
-          (progn
-            ,@body))))))
-
-
-(defmacro inside* ((size xy x y) &body body)
-  (with-gensyms (sname)
-    `(let ((,sname ,size))
-      (destructuring-bind (,x ,y)
-        (lround ,xy)
-        (if (and (>= ,x 0) (< ,x ,sname)
-                 (>= ,y 0) (< ,y ,sname))
-          (progn
-            ,@body))))))
 

@@ -1,4 +1,5 @@
 
+(in-package :snek)
 
 (defstruct (mutate (:constructor -make-mutate))
   (rules nil)
@@ -28,10 +29,10 @@
           #'mutate-add-vert-alt)
 
     (-make-mutate :rules rules
-                  :prob (to-dfloat prob)
+                  :prob (math:dfloat prob)
                   :ind ind
-                  :noise (to-dfloat noise)
-                  :xy (to-dfloat* xy))))
+                  :noise (math:dfloat noise)
+                  :xy (math:dfloat* xy))))
 
 
 (defun -ok-ind (i)
@@ -57,7 +58,7 @@
                      ;      (-ok-ind (+ (mutate-ind ,mut)
                      ;                 (rnd:rndi -1 2))))
                      ;(setf (mutate-xy ,mut)
-                     ;      (add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0)))
+                     ;      (math:add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0)))
                      (do-mutate (mutate-rules ,mut) ,a ,mut))
                    ,a))
                ,bd))))
@@ -69,12 +70,12 @@
 
 (defun mutate-add-vert-alt (a mut)
   (with-struct (add-vert-alt- xy) a
-    (add-vert? (add xy (rnd:in-circ (rnd:rnd (mutate-noise mut)))))))
+    (add-vert? (math:add xy (rnd:in-circ (rnd:rnd (mutate-noise mut)))))))
 
 
 (defun mutate-move-vert-alt (a mut)
   (with-struct (move-vert-alt- v xy rel) a
-    (move-vert? v (add xy (rnd:in-circ (mutate-noise mut))) :rel rel)))
+    (move-vert? v (math:add xy (rnd:in-circ (mutate-noise mut))) :rel rel)))
 
 
 (defun mutate-append-edge-alt (a mut)

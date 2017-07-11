@@ -16,22 +16,21 @@
         (right 850)
         (plt (plot:make size)))
 
-    (let ((ddd (make-perspective-transform
+    (let ((ddd (math:make-perspective-transform
                  (rnd:in-box 500 500 :xy (list -500 500))
                  (rnd:in-box 500 500 :xy (list 1500 500))
                  (rnd:in-box 500 500 :xy (list 500 1500)))))
-      (loop for x in (linspace left right rep) do
-        (loop for y in (linspace left right rep) do
+      (loop for x in (math:linspace left right rep) do
+        (loop for y in (math:linspace left right rep) do
           (let ((points (funcall ddd
                           (list x y) rad rad (half rad) (half rad))))
             (let ((top (subseq points 0 5))
                   (bottom (subseq points 5 10)))
-              (loop for s in (linspace 0.0 1.0 box-rep) do
+              (loop for s in (math:linspace 0.0 1.0 box-rep) do
                 (plot:path plt
                    (loop for a in top
                      for b in bottom
-                     collect
-                     (on-line s a b)))))))))
+                     collect (math:on-line s a b)))))))))
 
       (plot:save plt fn)))
 

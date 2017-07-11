@@ -1,36 +1,4 @@
 
-(defpackage :plot
-  (:use :common-lisp)
-  (:export
-    :dot-stroke
-    :make
-    :path
-    :save
-    :stipple-stroke
-    :stipple-strokes)
-  (:import-from :common-lisp-user
-    :add
-    :aif
-    :append-postfix
-    :dst
-    :half
-    :inside
-    :inside*
-    :iscale
-    :len
-    :linspace
-    :lround
-    :make-vec
-    :nrep
-    :nsub
-    :on-line
-    :range
-    :scale
-    :square-loop
-    :sub
-    :with-struct))
-
-
 (in-package :plot)
 
 
@@ -67,18 +35,18 @@
   (with-struct (plot- size verts coverage) plt
     (destructuring-bind (u v)
       line
-      (loop for xy in (nrep num (rnd:on-line u v)) do
+      (loop for xy in (math:nrep num (rnd:on-line u v)) do
         (inside* (size xy x y)
           (incf (aref coverage x y))
           (vector-push-extend xy verts))))))
 
 
 (defun -ok-coverage (size coverage offset a b)
-  (let ((itt (round (* 2.0d0 (len offset))))
+  (let ((itt (round (* 2.0d0 (math:len offset))))
         (cov-count 0)
         (cov (make-vec)))
-    (loop for s in (linspace 0.0 1.0 itt) do
-      (inside* (size (on-line s a b) x y)
+    (loop for s in (math:linspace 0.0 1.0 itt) do
+      (inside* (size (math:on-line s a b) x y)
         (incf cov-count (if (> (aref coverage x y) 0) 1 0))
         (vector-push-extend (list x y) cov)))
 
@@ -100,9 +68,9 @@
 (defun -coverage-path (size coverage path)
   (loop
     for a in path and b in (cdr path) do
-      (let ((n (* 2 (round (dst a b)))))
-        (loop for s in (linspace 0.0 1.0 n) do
-          (inside* (size (on-line s a b) x y)
+      (let ((n (* 2 (round (math:dst a b)))))
+        (loop for s in (math:linspace 0.0 1.0 n) do
+          (inside* (size (math:on-line s a b) x y)
             (incf (aref coverage x y)))))))
 
 
@@ -112,7 +80,7 @@
     (dolist (p path)
       (vector-push-extend p verts))
     (vector-push-extend
-      (range num-verts (+ num-verts n)) lines)
+      (math:range num-verts (+ num-verts n)) lines)
     (incf (plot-num-verts plt) n)
     (incf (plot-num-lines plt))
     (-coverage-path size coverage path)))
@@ -121,8 +89,8 @@
 (defun -stipple (plt xy offset)
   (with-struct (plot- size verts edges coverage) plt
     (let ((nv (plot-num-verts plt)))
-      (let ((a (sub xy offset))
-            (b (add xy offset)))
+      (let ((a (math:sub xy offset))
+            (b (math:add xy offset)))
 
         (if (-ok-coverage size coverage offset a b)
           (progn
@@ -136,7 +104,7 @@
 
 
 (defun -get-offset (u v s perp)
-  (let ((off (scale (nsub u v) s)))
+  (let ((off (math:scale (math:nsub u v) s)))
     (if perp (vflip off) off)))
 
 
@@ -145,7 +113,7 @@
     (destructuring-bind (u v)
       line
       (let ((offset (-get-offset u v s perp)))
-        (loop for xy in (nrep num (rnd:on-line u v)) do
+        (loop for xy in (math:nrep num (rnd:on-line u v)) do
           (inside (size xy)
             (incf (plot-discards plt)
                   (-stipple plt xy offset))))))))
@@ -194,7 +162,7 @@
     (if edges
       (dolist (ee (coerce edges 'list))
         (destructuring-bind (a b)
-          (add ee '(1 1))
+          (math:add ee '(1 1))
           (format stream "e ~d ~d~%" a b))))
     (if lines
       (dolist (ll (coerce lines 'list))

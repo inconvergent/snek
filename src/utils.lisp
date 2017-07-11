@@ -65,22 +65,6 @@
     collect (aref aa i)))
 
 
-(defun to-int (x)
-  (coerce x 'integer))
-
-
-(defun to-int* (xx)
-  (mapcar (lambda (x) (coerce x 'integer)) xx))
-
-
-(defun to-dfloat (x)
-  (coerce x 'double-float))
-
-
-(defun to-dfloat* (xx)
-  (mapcar (lambda (x) (coerce x 'double-float)) xx))
-
-
 (defun get-atup (arr row)
   (list
     (aref arr row 0)
@@ -99,8 +83,54 @@
     (lambda () (nth (setf i (mod (+ 1 i) n)) colors))))
 
 
-(defmacro val-if-eql (a b)
-  (with-gensyms (aname)
-    `(let ((,aname ,a))
-      (if (eql ,aname ,b) ,aname nil))))
+(defun close-path (p)
+  (append p (list (nth 0 p))))
+
+
+(defmacro square-loop ((x y s) &body body)
+  (with-gensyms (sname)
+    `(let ((,sname ,s))
+      (loop for ,x from 0 below ,sname do
+        (loop for ,y from 0 below ,sname do
+          ,@body)))))
+
+
+(defmacro inside-border ((size xy b) &body body)
+  (with-gensyms (xname yname sname small large)
+    `(let* ((,sname ,size)
+            (,small ,b)
+            (,large (- ,sname ,small)))
+      (destructuring-bind (,xname ,yname)
+        ,xy
+        (if (and (>= ,xname ,small) (< ,xname ,large)
+                 (>= ,yname ,small) (< ,yname ,large))
+          (progn
+            ,@body))))))
+
+
+(defun -lround (l)
+  (mapcar #'round l))
+
+
+; TODO: remove external use where lround does not make sense.
+(defmacro inside ((size xy) &body body)
+  (with-gensyms (xname yname sname)
+    `(let ((,sname ,size))
+      (destructuring-bind (,xname ,yname)
+        (-lround ,xy)
+        (if (and (>= ,xname 0) (< ,xname ,sname)
+                 (>= ,yname 0) (< ,yname ,sname))
+          (progn
+            ,@body))))))
+
+
+(defmacro inside* ((size xy x y) &body body)
+  (with-gensyms (sname)
+    `(let ((,sname ,size))
+      (destructuring-bind (,x ,y)
+        (-lround ,xy)
+        (if (and (>= ,x 0) (< ,x ,sname)
+                 (>= ,y 0) (< ,y ,sname))
+          (progn
+            ,@body))))))
 

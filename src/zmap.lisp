@@ -1,17 +1,4 @@
 
-(defpackage :zmap
-  (:use :common-lisp)
-  (:export
-    :make
-    :verts-in-rad)
-  (:import-from :common-lisp-user
-    :dst2
-    :to-dfloat
-    :get-atup
-    :to-dfloat*
-    :with-struct))
-
-
 (in-package :zmap)
 
 
@@ -39,7 +26,7 @@
     (loop for v from 0 below num-verts do
       (add-v-to-zone
         zmap
-        (v-to-zone verts v (to-dfloat zwidth))
+        (v-to-zone verts v (math:dfloat zwidth))
         v))
     zmap))
 
@@ -72,7 +59,7 @@
           (if exists
             (loop for j from 0 below (length vals) do
               (let ((zj (aref vals j)))
-                (if (< (dst2 xy (get-atup verts zj)) rad2)
+                (if (< (math:dst2 xy (get-atup verts zj)) rad2)
                   (vector-push-extend zj inds)))))))
         inds))
 

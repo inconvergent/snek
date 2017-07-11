@@ -4,16 +4,15 @@
 (proclaim '(inline last1 single append1 conc1 mklist))
 ;(declaim '(optimize (debug 1)))
 
-; TODO: restructure this while file more once i know it works.
-
 (load "~/quicklisp/setup.lisp")
+
 
 (ql:quickload "zpng")
 
 
 (asdf:defsystem "snek"
   :description "SNEK - A Generative System for Writing Generative Systems"
-  :version "1.4.5"
+  :version "2.0.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t
@@ -21,8 +20,11 @@
   :components ((:file "pg-utils")
                (:file "utils")
                (:file "utils-time")
+               (:file "packages")
                (:file "math")
                (:file "rnd")
+               (:file "hset")
+               (:file "graph")
                (:file "color")
                (:file "linear-path")
                (:file "bzspline")

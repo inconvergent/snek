@@ -7,10 +7,10 @@
 
 
 (defun init-snek (n)
-  (let ((snk (make-snek
+  (let ((snk (snek:make
                :max-verts 5000000
-               :max-main-grp-edges 500000)))
-    (nrep n (add-vert! snk (nrep 2 (rnd:rnd 100))))
+               :grp-size 100)))
+    (math:nrep n (snek:add-vert! snk (math:nrep 2 (rnd:rnd 100))))
     snk))
 
 
@@ -21,19 +21,19 @@
 
     (loop for i from 0 below itt do
       (if (= (mod i 100) 0)
-        (format t "itt ~a edges ~a ~%" i (length (get-edges snk))))
+        (format t "itt ~a edges ~a ~%" i (length (snek:get-edges snk))))
 
-      (with-snek (snk)
-        (join-verts? (rnd:rndi num) (rnd:rndi num)))
+      (snek:with (snk)
+        (snek:join-verts? (rnd:rndi num) (rnd:rndi num)))
 
-      ;(del-edge! snk (nrep 2 (rnd:rndi num)))
+      ;(snek:del-edge! snk (nrep 2 (rnd:rndi num)))
       )))
 
 (require :sb-sprof)
 (sb-sprof:with-profiling (:max-samples 200000
-                         ;:mode :cpu
+                         :mode :cpu
                          ;:mode :alloc
-                         :mode :time
-                         :report :flat)
+                         ;:mode :time
+                         :report :graph)
  (time (main)))
 

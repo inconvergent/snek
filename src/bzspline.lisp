@@ -1,22 +1,4 @@
 
-(defpackage :bzspl
-  (:use :common-lisp)
-  (:export
-    :pos
-    :pos*
-    :rndpos
-    :make
-    :move)
-  (:import-from :common-lisp-user
-    :add
-    :get-atup
-    :iscale
-    :make-dfloat-array
-    :scale
-    :to-dfloat
-    :to-dfloat*
-    :with-struct))
-
 (in-package :bzspl)
 
 ;M = 1/6
@@ -58,19 +40,19 @@
   (loop for mrow in *m* collect
     (let ((s (list 0.0d0 0.0d0)))
       (loop for p in pts and mr in mrow do
-        (setf s (add s (scale p mr))))
+        (setf s (math:add s (math:scale p mr))))
       s)))
 
 
 (defun do-t (x pk)
   (let ((s (list 0.0d0 0.0d0)))
     (loop for p in pk and xi in (list 1.0d0 x (* x x)) do
-      (setf s (add s (scale p xi))))
+      (setf s (math:add s (math:scale p xi))))
     s))
 
 
 (defun -get-seg-open (n x)
-  (let ((s (/ 1.0d0 (to-dfloat (- n 2)))))
+  (let ((s (/ 1.0d0 (math:dfloat (- n 2)))))
     (if (>= x 1.0d0)
       (list
         1.0d0
@@ -81,15 +63,15 @@
 
 
 (defun -get-seg-closed (n x)
-  (let ((s (/ 1.0d0 (to-dfloat n))))
+  (let ((s (/ 1.0d0 (math:dfloat n))))
     (list
       (/ (mod x s) s)
       (floor (/ x s)))))
 
 
 (defun -mean (pts a b)
-  (scale
-    (add (get-atup pts a)
+  (math:scale
+    (math:add (get-atup pts a)
          (get-atup pts b))
     0.5d0))
 
@@ -122,13 +104,13 @@
 (defun pos (b x)
   (with-struct (bzspl- n pts get-seg select-pts) b
     (destructuring-bind (x-loc seg)
-      (funcall get-seg n (to-dfloat x))
+      (funcall get-seg n (math:dfloat x))
       (do-t x-loc (do-m (funcall select-pts n pts seg))))))
 
 
 (defun pos* (b xx)
   (with-struct (bzspl- n pts get-seg select-pts) b
-    (loop for x in (to-dfloat* xx) collect
+    (loop for x in (math:dfloat* xx) collect
       (destructuring-bind (x-loc seg)
         (funcall get-seg n x)
         (do-t x-loc (do-m (funcall select-pts n pts seg)))))))
@@ -142,8 +124,8 @@
   (assert (>= n 4) (n) "must have at least 4 pts. has ~a." n)
   (let ((apts (make-dfloat-array n)))
     (loop for (x y) in pts and i from 0 do
-      (setf (aref apts i 0) (to-dfloat x)
-            (aref apts i 1) (to-dfloat y)))
+      (setf (aref apts i 0) (math:dfloat x)
+            (aref apts i 1) (math:dfloat y)))
     (make-bzspl :n n
                 :pts apts
                 :select-pts (if closed

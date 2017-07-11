@@ -9,79 +9,79 @@
 
 (defun test-utils ()
   (do-test
-    (norm '(3 0))
+    (math:norm '(3 0))
     '(1.0 0.0))
 
   (do-test
-    (sub '(1 2) '(2 3))
+    (math:sub '(1 2) '(2 3))
     '(-1 -1))
 
   (do-test
-    (add '(1 2) '(2 3))
+    (math:add '(1 2) '(2 3))
       '(3 5))
 
   (do-test
-    (nsub '(1 2) '(2 10))
+    (math:nsub '(1 2) '(2 10))
     '(-0.12403473 -0.99227786))
 
   (do-test
-    (len2 '(1 2))
+    (math:len2 '(1 2))
     5)
 
   (do-test
-    (len '(1 2))
+    (math:len '(1 2))
     2.236068)
 
   (do-test
-    (len '(1.0d0 2.0d0))
+    (math:len '(1.0d0 2.0d0))
     2.23606797749979d0)
 
   (do-test
-    (dst '(1 2) '(1 3))
+    (math:dst '(1 2) '(1 3))
     1.0)
 
   (do-test
-    (mid '(1 2) '(3 4))
+    (math:mid '(1 2) '(3 4))
     '(2 3))
 
   (do-test
-    (lmid '((1 2) (3 4) (5 6)))
+    (math:lmid '((1 2) (3 4) (5 6)))
     '(3 4))
 
-  (do-test
-    (lget '((1 2) (3 4) (5 6)) '(0 2))
-    '((1 2) (5 6)))
+  ;(do-test
+  ;  (lget '((1 2) (3 4) (5 6)) '(0 2))
+  ;  '((1 2) (5 6)))
 
   (do-test
-    (inc 0.1 0.4)
+    (math:inc 0.1 0.4)
     0.5)
 
   (do-test
-    (inc 0.1 -0.4)
+    (math:inc 0.1 -0.4)
     0.7)
 
   (do-test
-    (linspace 0 10 1)
+    (math:linspace 0 10 1)
     (list 0.0))
 
   (do-test
-    (linspace 0 10 3)
+    (math:linspace 0 10 3)
     (list 0.0 5.0 10.0))
 
   (do-test
-    (linspace 0 10 2 :end nil)
+    (math:linspace 0 10 2 :end nil)
     (list 0.0 5.0))
 
   (do-test
-    (linspace 0 10 2 :end t)
+    (math:linspace 0 10 2 :end t)
     (list 0.0 10.0))
 
   (do-test
-    (range 2 5)
+    (math:range 2 5)
     (list 2 3 4))
 
   (do-test
-    (range 5)
+    (math:range 5)
     (list 0 1 2 3 4)))
 
 
@@ -118,7 +118,7 @@
 (let ((pts-a '((-20 99) (0 1) (10 20) (100 100)))
       (pts-b'((-20 99) (0 1) (10 20) (100 100) (-3 -17) (0 4))))
     (do-test
-      (bzspl:pos* (bzspl:make pts-a) (linspace 0 1 10))
+      (bzspl:pos* (bzspl:make pts-a) (math:linspace 0 1 10))
       '((-20.0d0 99.0d0)
         (-11.851851851851851d0 60.75308641975309d0)
         (-5.185185185185184d0 33.12345679012347d0)
@@ -131,7 +131,7 @@
         (100.0d0 100.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-b) (linspace 0 1 10))
+      (bzspl:pos* (bzspl:make pts-b) (math:linspace 0 1 10))
       '((-20.0d0 99.0d0)
         (-5.185185185185184d0 33.12345679012347d0)
         (3.703703703703706d0 9.716049382716065d0)
@@ -144,7 +144,7 @@
         (0.0d0 4.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-a :closed t) (linspace 0 1 10))
+      (bzspl:pos* (bzspl:make pts-a :closed t) (math:linspace 0 1 10))
       '((-10.0d0 50.0d0)
         (-2.098765432098765d0 18.000000000000007d0)
         (3.8271604938271615d0 9.111111111111121d0)
@@ -157,7 +157,7 @@
         (-10.0d0 50.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-b :closed t) (linspace 0 1 10))
+      (bzspl:pos* (bzspl:make pts-b :closed t) (math:linspace 0 1 10))
       '((-10.0d0 50.0d0) (1.1111111111111098d0 10.666666666666671d0)
         (12.777777777777777d0 20.22222222222222d0)
         (55.0d0 60.0d0)
@@ -169,46 +169,153 @@
         (-10.0d0 50.0d0)))))
 
 
-(defun test-bin ()
-  (let ((edges (make-array
-        (list 10 2)
-        :adjustable nil
-        :initial-contents
-          '((1 0) (1 2) (1 5) (3 4) (10 3) (0 0) (0 0) (0 0) (0 0) (0 0)))))
+(defun test-hset ()
+
+  (let ((hs (hset:make)))
 
     (do-test
-      (-binary-edge-insert-search edges '(3 4) 5)
+      (hset:add hs 1)
+      t)
+
+    (do-test
+      (hset:add hs 1)
+      nil)
+
+    (do-test
+      (hset:add hs 20)
+      t)
+
+    (do-test
+      (hset:add hs 40)
+      t)
+
+    (do-test
+      (hset:add hs 73)
+      t)
+
+    (do-test
+      (hset:num hs)
       4)
 
     (do-test
-      (-binary-edge-insert-search edges '(0 0) 5)
-      0)
+      (hset:del hs 1)
+      t)
 
     (do-test
-      (-binary-edge-insert-search edges '(1 6) 5)
-      3)
-
-    (-add-edge edges '(11 1) 5 5)
-    (-add-edge edges '(11 0) 5 6)
-
-    (-del-edge edges 0 7)
+      (hset:del hs 1)
+      nil)
 
     (do-test
-      edges
-      (make-array
-        (list 10 2)
-        :adjustable nil
-        :initial-contents
-          '((1 2) (1 5) (3 4) (10 3) (11 0) (11 1) (0 0) (0 0) (0 0) (0 0)
-            )))))
+      (hset:mem hs 40)
+      t)
 
+    (do-test
+      (hset:mem* hs (list 40 'a))
+      (list t nil))
+
+    (do-test
+      (sort (hset:to-list hs) #'<)
+      (list 20 40 73)))
+
+
+  (let ((hs (hset:make :init (list 1 2 3))))
+
+    (do-test
+      (hset:to-list hs)
+      (list 1 2 3))))
+
+
+(defun test-graph ()
+
+  (let ((grph (graph:make)))
+
+    (do-test
+      (graph:add grph (list 1 1))
+      t)
+
+    (do-test
+      (graph:add grph (list 1 2))
+      t)
+
+    (do-test
+      (graph:add grph (list 1 2))
+      nil)
+
+    (do-test
+      (graph:add grph (list 2 1))
+      nil)
+
+    (do-test
+      (graph:get-num-edges grph)
+      4)
+
+    (do-test
+      (graph:get-edges grph)
+      '#((1 1) (1 2)))
+
+    (do-test
+      (graph:add grph (list 20 5))
+      t)
+
+    (do-test
+      (graph:get-edges grph)
+      '#((1 1) (1 2) (5 20)))
+
+    (do-test
+      (graph:del grph (list 1 2))
+      t)
+
+    (do-test
+      (graph:del grph (list 1 2))
+      nil)
+
+    (do-test
+      (graph:get-edges grph)
+      '#((1 1) (5 20)))
+
+    (do-test
+      (graph:get-num-edges grph)
+      4)
+
+    (do-test
+      (graph:mem grph (list 1 4))
+      nil)
+
+    (do-test
+      (graph:mem grph (list 1 1))
+      t)
+
+    (do-test
+      (sort (graph:get-verts grph) #'<)
+      '(1 5 20))
+
+    (do-test
+      (graph:del grph (list 1 1))
+      t)
+
+    (do-test
+      (graph:get-edges grph)
+      '#((5 20)))
+
+    (do-test
+      (sort (graph:get-verts grph) #'<)
+      '(5 20))
+
+    (do-test
+      (graph:del grph (list 5 20))
+      t)
+
+    (do-test
+      (sort (graph:get-verts grph) #'<)
+      nil)))
 
 
 (defun main ()
   (test-title (test-utils))
   (test-title (test-rnd))
   (test-title (test-bzspl))
-  (test-title (test-bin))
+  (test-title (test-hset))
+  (test-title (test-graph))
   (test-title (test-summary)))
 
 (main)

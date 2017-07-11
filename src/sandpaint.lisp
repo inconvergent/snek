@@ -1,42 +1,6 @@
 
-(defpackage :sandpaint
-  (:use :common-lisp)
-  (:export
-    :chromatic-aberration
-    :circ
-    :circ*
-    :clear
-    :make
-    :pix
-    :pix*
-    :pixel-hack
-    :save
-    :lin-path
-    :set-rgba
-    :stroke
-    :strokes)
-  (:import-from :common-lisp-user
-    :add
-    :aif
-    :append-postfix
-    :dst
-    :get-atup
-    :inside
-    :inside*
-    :linspace
-    :iscale
-    :lround
-    :rep
-    :on-line
-    :range
-    :square-loop
-    :sub
-    :to-dfloat
-    :to-dfloat*
-    :to-int
-    :with-struct))
-
 (in-package :sandpaint)
+
 
 
 (defun make-rgba-array (size)
@@ -59,9 +23,8 @@
 
 
 (defun -setf-operator-over (vals x y i -alpha color)
-  (setf
-    (aref vals x y i)
-    (+ (* (aref vals x y i) -alpha) color)))
+  (setf (aref vals x y i)
+        (+ (* (aref vals x y i) -alpha) color)))
 
 (defun -operator-over (vals x y r g b a)
   (let ((ia (- 1.0 a)))
@@ -72,7 +35,7 @@
 
 
 (defun -draw-stroke (vals size grains v1 v2 r g b a)
-  (loop for i from 1 to grains do
+  (loop for i from 0 below grains do
     (inside* (size (rnd:on-line v1 v2) x y)
       (-operator-over vals x y r g b a))))
 
@@ -96,7 +59,7 @@
 
 (defun -draw-circ (vals size xy rad grains r g b a)
   (loop for i below grains do
-    (inside* (size (add xy (rnd:in-circ rad)) x y)
+    (inside* (size (math:add xy (rnd:in-circ rad)) x y)
       (-operator-over vals x y r g b a))))
 
 
@@ -106,20 +69,18 @@
     (if (and (>= nx 0) (< nx size) (>= ny 0) (< ny size))
       (setf (aref new-vals nx ny i) (aref old-vals x y i)))))
 
-(defun chromatic-aberration (sand center &key (scale 1.0) (noise 1.0))
+(defun chromatic-aberration (sand center &key (s 1.0) (noise 1.0))
   (with-struct (sandpaint- size vals) sand
     (let ((new-vals (make-rgba-array size)))
       (copy-rgba-array-to-from new-vals vals size)
 
       (square-loop (x y size)
         (let* ((xy (list x y))
-               (dx (iscale
-                     (sub
-                       (add (rnd:in-circ noise) xy)
-                       center)
-                     scale)))
-          (-offset-rgba new-vals vals size x y (add xy dx) 0)
-          (-offset-rgba new-vals vals size x y (sub xy dx) 2)))
+               (dx (math:iscale
+                     (math:sub (math:add (rnd:in-circ noise) xy) center)
+                     s)))
+          (-offset-rgba new-vals vals size x y (math:add xy dx) 0)
+          (-offset-rgba new-vals vals size x y (math:sub xy dx) 2)))
 
       (setf (sandpaint-vals sand) new-vals))))
 
@@ -149,7 +110,7 @@
 (defun make (size &key (active '(0.0d0 0.0d0 0.0d0 1.0d0))
                        (bg '(1.0d0 1.0d0 1.0d0 1.0d0)))
   (destructuring-bind (ar ag ab aa br bg bb ba)
-    (mapcar (lambda (x) (to-dfloat x))
+    (mapcar (lambda (x) (math:dfloat x))
             (append active bg))
 
     (let ((vals (make-rgba-array size)))
@@ -170,7 +131,7 @@
 
 (defun set-rgba (sand rgba)
   (destructuring-bind (r g b a)
-    (to-dfloat* rgba)
+    (math:dfloat* rgba)
     (setf (sandpaint-r sand) (* r a)
           (sandpaint-g sand) (* g a)
           (sandpaint-b sand) (* b a)
@@ -183,9 +144,9 @@
   "
   (let ((vals (sandpaint-vals sand)))
     (destructuring-bind (r g b a)
-      (mapcar (lambda (i) (aref vals 0 0 i)) (range 4))
+      (mapcar (lambda (i) (aref vals 0 0 i)) (math:range 4))
       (if (>= a 1.0d0)
-        (let ((na (* a (to-dfloat sa))))
+        (let ((na (* a (math:dfloat sa))))
           (setf (aref vals 0 0 0) (* (/ r a) na)
                 (aref vals 0 0 1) (* (/ g a) na)
                 (aref vals 0 0 2) (* (/ b a) na)
@@ -236,9 +197,9 @@
 (defun lin-path (sand path rad grains &key (dens 1))
   (with-struct (sandpaint- size vals r g b a) sand
     (loop for u in path and w in (cdr path) do
-      (let ((stps (to-int (floor (+ 1 (* dens (dst u w)))))))
-        (rep (p (linspace 0 1 stps :end nil))
-          (-draw-circ vals size (on-line p u w) rad grains r g b a))))))
+      (let ((stps (math:int (floor (+ 1 (* dens (math:dst u w)))))))
+        (math:rep (p (math:linspace 0 1 stps :end nil))
+          (-draw-circ vals size (math:on-line p u w) rad grains r g b a))))))
 
 
 ; TODO: 16 bit?
