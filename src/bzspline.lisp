@@ -71,33 +71,33 @@
 
 (defun -mean (pts a b)
   (math:scale
-    (math:add (get-atup pts a)
-         (get-atup pts b))
+    (math:add (get-dfloat-tup pts a)
+              (get-dfloat-tup pts b))
     0.5d0))
 
 
 (defun -select-pts-open (n pts seg)
   (cond ((< seg 1)
           (list
-            (get-atup pts 0)
-            (get-atup pts 1)
+            (get-dfloat-tup pts 0)
+            (get-dfloat-tup pts 1)
             (-mean pts 1 2)))
         ((< seg (- n 3))
           (list
             (-mean pts seg (+ seg 1))
-            (get-atup pts (+ seg 1))
+            (get-dfloat-tup pts (+ seg 1))
             (-mean pts (+ seg 1) (+ seg 2))))
         (t
           (list
             (-mean pts (- n 3) (- n 2))
-            (get-atup pts (- n 2))
-            (get-atup pts (- n 1))))))
+            (get-dfloat-tup pts (- n 2))
+            (get-dfloat-tup pts (- n 1))))))
 
 
 (defun -select-pts-closed (n pts seg)
   (list
     (-mean pts (mod seg n) (mod (+ seg 1) n))
-    (get-atup pts (mod (+ seg 1) n))
+    (get-dfloat-tup pts (mod (+ seg 1) n))
     (-mean pts (mod (+ seg 1) n) (mod (+ seg 2) n))))
 
 

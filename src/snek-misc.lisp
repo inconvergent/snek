@@ -7,12 +7,12 @@
 
 (defun edge-length (snk e)
   (with-struct (snek- verts) snk
-    (apply #'math:dst (mapcar (lambda (v) (get-atup verts v)) e))))
+    (apply #'math:dst (mapcar (lambda (v) (get-dfloat-tup verts v)) e))))
 
 
 (defun init-circ (snk num rad &key (xy (list 0.0d0 0.0d0)) g)
   (let ((vv (loop for p in (math:linspace 0.0d0 1.0d0 num)
-                  collect (add-vert! snk (on-circ p rad :xy xy)))))
+                  collect (add-vert! snk (math:on-circ p rad :xy xy)))))
     (loop for a in vv and b in (-roll-once vv)
           collect (add-edge! snk (list a b) :g g))))
 
@@ -49,8 +49,8 @@
   (with-struct (snek- verts) snk
     (sandpaint:strokes
       sand
-      (map 'list (lambda (ab) (mapcar (lambda (i) (get-atup verts i)) ab))
-           (get-edges snk :g g))
+      (map 'list (lambda (ab) (mapcar (lambda (i) (get-dfloat-tup verts i)) ab))
+                 (get-edges snk :g g))
         grains)))
 
 

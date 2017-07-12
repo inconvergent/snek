@@ -210,7 +210,7 @@
       t)
 
     (do-test
-      (hset:mem* hs (list 40 'a))
+      (hset:mem* hs (list 40 88))
       (list t nil))
 
     (do-test
@@ -230,19 +230,19 @@
   (let ((grph (graph:make)))
 
     (do-test
-      (graph:add grph (list 1 1))
+      (graph:add grph 1 1)
       t)
 
     (do-test
-      (graph:add grph (list 1 2))
+      (graph:add grph 1 2)
       t)
 
     (do-test
-      (graph:add grph (list 1 2))
+      (graph:add grph 1 2)
       nil)
 
     (do-test
-      (graph:add grph (list 2 1))
+      (graph:add grph 2 1)
       nil)
 
     (do-test
@@ -254,7 +254,7 @@
       '#((1 1) (1 2)))
 
     (do-test
-      (graph:add grph (list 20 5))
+      (graph:add grph 20 5)
       t)
 
     (do-test
@@ -262,11 +262,11 @@
       '#((1 1) (1 2) (5 20)))
 
     (do-test
-      (graph:del grph (list 1 2))
+      (graph:del grph 1 2)
       t)
 
     (do-test
-      (graph:del grph (list 1 2))
+      (graph:del grph 1 2)
       nil)
 
     (do-test
@@ -278,11 +278,11 @@
       4)
 
     (do-test
-      (graph:mem grph (list 1 4))
+      (graph:mem grph 1 4)
       nil)
 
     (do-test
-      (graph:mem grph (list 1 1))
+      (graph:mem grph 1 1)
       t)
 
     (do-test
@@ -290,7 +290,7 @@
       '(1 5 20))
 
     (do-test
-      (graph:del grph (list 1 1))
+      (graph:del grph 1 1)
       t)
 
     (do-test
@@ -302,7 +302,7 @@
       '(5 20))
 
     (do-test
-      (graph:del grph (list 5 20))
+      (graph:del grph 5 20)
       t)
 
     (do-test

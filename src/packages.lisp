@@ -91,9 +91,9 @@
     :make
     :move)
   (:import-from :common-lisp-user
-    :get-atup
-    :set-atup
+    :get-dfloat-tup
     :make-dfloat-array
+    :set-dfloat-tup
     :with-struct))
 
 (defpackage :bzspl
@@ -105,7 +105,7 @@
     :make
     :move)
   (:import-from :common-lisp-user
-    :get-atup
+    :get-dfloat-tup
     :make-dfloat-array
     :with-struct))
 
@@ -115,7 +115,8 @@
     :make
     :verts-in-rad)
   (:import-from :common-lisp-user
-    :get-atup
+    :get-dfloat-tup
+    :make-int-vec
     :with-struct))
 
 (defpackage :hset
@@ -187,7 +188,7 @@
   (:import-from :common-lisp-user
     :aif
     :append-postfix
-    :get-atup
+    :get-dfloat-tup
     :inside
     :inside*
     :square-loop
@@ -200,6 +201,7 @@
     :add-edge*?
     :add-grp!
     :add-vert!
+    :add-verts!
     :add-vert?
     :append-edge?
     :del-edge!
@@ -238,7 +240,7 @@
     :with-rnd-vert)
   (:import-from :common-lisp-user
     :append-postfix
-    :get-atup
+    :get-dfloat-tup
     :make-dfloat-array
     :with-gensyms
     :with-struct

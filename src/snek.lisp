@@ -4,7 +4,7 @@
 
 (defstruct (snek (:constructor -make-snek))
   (wc 0 :type integer)
-  (verts nil)
+  (verts nil :type array)
   (num-verts 0 :type integer)
   (zmap nil)
   (zwidth nil)
@@ -15,10 +15,10 @@
 
 
 (defstruct grp
-  (name nil)
-  (grph nil)
+  (name nil :type symbol)
+  (grph nil :type graph::graph)
   (type nil :type symbol :read-only t)
-  (closed nil :read-only t))
+  (closed nil :type boolean :read-only t))
 
 (defun make (&key
               (max-verts 100000)

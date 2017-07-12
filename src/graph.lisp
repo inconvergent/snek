@@ -26,6 +26,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun -add (make adj a b)
+  (declare (integer a b))
   (multiple-value-bind (val exists)
     (gethash a adj)
     (if (not exists)
@@ -36,11 +37,11 @@ a simple (undirected) graph structure based on adjacency lists.
       (hset:add val b))))
 
 
-(defun add (grph e)
+(defun add (grph a b)
+  (declare (integer a b))
   (with-struct (graph- adj make-hset verts) grph
     (if
-      (destructuring-bind (a b)
-        (math:int* e)
+      (progn
         (hset:add* verts (list a b))
         (reduce (lambda (x y) (or x y))
                 (list
@@ -52,6 +53,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun -del (adj a b)
+  (declare (integer a b))
   (multiple-value-bind (val exists)
     (gethash a adj)
     (if exists
@@ -59,6 +61,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun -prune (adj verts a)
+  (declare (integer a))
   (multiple-value-bind (val exists)
     (gethash a adj)
     (if (not exists)
@@ -69,20 +72,19 @@ a simple (undirected) graph structure based on adjacency lists.
               (hset:del verts a))))))
 
 
-(defun del (grph e)
+(defun del (grph a b)
+  (declare (integer a b))
   (with-struct (graph- adj verts) grph
-    (destructuring-bind (a b)
-      (math:int* e)
-      (if
-        (reduce (lambda (x y) (or x y))
-                (list
-                  (-del adj a b)
-                  (-del adj b a)))
-        (progn
-          (-prune adj verts a)
-          (-prune adj verts b)
-          (incf (graph-num-edges grph) -2)
-          t)))))
+    (if
+      (reduce (lambda (x y) (or x y))
+              (list
+                (-del adj a b)
+                (-del adj b a)))
+      (progn
+        (-prune adj verts a)
+        (-prune adj verts b)
+        (incf (graph-num-edges grph) -2)
+        t))))
 
 
 (defun get-num-edges (grph)
@@ -93,24 +95,24 @@ a simple (undirected) graph structure based on adjacency lists.
   (hset:num (graph-verts grph)))
 
 
-(defun mem (grph e)
+(defun mem (grph a b)
+  (declare (integer a b))
   (with-struct (graph- adj) grph
-    (destructuring-bind (a b)
-      (math:int* e)
-      (multiple-value-bind (val exists)
-        (gethash a adj)
-        (if exists
-          (hset:mem val b))))))
+    (multiple-value-bind (val exists)
+      (gethash a adj)
+      (if exists
+        (hset:mem val b)))))
 
 
 (defun get-edges (grph)
   (let ((res (make-vec (graph-size grph)))
         (adj (graph-adj grph)))
-    (loop for a being the hash-keys of adj do
-      (loop for b in (hset:to-list (gethash a adj))
-            if (<= a b)
-            do
-              (vector-push-extend (list a b) res)))
+    (declare (type (array list) res))
+    (declare (hash-table adj))
+    (loop for a integer being the hash-keys of adj do
+      (loop for b integer in (hset:to-list (gethash a adj))
+        if (<= a b)
+        do (vector-push-extend (list a b) res)))
     res))
 
 
@@ -123,8 +125,8 @@ a simple (undirected) graph structure based on adjacency lists.
         (a (gensym))
         (b (gensym)))
     `(let ((,adj (graph-adj ,grph)))
-      (loop for ,a being the hash-keys of ,adj collect
-        (loop for ,b in (hset:to-list (gethash ,a ,adj))
+      (loop for ,a integer being the hash-keys of ,adj collect
+        (loop for ,b integer in (hset:to-list (gethash ,a ,adj))
               do
                 (setf ,e (list ,a ,b))
               collect

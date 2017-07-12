@@ -7,9 +7,11 @@ this is a naive wrapper around hash-map. not sure how efficient it will be?
 
 
 (defun add (s e)
-  (multiple-value-bind (val exists)
-    (gethash e s)
-    (if exists nil (setf (gethash e s) t))))
+  (declare (integer e))
+  (the boolean
+       (multiple-value-bind (val exists)
+         (gethash e s)
+         (if exists nil (setf (gethash e s) t)))))
 
 
 (defun add* (s ee)
@@ -17,7 +19,9 @@ this is a naive wrapper around hash-map. not sure how efficient it will be?
 
 
 (defun del (s e)
-  (remhash e s))
+  (declare (integer e))
+  (the boolean
+       (remhash e s)))
 
 
 (defun del* (s ee)
@@ -25,9 +29,11 @@ this is a naive wrapper around hash-map. not sure how efficient it will be?
 
 
 (defun mem (s e)
-  (multiple-value-bind (val exists)
-    (gethash e s)
-    exists))
+  (declare (integer e))
+  (the boolean
+       (multiple-value-bind (val exists)
+         (gethash e s)
+         exists)))
 
 
 (defun mem* (s ee)

@@ -17,19 +17,19 @@
 ; TYPES
 
 (defun int (x)
-  (coerce x 'integer))
+  (the integer (coerce x 'integer)))
 
 
 (defun int* (xx)
-  (mapcar (lambda (x) (coerce x 'integer)) xx))
+  (mapcar (lambda (x) (int x)) xx))
 
 
 (defun dfloat (x)
-  (coerce x 'double-float))
+  (the double-float (coerce x 'double-float)))
 
 
 (defun dfloat* (xx)
-  (mapcar (lambda (x) (coerce x 'double-float)) xx))
+  (mapcar (lambda (x) (dfloat x)) xx))
 
 
 ; VEC
@@ -121,13 +121,13 @@
 (defmacro nrep (n &body body)
   (with-gensyms (i nname)
     `(let ((,nname ,n))
-      (loop for ,i from 1 to ,nname collect (progn ,@body)))))
+      (loop for ,i integer from 1 to ,nname collect (progn ,@body)))))
 
 
 (defun range (a &optional (b nil))
   (if (not b)
-    (loop for x from 0 below a collect x)
-    (loop for x from a below b collect x)))
+    (loop for x integer from 0 below a collect x)
+    (loop for x integer from a below b collect x)))
 
 
 (defun inc (x stp)

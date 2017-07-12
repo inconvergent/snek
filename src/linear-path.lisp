@@ -15,8 +15,8 @@
   (let ((total (loop
                   for i from 0 below (1- n)
                   sum (math:dst
-                        (get-atup pts i)
-                        (get-atup pts (1+ i))) into total
+                        (get-dfloat-tup pts i)
+                        (get-dfloat-tup pts (1+ i))) into total
                   do
                     (setf (aref lens (1+ i) 0) total)
                   finally
@@ -36,8 +36,8 @@
 
 (defun -calc-pos (pts lens n f)
   (let ((ind (-find-seg-ind lens f n)))
-        (let ((pb (get-atup pts ind))
-              (pa (get-atup pts (1- ind)))
+        (let ((pb (get-dfloat-tup pts ind))
+              (pa (get-dfloat-tup pts (1- ind)))
               (s (-diff-scale
                    (aref lens (1- ind) 0)
                    f
@@ -66,7 +66,7 @@
   (let ((p (make-dfloat-array n))
         (l (make-dfloat-array n :cols 1)))
     (loop for d in pts and i from 0 do
-      (set-atup p i (math:dfloat* d)))
+      (set-dfloat-tup p i (math:dfloat* d)))
     (-set-path-lens p l n)
     (make-path :n n :pts p :lens l :closed closed)))
 

@@ -49,11 +49,14 @@
   else: move to xy.
   "
   (with-struct (snek- verts num-verts) snk
+    (declare (type (array double-float) verts))
     (with-struct (move-vert-alt- v xy rel) a
       (-valid-vert (num-verts v :err nil)
         (let ((fxy (math:dfloat* xy)))
+          (declare (list fxy))
           (destructuring-bind (x y)
-            (if rel (math:add (get-atup verts v) fxy) fxy)
+            (if rel (math:add (get-dfloat-tup verts v) fxy) fxy)
+            (declare (double-float x y))
             (setf (aref verts v 0) x
                   (aref verts v 1) y)))))))
 
@@ -78,6 +81,7 @@
         (let ((w (if rel
                    (add-vert! snk (math:add (get-vert snk v) xy))
                    (add-vert! snk xy))))
+          (declare (integer w))
           (add-edge! snk (list v w) :g g)
           w)))))
 
@@ -118,12 +122,14 @@
   (with-struct (split-edge-alt- e g) a
     (let ((res (del-edge! snk e :g g))
           (verts (snek-verts snk)))
+      (declare (type (array double-float) verts))
       (destructuring-bind (a b)
         e
+        (declare (integer a b))
         (if res
           (let ((c (add-vert! snk
-                      (math:mid (get-atup verts a)
-                           (get-atup verts b)))))
+                      (math:mid (get-dfloat-tup verts a)
+                                (get-dfloat-tup verts b)))))
             (add-edge! snk (list a c) :g g)
             (add-edge! snk (list c b) :g g)))))))
 
@@ -141,12 +147,15 @@
     `(let ((,vname (snek-verts ,snk))
            (,v1name ,v1)
            (,v2name ,v2)
-           (,rname ,r))
+           (,rname (math:dfloat ,r)))
+      (declare (double-float ,rname))
+      (declare (integer ,v1name))
+      (declare (integer ,v2name))
       (-get-force-alterations
-        ,v1 ,v2
+        ,v1name ,v2name
         (math:scale
           (math:nsub
-            (get-atup ,vname ,v1name)
-            (get-atup ,vname ,v2name))
+            (get-dfloat-tup ,vname ,v1name)
+            (get-dfloat-tup ,vname ,v2name))
           ,rname)))))
 

@@ -48,6 +48,8 @@
     `(let ((,sname ,snk))
        (let* ((,dx (apply #'math:isub (get-verts ,sname ,vv)))
               (,d (math:len ,dx)))
+         (declare (double-float ,d))
+         (declare (list ,dx))
          (if (> ,d 0.0d0)
            (list ,@body))))))
 
@@ -76,13 +78,15 @@
   if a grp is supplied it will select an edge from g, otherwise it will
   use the main grp.
   "
-  (with-gensyms (grp num-edges edges grph ln)
+  (with-gensyms (grp edges grph ln)
     `(with-grp (,snk ,grp ,g)
       (let ((,grph (grp-grph ,grp)))
         (let* ((,edges (graph:get-edges ,grph))
                (,ln (length ,edges)))
+          (declare (integer ,ln))
           (if (> ,ln 0)
             (let ((,i (aref ,edges (random ,ln))))
+              (declare (list ,i))
               (list ,@body))))))))
 
 
@@ -95,6 +99,7 @@
     `(let ((,num (snek-num-verts ,snk)))
        (if (> ,num 0)
          (let ((,i (random ,num)))
+           (declare (integer ,i))
            (list ,@body))))))
 
 
@@ -106,10 +111,10 @@
 
   if g is not provided, the main grp wil be used.
   "
-  (with-gensyms (gv grp sname)
+  (with-gensyms (grp sname)
     `(let ((,sname ,snk))
       (with-grp (,sname ,grp ,g)
-        (mapcar (lambda (,i) (list ,@body))
+        (mapcar (lambda (,i) (declare (integer ,i)) ( list ,@body))
                 (graph:get-verts (grp-grph ,grp)))))))
 
 
@@ -119,7 +124,7 @@
   "
   (with-gensyms (sname)
     `(let ((,sname ,snk))
-      (loop for ,i from 0 below (snek-num-verts ,sname)
+      (loop for ,i integer from 0 below (snek-num-verts ,sname)
         collect (list ,@body)))))
 
 
@@ -129,7 +134,7 @@
 
   if g is not provided, the main grp will be used.
   "
-  (with-gensyms (grp grph num-edges edges)
+  (with-gensyms (grp grph)
     `(with-grp (,snk ,grp ,g)
       (let ((,grph (grp-grph ,grp)))
         (map 'list

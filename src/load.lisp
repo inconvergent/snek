@@ -2,7 +2,7 @@
 (proclaim '(optimize speed))
 (proclaim '(optimize (space 0)))
 (proclaim '(inline last1 single append1 conc1 mklist))
-;(declaim '(optimize (debug 1)))
+;(declaim '(optimize (debug 3)))
 
 (load "~/quicklisp/setup.lisp")
 
@@ -12,7 +12,7 @@
 
 (asdf:defsystem "snek"
   :description "SNEK - A Generative System for Writing Generative Systems"
-  :version "2.0.0"
+  :version "2.1.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t

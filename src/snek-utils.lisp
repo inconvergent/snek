@@ -25,6 +25,7 @@
 (defmacro -valid-vert ((num vv &key (err t)) &body body)
   (with-gensyms (v)
     `(let ((,v ,vv))
+      (declare (integer ,v))
       (if (and (> ,v -1) (< ,v ,num))
         (progn ,@body)
         (if ,err (error "vert does not exist: ~a" ,v))))))
@@ -33,7 +34,7 @@
 (defmacro -valid-verts ((num vv v) &body body)
   (with-gensyms (vv*)
     `(let ((,vv* ,vv))
-      (loop for ,v in ,vv*
+      (loop for ,v integer in ,vv*
         if
           (and (> ,v -1) (< ,v ,num))
         collect
@@ -42,8 +43,10 @@
 
 (defun add-vert! (snk xy)
   (with-struct (snek- verts num-verts) snk
+    (declare (type (array double-float) verts))
     (destructuring-bind (x y)
       (math:dfloat* xy)
+      (declare (double-float x y))
       (setf (aref verts num-verts 0) x
             (aref verts num-verts 1) y)
       (- (incf (snek-num-verts snk)) 1))))
@@ -56,20 +59,23 @@
 
 (defun get-vert (snk v)
   (with-struct (snek- verts num-verts) snk
+    (declare (type (array double-float) verts))
     (-valid-vert (num-verts v)
-      (get-atup verts v))))
+      (get-dfloat-tup verts v))))
 
 
 (defun get-verts (snk vv)
   (with-struct (snek- verts num-verts) snk
+    (declare (type (array double-float) verts))
     (-valid-verts (num-verts vv v)
-      (get-atup verts v))))
+      (get-dfloat-tup verts v))))
 
 
 (defun get-all-verts (snk)
   (with-struct (snek- verts num-verts) snk
-    (loop for v from 0 below num-verts
-      collect (get-atup verts v))))
+    (declare (type (array double-float) verts))
+    (loop for v integer from 0 below num-verts
+      collect (get-dfloat-tup verts v))))
 
 
 (defun get-grp-verts (snk &key g)
@@ -104,20 +110,25 @@
       (with-struct (grp- grph) grp
         (destructuring-bind (a b)
           ee
+          (declare (integer a b))
           (if (and (< a num-verts)
                    (< b num-verts)
                    (not (eql a b)))
-            (if (graph:add grph ee)
-              (sort ee #'<))))))))
+            (if (graph:add grph a b)
+              (sort (list a b) #'<))))))))
 
 
 (defun del-edge! (snk ee &key g)
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
-      (graph:del grph ee))))
+      (destructuring-bind (a b)
+        ee
+        (declare (integer a b))
+        (graph:del grph a b)))))
 
 
 (defun verts-in-rad (snk xy rad)
   (with-struct (snek- verts zmap zwidth) snk
+    (declare (type (array double-float) verts))
     (zmap:verts-in-rad verts zmap zwidth xy rad)))
 
