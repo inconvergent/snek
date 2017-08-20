@@ -46,10 +46,10 @@
 (defmacro with-dx ((snk vv dx d) &body body)
   (with-gensyms (sname)
     `(let ((,sname ,snk))
-       (let* ((,dx (apply #'math:isub (get-verts ,sname ,vv)))
-              (,d (math:len ,dx)))
+       (let* ((,dx (apply #'vec:isub (get-verts ,sname ,vv)))
+              (,d (vec:len ,dx)))
          (declare (double-float ,d))
-         (declare (list ,dx))
+         (declare (vec:vec ,dx))
          (if (> ,d 0.0d0)
            (list ,@body))))))
 

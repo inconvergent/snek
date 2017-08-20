@@ -13,7 +13,7 @@
   (let ((snk (snek:make)))
     (mapcar (lambda (g)
               (snek:init-path snk
-                (math:rep (p (math:linspace 0 1 n)) (math:on-circ p 600 :xy xy))
+                (math:rep (p (math:linspace 0 1 n)) (math:on-circ p 600d0 :xy xy))
                 :g g))
             (math:nrep m (snek:add-grp! snk)))
     snk))
@@ -42,7 +42,7 @@
         (grains 10)
         (snk (init-snek 40 1
                (half size)
-               (math:nrep 2 (half size))))
+               (vec:rep (* 0.5d0 size))))
         (sand (sandpaint:make size
                 :active (color:white 0.05)
                 :bg (color:dark)))

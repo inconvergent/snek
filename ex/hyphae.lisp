@@ -6,6 +6,19 @@
 (setf *random-state* (make-random-state t))
 
 
+; TODO: where does this go?
+(defmacro inside-border ((size xy b) &body body)
+  (with-gensyms (xyname sname small large)
+    `(let* ((,xyname ,xy)
+            (,sname ,size)
+            (,small ,b)
+            (,large (- ,sname ,small)))
+      (if (and (>= (vec::vec-x ,xyname) ,small) (< (vec::vec-x ,xyname) ,large)
+               (>= (vec::vec-y ,xyname) ,small) (< (vec::vec-y ,xyname) ,large))
+        (progn
+          ,@body)))))
+
+
 (defun hyphae (sand size fn itt rad mid)
   (let ((curr (make-hash-table :test #'equal))
         (hits 0))
@@ -13,17 +26,17 @@
     (labels ((init (snk n)
                (loop for i from 0 below n do
                  (setf (gethash
-                         (snek:add-vert! snk (rnd:in-box 250 250 :xy '(250 250)))
+                         (snek:add-vert! snk (rnd:in-box 250 250 :xy (vec:vec 250d0 250d0)))
                          curr)
                        0)))
 
              (draw (snk a w)
                (sandpaint:set-rgba sand (list 0.0 0.7 0.7 0.1))
-               (sandpaint:circ sand (list (snek::append-edge-alt-xy a)) 4 300)
+               (sandpaint:circ sand (list (snek::append-edge-alt-xy a)) 4d0 300)
                (sandpaint:set-rgba sand (list 0.0 0.0 0.0 0.1))
                (sandpaint:lin-path sand
                  (snek:get-verts snk (list w (snek::append-edge-alt-v a)))
-                 2.0
+                 2d0
                  50))
 
              (count-control (v)
@@ -55,7 +68,7 @@
           (snek:with (snk :zwidth rad)
             (loop for k being the hash-keys in curr collect
               (snek:append-edge? k
-                (math:add (snek:get-vert snk k)
+                (vec:add (snek:get-vert snk k)
                      (rnd:in-circ rad))
                 :rel nil))
             (sandpaint:save sand (append-number fn hits))))))))
@@ -66,7 +79,7 @@
                 :active (list 0 0 0 0.01)
                 :bg (list 1 1 1 1.0))))
 
-    (hyphae sand size fn 5000 10.0d0 (list 250 250))))
+    (hyphae sand size fn 5000 10.0d0 (vec:vec 250d0 250d0))))
 
 (time (main 500 (second (cmd-args))))
 

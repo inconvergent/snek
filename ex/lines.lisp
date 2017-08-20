@@ -8,7 +8,7 @@
 
 (defun main (size fn)
 
-  (let ((math:mid (half size))
+  (let ((mid (* 0.5d0 size))
         (repeat 15)
         (grains 3)
         (itt 1000)
@@ -20,21 +20,21 @@
           for j from 1 to repeat do
       (print-every j 2)
       (let ((snk (snek:make))
-            (va (list 0 0))
-            (vb (list 0 0))
-            (p1 (list 100 i))
-            (p2 (list 900 i)))
+            (va (vec:vec 0d0 0d0))
+            (vb (vec:vec 0d0 0d0))
+            (p1 (vec:vec 100d0 i))
+            (p2 (vec:vec 900d0 i)))
 
         (loop for s in (math:linspace 0.0 1.0 itt) do
           (let ((v1 (snek:add-vert! snk (math:on-line s p1 p2)))
-                (v2 (snek:add-vert! snk (math:add va (math:on-line s p1 p2)))))
+                (v2 (snek:add-vert! snk (vec:add va (math:on-line s p1 p2)))))
 
-            (setf va (math:add va (rnd:in-circ (* 0.7 j))))
-            (setf vb (math:add vb (rnd:in-circ (* 0.001 j))))
+            (setf va (vec:add va (rnd:in-circ (* 0.7d0 j))))
+            (setf vb (vec:add vb (rnd:in-circ (* 0.001d0 j))))
 
             (snek:with (snk)
               (snek:itr-verts (snk v)
-                (snek:move-vert? v (math:add (rnd:in-circ 0.1) vb)))
+                (snek:move-vert? v (vec:add (rnd:in-circ 0.1d0) vb)))
               (snek:join-verts? v1 v2))
 
             (snek:draw-edges snk sand grains)

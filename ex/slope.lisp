@@ -8,16 +8,16 @@
 
 (defun main (size fn)
 
-  (let ((p1 (rnd:in-circ 100 :xy (list 800.0 200.0)))
-        (p2 (rnd:in-circ 100 :xy (list 200.0 800.0))))
-    (let ((va (math:add
-                (math:scale
-                   (math:norm
-                     (math:mult (reverse (math:sub p1 p2)) (list -1.0 1.0)))
-                   40.0)
-                 (rnd:on-circ 20 :xy (list 0.0 0.0))))
+  (let ((p1 (rnd:in-circ 100d0 :xy (vec:vec 800d0 200d0)))
+        (p2 (rnd:in-circ 100d0 :xy (vec:vec 200d0 800d0))))
+    (let ((va (vec:add
+                (vec:scale
+                   (vec:norm
+                     (vec:mult (vec:flip (vec:sub p1 p2)) (vec:vec -1d0 1d0)))
+                   40d0)
+                 (rnd:on-circ 20d0 :xy (vec:vec 0d0 0d0))))
          (repeat 10)
-         (noise (random 4.0))
+         (noise (rnd:rnd 4d0))
          (grains 70)
          (itt 6000)
          (sand (sandpaint:make size
@@ -28,7 +28,7 @@
         do
           (print-every j 2)
           (let ((snk (snek:make)))
-            (setf va (math:add va (rnd:in-circ noise :xy (list 0.0 0.0))))
+            (setf va (vec:add va (rnd:in-circ noise :xy (vec:vec 0d0 0d0))))
 
             (loop for k from 1 to itt
               do

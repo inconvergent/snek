@@ -10,7 +10,7 @@
   (let ((snk (snek:make
                :max-verts 5000000
                :grp-size 500000)))
-    (math:nrep n (snek:add-vert! snk (math:nrep 2 (rnd:rnd size))))
+    (math:nrep n (snek:add-vert! snk (vec:rep (rnd:rnd (math:dfloat size)))))
     snk))
 
 

@@ -9,10 +9,10 @@
 (defun init-snek (n m size xy)
   (let ((snk (snek:make :max-verts 5000)))
     (mapcar
-      (lambda (g) (let ((mid (rnd:in-circ (half (- size 200)) :xy xy)))
+      (lambda (g) (let ((mid (rnd:in-circ (* 0.5d0 (- size 200)) :xy xy)))
                     (snek:init-path snk
                       (math:rep (p (math:linspace 0 1 n :end nil))
-                        (math:on-circ p 20 :xy mid))
+                        (math:on-circ p 20d0 :xy mid))
                       :g g
                       :closed t)))
       (math:nrep m (snek:add-grp! snk)))
@@ -23,7 +23,7 @@
 (defun main (size fn)
   (let ((itt 1000)
         (grains 30)
-        (snk (init-snek 5 800 size (math:nrep 2 (half size))))
+        (snk (init-snek 5 800 size (vec:rep (* 0.5d0 size))))
         (sand (sandpaint:make size
                 :active (color:white 0.05)
                 :bg (color:dark))))

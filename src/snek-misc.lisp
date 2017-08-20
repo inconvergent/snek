@@ -7,17 +7,21 @@
 
 (defun edge-length (snk e)
   (with-struct (snek- verts) snk
-    (apply #'math:dst (mapcar (lambda (v) (get-dfloat-tup verts v)) e))))
+    (destructuring-bind (a b)
+      e
+      (vec:dst (vec:arr-get verts a)
+               (vec:arr-get verts b)))))
 
 
-(defun init-circ (snk num rad &key (xy (list 0.0d0 0.0d0)) g)
+(defun init-circ (snk num rad &key (xy (vec:vec 0.0d0 0.0d0)) g)
   (let ((vv (loop for p in (math:linspace 0.0d0 1.0d0 num)
                   collect (add-vert! snk (math:on-circ p rad :xy xy)))))
     (loop for a in vv and b in (-roll-once vv)
           collect (add-edge! snk (list a b) :g g))))
 
 
-(defun init-polygon (snk rad n &key (xy (list 0.0d0 0.0d0)) (rot (* 0.25 PI)) g)
+(defun init-polygon (snk rad n &key (xy (vec:vec 0.0d0 0.0d0))
+                                    (rot (* 0.25 PI)) g)
   (let ((vv (loop for v in (math:polygon n rad :xy xy :rot rot)
                   collect (add-vert! snk v))))
     (loop for a in vv and b in (-roll-once vv)
@@ -49,7 +53,7 @@
   (with-struct (snek- verts) snk
     (sandpaint:strokes
       sand
-      (map 'list (lambda (ab) (mapcar (lambda (i) (get-dfloat-tup verts i)) ab))
+      (map 'list (lambda (ab) (mapcar (lambda (i) (vec:arr-get verts i)) ab))
                  (get-edges snk :g g))
         grains)))
 
@@ -66,9 +70,7 @@
                       :if-exists :supersede)
       (format stream "o mesh~%")
       (dolist (ll verts)
-        (destructuring-bind (a b)
-          ll
-          (format stream "v ~f ~f~%" a b)))
+        (format stream "v ~f ~f~%" (vec::vec-x ll) (vec::vec-y ll)))
       (dolist (ll (coerce edges 'list))
         (destructuring-bind (a b)
           (math:add ll '(1 1))

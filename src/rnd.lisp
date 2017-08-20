@@ -14,29 +14,39 @@
 
 
 (defun rndi (a &optional b)
-  (let ((a (math:int a)))
-    (if (not b)
-      (random a)
-      (+ a (random (- (math:int b) a))))))
+  (declare (integer a))
+  ;(declare (type (or integer nil) b))
+  (if (not b)
+    (random a)
+    (+ a (random (- (math:int b) a)))))
+
+
+(defun rndi* (ab)
+  (declare (list ab))
+  (destructuring-bind (a b)
+    ab
+    (declare (integer a b))
+    (+ a (random (- b a)))))
 
 
 (defun rnd (&optional (x 1.0d0))
-  (random (math:dfloat x)))
+  (declare (double-float x))
+  (random x))
 
 
-(defun rndbtwn (&optional a b)
-  (+ a (random (math:dfloat (- b a)))))
+(defun rndbtwn (a b)
+  (declare (double-float a b))
+  (+ a (random (- b a))))
 
 
 (defun rnd* (&optional (x 1.0d0))
-  (- x (* 2.0d0 (random (math:dfloat x)))))
+  (declare (double-float x))
+  (- x (* 2.0d0 (random x))))
 
 
 (defun mixed (x f)
-  (let ((x* (math:dfloat x)))
-    (+
-      (random (* (math:dfloat f) x*))
-      (- x* (* 2.0d0 (random x*))))))
+  (declare (double-float x f))
+  (+ (random (* f x)) (- x (* 2.0d0 (random x)))))
 
 
 (defun rndspace (a b n &key order)
@@ -55,44 +65,47 @@
           (if order (sort res #'<) res)))))
 
 
+(defun bernoulli (p n)
+  (loop for i from 0 below n collect
+    (if (< (rnd:rnd) p)
+      1d0
+      0d0)))
+
+
 ; SHAPES
 
 
-(defun on-circ (rad &key (xy (list 0.0d0 0.0d0)))
-  (math:add
-    xy
-    (math:scale
-      (math:cos-sin (random (* PI 2.0d0)))
-      rad)))
+(defun -add-if (a xy)
+  (if xy (vec:add a xy) a))
 
 
-(defun in-circ (rad &key (xy (list 0.0d0 0.0d0)))
-  (let ((ab (sort (list (random 1.0d0) (random 1.0d0)) #'<)))
-    (math:add
-      xy
-      (math:scale
-        (math:cos-sin (* 2 PI (apply #'/ ab)))
-        (* (second ab) rad)))))
+(defun on-circ (rad &key xy)
+  (-add-if (vec:scale (vec:cos-sin (random (* PI 2.0d0))) rad) xy))
 
 
-(defun in-box (sx sy &key (xy (list 0.0d0 0.0d0)))
-  (math:add
-    (list (rnd* (math:dfloat sx))
-          (rnd* (math:dfloat sy)))
+
+(defun in-circ (rad &key xy)
+  (declare (double-float rad))
+  (-add-if
+    (let ((a (random 1.0d0))
+          (b (random 1.0d0)))
+      (declare (double-float a b))
+      (if (< a b)
+        (vec:scale (vec:cos-sin (* 2 PI (/ a b))) (* b rad))
+        (vec:scale (vec:cos-sin (* 2 PI (/ b a))) (* a rad))))
     xy))
 
 
-(defun on-line (x1 x2)
-  (math:add x1
-           (math:scale (math:sub x2 x1) (random 1.0d0))))
+(defun in-box (sx sy &key xy)
+    (-add-if
+      (vec:vec (rnd* (math:dfloat sx))
+               (rnd* (math:dfloat sy)))
+      xy))
 
 
-(defun on-spiral (rad &key (xy (list 0.0d0 0.0d0)) (rot 1.0d0))
-  (let ((i (random 1.0)))
-    (math:add xy
-              (math:scale
-                (math:cos-sin (* i (* PI rot)))
-                (* i rad)))))
+(defun on-line (a b)
+  (declare (vec:vec a b))
+  (vec:add a (vec:scale (vec:sub b a) (random 1.0d0))))
 
 
 ; WALKERS
@@ -124,16 +137,16 @@
       (incf x (incf a (rnd* s))))))
 
 
-(defun get-circ-stp* (&optional (init (list 0.0d0 0.0d0)))
-  (let ((xy (math:dfloat* init)))
+(defun get-circ-stp* (&optional (init (vec:vec 0.0d0 0.0d0)))
+  (let ((xy (vec:copy init)))
     (lambda (stp)
-      (setf xy (math:add xy (in-circ stp))))))
+      (setf xy (vec:add xy (in-circ stp))))))
 
 
-(defun get-acc-circ-stp* (&optional (init (list 0.0d0 0.0d0))
-                                    (init-a (list 0.0d0 0.0d0)))
-  (let ((a (math:dfloat* init-a))
-        (xy (math:dfloat* init)))
+(defun get-acc-circ-stp* (&optional (init (vec:vec 0.0d0 0.0d0))
+                                    (init-a (vec:vec 0.0d0 0.0d0)))
+  (let ((a (vec:copy init-a))
+        (xy (vec:copy init)))
     (lambda (stp)
-      (setf xy (math:add xy (setf a (math:add a (in-circ stp))))))))
+      (setf xy (vec:add xy (setf a (vec:add a (in-circ stp))))))))
 

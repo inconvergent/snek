@@ -1,50 +1,76 @@
 
+(defpackage :vec
+  (:use :common-lisp)
+  (:export
+    :add
+    :arr-get
+    :arr-set
+    :copy
+    :cos-sin
+    :div
+    :dot
+    :dst
+    :dst2
+    :flip
+    :idiv
+    :inside
+    :inside*
+    :iscale
+    :isub
+    :len
+    :len2
+    :lmid
+    :lround
+    :mid
+    :mult
+    :norm
+    :nsub
+    :perp
+    :rep
+    :scale
+    :sin-cos
+    :sub
+    :sum
+    :vec
+    :vec*
+    :vec-coerce
+    :with-xy)
+  (:import-from :common-lisp-user
+    :with-gensyms))
+
 (defpackage :math
   (:use :common-lisp)
   (:export
     :add
     :close-path
-    :cos-sin
     :dfloat
     :dfloat*
     :div
-    :dot
-    :dst
-    :dst2
-    :idiv
     :inc
     :int
     :int*
     :iscale
-    :isub
-    :len
-    :len2
     :linspace
-    :lmid
-    :lround
     :make-perspective-transform
-    :mid
     :mult
-    :norm
     :nrep
-    :nsub
     :on-circ
     :on-line
-    :on-spiral
     :polygon
     :range
     :rep
     :scale
-    :sin-cos
     :sub
     :sum)
   (:import-from :common-lisp-user
     :with-gensyms))
 
+
 (defpackage :rnd
   (:use :common-lisp)
   (:export
     :aget
+    :bernoulli
     :get-acc-circ-stp*
     :get-acc-lin-stp
     :get-acc-lin-stp*
@@ -53,19 +79,20 @@
     :get-lin-stp*
     :in-box
     :in-circ
-    :rndi
-    :rndbtwn
     :lget
     :mixed
     :on-circ
     :on-line
-    :on-spiral
     :rnd
     :rnd*
+    :rndbtwn
+    :rndi
+    :rndi*
     :rndspace
     :rndspacei)
   (:import-from :common-lisp-user
     :with-gensyms))
+
 
 (defpackage :color
   (:use :common-lisp)
@@ -82,42 +109,6 @@
   (:import-from :common-lisp-user
     :with-gensyms))
 
-(defpackage :lin-path
-  (:use :common-lisp)
-  (:export
-    :pos
-    :pos*
-    :rndpos
-    :make
-    :move)
-  (:import-from :common-lisp-user
-    :get-dfloat-tup
-    :make-dfloat-array
-    :set-dfloat-tup
-    :with-struct))
-
-(defpackage :bzspl
-  (:use :common-lisp)
-  (:export
-    :pos
-    :pos*
-    :rndpos
-    :make
-    :move)
-  (:import-from :common-lisp-user
-    :get-dfloat-tup
-    :make-dfloat-array
-    :with-struct))
-
-(defpackage :zmap
-  (:use :common-lisp)
-  (:export
-    :make
-    :verts-in-rad)
-  (:import-from :common-lisp-user
-    :get-dfloat-tup
-    :make-int-vec
-    :with-struct))
 
 (defpackage :hset
   (:use :common-lisp)
@@ -150,6 +141,67 @@
     :make-vec
     :with-struct))
 
+
+(defpackage :bzspl
+  (:use :common-lisp)
+  (:export
+    :pos
+    :pos*
+    :rndpos
+    :rndpos*
+    :make
+    :move)
+  (:import-from :common-lisp-user
+    :make-dfloat-array
+    :with-struct))
+
+
+(defpackage :lin-path
+  (:use :common-lisp)
+  (:export
+    :pos
+    :pos*
+    :rndpos
+    :make
+    :move)
+  (:import-from :common-lisp-user
+    :make-dfloat-array
+    :set-dfloat-tup
+    :with-struct))
+
+(defpackage :zmap
+  (:use :common-lisp)
+  (:export
+    :make
+    :verts-in-rad)
+  (:import-from :common-lisp-user
+    :get-dfloat-tup
+    :make-int-vec
+    :with-struct))
+
+(defpackage :sandpaint
+  (:use :common-lisp)
+  (:export
+    :chromatic-aberration
+    :circ
+    :circ*
+    :clear
+    :lin-path
+    :make
+    :pix
+    :pix*
+    :pixel-hack
+    :save
+    :set-rgba
+    :stroke
+    :strokes)
+  (:import-from :common-lisp-user
+    :aif
+    :append-postfix
+    :get-dfloat-tup
+    :square-loop
+    :with-struct))
+
 (defpackage :plot
   (:use :common-lisp)
   (:export
@@ -163,34 +215,7 @@
     :aif
     :append-postfix
     :half
-    :inside
-    :inside*
     :make-vec
-    :square-loop
-    :with-struct))
-
-(defpackage :sandpaint
-  (:use :common-lisp)
-  (:export
-    :chromatic-aberration
-    :circ
-    :circ*
-    :clear
-    :make
-    :pix
-    :pix*
-    :pixel-hack
-    :save
-    :lin-path
-    :set-rgba
-    :stroke
-    :strokes)
-  (:import-from :common-lisp-user
-    :aif
-    :append-postfix
-    :get-dfloat-tup
-    :inside
-    :inside*
     :square-loop
     :with-struct))
 
@@ -201,8 +226,8 @@
     :add-edge*?
     :add-grp!
     :add-vert!
-    :add-verts!
     :add-vert?
+    :add-verts!
     :append-edge?
     :del-edge!
     :draw-circ
@@ -240,9 +265,9 @@
     :with-rnd-vert)
   (:import-from :common-lisp-user
     :append-postfix
+    :flatten
     :get-dfloat-tup
     :make-dfloat-array
     :with-gensyms
-    :with-struct
-    :flatten))
+    :with-struct))
 

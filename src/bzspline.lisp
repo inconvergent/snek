@@ -38,16 +38,16 @@
 
 (defun do-m (pts)
   (loop for mrow in *m* collect
-    (let ((s (list 0.0d0 0.0d0)))
+    (let ((s (vec:Vec 0.0d0 0.0d0)))
       (loop for p in pts and mr in mrow do
-        (setf s (math:add s (math:scale p mr))))
+        (setf s (vec:add s (vec:scale p mr))))
       s)))
 
 
 (defun do-t (x pk)
-  (let ((s (list 0.0d0 0.0d0)))
+  (let ((s (vec:vec 0.0d0 0.0d0)))
     (loop for p in pk and xi in (list 1.0d0 x (* x x)) do
-      (setf s (math:add s (math:scale p xi))))
+      (setf s (vec:add s (vec:scale p xi))))
     s))
 
 
@@ -70,34 +70,34 @@
 
 
 (defun -mean (pts a b)
-  (math:scale
-    (math:add (get-dfloat-tup pts a)
-              (get-dfloat-tup pts b))
+  (vec:scale
+    (vec:add (vec:arr-get pts a)
+             (vec:arr-get pts b))
     0.5d0))
 
 
 (defun -select-pts-open (n pts seg)
   (cond ((< seg 1)
           (list
-            (get-dfloat-tup pts 0)
-            (get-dfloat-tup pts 1)
+            (vec:arr-get pts 0)
+            (vec:arr-get pts 1)
             (-mean pts 1 2)))
         ((< seg (- n 3))
           (list
             (-mean pts seg (+ seg 1))
-            (get-dfloat-tup pts (+ seg 1))
+            (vec:arr-get pts (+ seg 1))
             (-mean pts (+ seg 1) (+ seg 2))))
         (t
           (list
             (-mean pts (- n 3) (- n 2))
-            (get-dfloat-tup pts (- n 2))
-            (get-dfloat-tup pts (- n 1))))))
+            (vec:arr-get pts (- n 2))
+            (vec:arr-get pts (- n 1))))))
 
 
 (defun -select-pts-closed (n pts seg)
   (list
     (-mean pts (mod seg n) (mod (+ seg 1) n))
-    (get-dfloat-tup pts (mod (+ seg 1) n))
+    (vec:arr-get pts (mod (+ seg 1) n))
     (-mean pts (mod (+ seg 1) n) (mod (+ seg 2) n))))
 
 
@@ -120,12 +120,16 @@
   `(pos* ,b (rnd:rndspace 0.0d0 1.0d0 ,n)))
 
 
+(defmacro rndpos* (b n)
+  `(pos* ,b (sort (rnd:rndspace 0.0d0 1.0d0 ,n) #'<)))
+
+
 (defun make (pts &key closed &aux (n (length pts)))
   (assert (>= n 4) (n) "must have at least 4 pts. has ~a." n)
   (let ((apts (make-dfloat-array n)))
-    (loop for (x y) in pts and i from 0 do
-      (setf (aref apts i 0) (math:dfloat x)
-            (aref apts i 1) (math:dfloat y)))
+    (loop for xy in pts and i from 0 do
+      (setf (aref apts i 0) (math:dfloat (vec::vec-x xy))
+            (aref apts i 1) (math:dfloat (vec::vec-y xy))))
     (make-bzspl :n n
                 :pts apts
                 :select-pts (if closed

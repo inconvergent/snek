@@ -5,7 +5,7 @@
 
 (defstruct (add-vert-alt
     (:constructor add-vert? (xy)))
-  (xy nil :type list :read-only t))
+  (xy nil :type vec:vec :read-only t))
 
 
 (defun do-add-vert-alt (snk a)
@@ -20,8 +20,8 @@
 
 (defstruct (add-edge*-alt
     (:constructor add-edge*? (xya xyb &key g)))
-  (xya nil :type list :read-only t)
-  (xyb nil :type list :read-only t)
+  (xya nil :type vec:vec :read-only t)
+  (xyb nil :type vec:vec :read-only t)
   (g nil :type symbol :read-only t))
 
 
@@ -30,7 +30,9 @@
   add verts xya and xyb, and create an edge between them.
   "
   (with-struct (add-edge*-alt- xya xyb g) a
-    (add-edge! snk (list (add-vert! snk xya) (add-vert! snk xyb)) :g g)))
+    (add-edge! snk (list (add-vert! snk xya)
+                         (add-vert! snk xyb))
+               :g g)))
 
 
 ; MOVE VERT
@@ -38,7 +40,7 @@
 (defstruct (move-vert-alt
     (:constructor move-vert? (v xy &key (rel t))))
   (rel t :type boolean :read-only t)
-  (xy nil :type list :read-only t)
+  (xy nil :type vec:vec :read-only t)
   (v nil :type integer :read-only t))
 
 
@@ -52,20 +54,16 @@
     (declare (type (array double-float) verts))
     (with-struct (move-vert-alt- v xy rel) a
       (-valid-vert (num-verts v :err nil)
-        (let ((fxy (math:dfloat* xy)))
-          (declare (list fxy))
-          (destructuring-bind (x y)
-            (if rel (math:add (get-dfloat-tup verts v) fxy) fxy)
-            (declare (double-float x y))
-            (setf (aref verts v 0) x
-                  (aref verts v 1) y)))))))
+        (let ((fxy (if rel (vec:add (vec:arr-get verts v) xy) xy)))
+          (setf (aref verts v 0) (vec::vec-x fxy)
+                (aref verts v 1) (vec::vec-y fxy)))))))
 
 
 ; APPEND EDGE
 
 (defstruct (append-edge-alt
     (:constructor append-edge? (v xy &key (rel t) g)))
-  (xy nil :type list :read-only t)
+  (xy nil :type vec:vec :read-only t)
   (v nil :type integer :read-only t)
   (g nil :type symbol :read-only t)
   (rel t :type boolean :read-only t))
@@ -79,7 +77,7 @@
     (with-struct (append-edge-alt- v xy rel g) a
       (-valid-vert (num-verts v :err nil)
         (let ((w (if rel
-                   (add-vert! snk (math:add (get-vert snk v) xy))
+                   (add-vert! snk (vec:add (get-vert snk v) xy))
                    (add-vert! snk xy))))
           (declare (integer w))
           (add-edge! snk (list v w) :g g)
@@ -128,14 +126,14 @@
         (declare (integer a b))
         (if res
           (let ((c (add-vert! snk
-                      (math:mid (get-dfloat-tup verts a)
-                                (get-dfloat-tup verts b)))))
+                      (vec:mid (vec:arr-get verts a)
+                               (vec:arr-get verts b)))))
             (add-edge! snk (list a c) :g g)
             (add-edge! snk (list c b) :g g)))))))
 
 
 (defun -get-force-alterations (u v f)
-  (list (move-vert? v f) (move-vert? u (math:scale f -1.0d0))))
+  (list (move-vert? v f) (move-vert? u (vec:scale f -1.0d0))))
 
 
 (defmacro force? (snk v1 v2 r)
@@ -153,9 +151,9 @@
       (declare (integer ,v2name))
       (-get-force-alterations
         ,v1name ,v2name
-        (math:scale
-          (math:nsub
-            (get-dfloat-tup ,vname ,v1name)
-            (get-dfloat-tup ,vname ,v2name))
+        (vec:scale
+          (vec:nsub
+            (vec:arr-get ,vname ,v1name)
+            (vec:arr-get ,vname ,v2name))
           ,rname)))))
 

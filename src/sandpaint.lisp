@@ -43,11 +43,11 @@
 
 
 (defun -draw-stroke (vals size grains v1 v2 r g b a)
-  (declare (list v1 v2))
+  (declare (integer grains))
   (declare (double-float r g b a))
   (declare (type (array double-float) vals))
   (loop for i integer from 0 below grains do
-    (inside* (size (rnd:on-line v1 v2) x y)
+    (vec:inside* (size (rnd:on-line v1 v2) x y)
       (-operator-over vals x y r g b a))))
 
 
@@ -69,21 +69,25 @@
 
 
 (defun -draw-circ (vals size xy rad grains r g b a)
-  (declare (double-float r g b a))
+  (declare (integer grains))
+  (declare (double-float rad r g b a))
   (declare (type (array double-float) vals))
   (loop for i integer below grains do
-    (inside* (size (math:add xy (rnd:in-circ rad)) x y)
+    (vec:inside* (size (vec:add xy (rnd:in-circ rad)) x y)
       (-operator-over vals x y r g b a))))
 
 
 (defun -offset-rgba (new-vals old-vals size x y nxy i)
   (declare (type (array double-float) new-vals old-vals))
-  (destructuring-bind (nx ny)
-    (mapcar #'round nxy)
-    (if (and (>= nx 0) (< nx size) (>= ny 0) (< ny size))
-      (setf (aref new-vals nx ny i) (aref old-vals x y i)))))
+  (let ((rx (round (vec::vec-x nxy)))
+        (ry (round (vec::vec-y nxy))))
+    (if (and (>= rx 0) (< rx size)
+             (>= ry 0) (< ry size))
+      (setf (aref new-vals rx ry i)
+            (aref old-vals x y i)))))
 
-(defun chromatic-aberration (sand center &key (s 1.0) (noise 1.0))
+(defun chromatic-aberration (sand center &key (s 1d0) (noise 1d0))
+  (declare (double-float s noise))
   (with-struct (sandpaint- size vals) sand
     (declare (type (array double-float) vals))
     (let ((new-vals (make-rgba-array size)))
@@ -91,12 +95,12 @@
       (copy-rgba-array-to-from new-vals vals size)
 
       (square-loop (x y size)
-        (let* ((xy (list x y))
-               (dx (math:iscale
-                     (math:sub (math:add (rnd:in-circ noise) xy) center)
+        (let* ((xy (vec:vec-coerce x y))
+               (dx (vec:iscale
+                     (vec:sub (vec:add (rnd:in-circ noise) xy) center)
                      s)))
-          (-offset-rgba new-vals vals size x y (math:add xy dx) 0)
-          (-offset-rgba new-vals vals size x y (math:sub xy dx) 2)))
+          (-offset-rgba new-vals vals size x y (vec:add xy dx) 0)
+          (-offset-rgba new-vals vals size x y (vec:sub xy dx) 2)))
 
       (setf (sandpaint-vals sand) new-vals))))
 
@@ -182,8 +186,8 @@
 (defun pix (sand vv)
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
-    (loop for v list in vv do
-      (inside* (size v x y)
+    (loop for v of-type vec:vec in vv do
+      (vec:inside* (size v x y)
         (-operator-over vals x y r g b a)))))
 
 
@@ -191,27 +195,31 @@
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (loop for i integer from 0 below n do
-      (inside* (size (get-dfloat-tup vv i) x y)
+      (vec:inside* (size (vec:arr-get vv i) x y)
         (-operator-over vals x y r g b a)))))
 
 
 (defun circ (sand vv rad n)
+  (declare (double-float rad))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
-    (loop for v list in vv do
+    (loop for v of-type vec:vec in vv do
       (-draw-circ vals size v rad n r g b a))))
 
 
 ; draw circ from array
 (defun circ* (sand vv num rad grains)
+  (declare (integer grains))
+  (declare (double-float rad))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (loop for i integer from 0 below num do
-      (-draw-circ vals size (get-dfloat-tup vv i)
+      (-draw-circ vals size (vec:arr-get vv i)
                   rad grains r g b a))))
 
 
 (defun strokes (sand lines grains)
+  (declare (integer grains))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (loop for (u v) in lines do
@@ -219,6 +227,7 @@
 
 
 (defun stroke (sand line grains)
+  (declare (integer grains))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (destructuring-bind (u v)
@@ -226,11 +235,13 @@
       (-draw-stroke vals size grains u v r g b a))))
 
 
-(defun lin-path (sand path rad grains &key (dens 1))
+(defun lin-path (sand path rad grains &key (dens 1d0))
+  (declare (double-float rad dens))
+  (declare (integer grains))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
-    (loop for u list in path and w list in (cdr path) do
-      (let ((stps (math:int (floor (+ 1 (* dens (math:dst u w)))))))
+    (loop for u of-type vec:vec in path and w of-type vec:vec in (cdr path) do
+      (let ((stps (math:int (floor (+ 1 (* dens (vec:dst u w)))))))
         (declare (integer stps))
         (math:rep (p (math:linspace 0 1 stps :end nil))
           (-draw-circ vals size (math:on-line p u w) rad grains r g b a))))))

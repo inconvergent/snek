@@ -36,47 +36,39 @@
     (destructuring-bind (u v)
       line
       (loop for xy in (math:nrep num (rnd:on-line u v)) do
-        (inside* (size xy x y)
+        (vec:inside* (size xy x y)
           (incf (aref coverage x y))
           (vector-push-extend xy verts))))))
 
 
 (defun -ok-coverage (size coverage offset a b)
-  (let ((itt (round (* 2.0d0 (math:len offset))))
+  (let ((itt (round (* 2.0d0 (vec:len offset))))
         (cov-count 0)
         (cov (make-vec)))
     (loop for s in (math:linspace 0.0 1.0 itt) do
-      (inside* (size (math:on-line s a b) x y)
+      (vec:inside* (size (math:on-line s a b) x y)
         (incf cov-count (if (> (aref coverage x y) 0) 1 0))
         (vector-push-extend (list x y) cov)))
 
     (if (< cov-count (half itt))
       (progn
-        ; todo: avoid coerce?
         (loop for (x y) in (coerce cov 'list) do
           (incf (aref coverage x y)))
         t)
       nil)))
 
 
-(defun vflip (v)
-  (destructuring-bind (a b)
-    v
-    (list b (- 0 a))))
-
-
 (defun -coverage-path (size coverage path)
   (loop
     for a in path and b in (cdr path) do
-      (let ((n (* 2 (round (math:dst a b)))))
+      (let ((n (* 2 (round (vec:dst a b)))))
         (loop for s in (math:linspace 0.0 1.0 n) do
-          (inside* (size (math:on-line s a b) x y)
+          (vec:inside* (size (math:on-line s a b) x y)
             (incf (aref coverage x y)))))))
 
 
 (defun path (plt path &aux (n (length path)))
   (with-struct (plot- size verts lines num-verts coverage) plt
-    ; todo: test if path is outside boundary
     (dolist (p path)
       (vector-push-extend p verts))
     (vector-push-extend
@@ -89,8 +81,8 @@
 (defun -stipple (plt xy offset)
   (with-struct (plot- size verts edges coverage) plt
     (let ((nv (plot-num-verts plt)))
-      (let ((a (math:sub xy offset))
-            (b (math:add xy offset)))
+      (let ((a (vec:sub xy offset))
+            (b (vec:add xy offset)))
 
         (if (-ok-coverage size coverage offset a b)
           (progn
@@ -104,8 +96,8 @@
 
 
 (defun -get-offset (u v s perp)
-  (let ((off (math:scale (math:nsub u v) s)))
-    (if perp (vflip off) off)))
+  (let ((off (vec:scale (vec:nsub u v) s)))
+    (if perp (vec:perp off) off)))
 
 
 (defun stipple-stroke (plt line num s &key perp)
@@ -114,7 +106,7 @@
       line
       (let ((offset (-get-offset u v s perp)))
         (loop for xy in (math:nrep num (rnd:on-line u v)) do
-          (inside (size xy)
+          (vec:inside (size xy x y)
             (incf (plot-discards plt)
                   (-stipple plt xy offset))))))))
 
@@ -156,9 +148,8 @@
   (with-open-file (stream fn :direction :output :if-exists :supersede)
     (format stream "o mesh~%")
     (dolist (ll (coerce verts 'list))
-      (destructuring-bind (a b)
-        ll
-        (format stream "v ~f ~f~%" a b)))
+      (format stream "v ~f ~f~%" (vec::vec-x ll)
+                                 (vec::vec-y ll)))
     (if edges
       (dolist (ee (coerce edges 'list))
         (destructuring-bind (a b)

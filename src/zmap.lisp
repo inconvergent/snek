@@ -3,10 +3,11 @@
 
 
 (defun xy-to-zone (xy zwidth)
+  (declare (vec:vec xy))
   (declare (double-float zwidth))
-  (mapcar (lambda (x)
-            (declare (double-float x))
-            (floor x zwidth)) xy))
+  (list
+    (floor (vec::vec-x xy) zwidth)
+    (floor (vec::vec-y xy) zwidth)))
 
 
 (defun v-to-zone (verts v zwidth)
@@ -58,16 +59,15 @@
 
 (defun verts-in-rad (verts zmap zwidth xy rad &aux
                            (zwidth* (math:dfloat zwidth))
-                           (rad2 (expt (math:dfloat rad) 2.0d0))
-                           (xy* (math:dfloat* xy)))
-  (declare (list xy xy*))
+                           (rad2 (expt (math:dfloat rad) 2.0d0)))
+  (declare (vec:vec xy))
   (declare (double-float zwidth* rad2))
   (declare (hash-table zmap))
   (declare (type (array double-float) verts))
   (let ((inds (make-int-vec)))
     (declare (type (array integer) inds))
     (destructuring-bind (za zb)
-      (xy-to-zone xy* zwidth*)
+      (xy-to-zone xy zwidth*)
       (declare (integer za zb))
       (-extend (za zb z)
         (multiple-value-bind (vals exists)
@@ -75,7 +75,7 @@
           (if exists
             (map nil (lambda (zj)
                        (declare (integer zj))
-                       (if (< (math:dst2 xy (get-dfloat-tup verts zj)) rad2)
+                       (if (< (vec:dst2 xy (vec:arr-get verts zj)) rad2)
                          (vector-push-extend zj inds)))
                  vals)))))
     inds))

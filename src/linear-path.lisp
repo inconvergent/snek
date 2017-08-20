@@ -14,9 +14,9 @@
 (defun -set-path-lens (pts lens n)
   (let ((total (loop
                   for i from 0 below (1- n)
-                  sum (math:dst
-                        (get-dfloat-tup pts i)
-                        (get-dfloat-tup pts (1+ i))) into total
+                  sum (vec:dst
+                        (vec:arr-get pts i)
+                        (vec:arr-get pts (1+ i))) into total
                   do
                     (setf (aref lens (1+ i) 0) total)
                   finally
@@ -36,14 +36,14 @@
 
 (defun -calc-pos (pts lens n f)
   (let ((ind (-find-seg-ind lens f n)))
-        (let ((pb (get-dfloat-tup pts ind))
-              (pa (get-dfloat-tup pts (1- ind)))
+        (let ((pb (vec:arr-get pts ind))
+              (pa (vec:arr-get pts (1- ind)))
               (s (-diff-scale
                    (aref lens (1- ind) 0)
                    f
                    (- (aref lens ind 0)
                       (aref lens (1- ind) 0)))))
-          (math:add pa (math:scale (math:sub pb pa) s)))))
+          (vec:add pa (vec:scale (vec:sub pb pa) s)))))
 
 
 (defun pos (path f)
@@ -65,8 +65,8 @@
 (defun make (pts &key closed &aux (n (length pts)))
   (let ((p (make-dfloat-array n))
         (l (make-dfloat-array n :cols 1)))
-    (loop for d in pts and i from 0 do
-      (set-dfloat-tup p i (math:dfloat* d)))
+    (loop for pt in pts and i from 0 do
+      (vec:arr-set p i pt))
     (-set-path-lens p l n)
     (make-path :n n :pts p :lens l :closed closed)))
 
