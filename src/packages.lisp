@@ -244,8 +244,8 @@
     :get-vert
     :get-vert-inds
     :get-verts
-    :init-path
-    :init-polygon
+    :add-path!
+    :add-polygon!
     :itr-all-verts
     :itr-edges
     :itr-grps

@@ -12,7 +12,7 @@
   ; make m grps with n verts in each grp.
   (let ((snk (snek:make)))
     (mapcar (lambda (g)
-              (snek:init-path snk
+              (snek:add-path! snk
                 (math:rep (p (math:linspace 0 1 n)) (math:on-circ p 600d0 :xy xy))
                 :g g))
             (math:nrep m (snek:add-grp! snk)))

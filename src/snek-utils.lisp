@@ -6,7 +6,12 @@
 
   edges can be associated with multiple grps.
 
-  verts are global. that is, they do not belong to any grp.
+  verts are global. that is, they do not belong to any grp on their own.
+  however, if a vert is associated with an edge, that vert is also associated
+  with whatever grp that edge belongs to.
+
+    - to get verts in a grp: (get-grp-verts ...).
+    - to get indices of verts (in a grp): (get-vert-inds ...)
   "
 
   (with-struct (snek- grps grp-size) snk
