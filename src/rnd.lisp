@@ -29,9 +29,22 @@
     (+ a (random (- b a)))))
 
 
+
 (defun rnd (&optional (x 1.0d0))
   (declare (double-float x))
   (random x))
+
+
+(defun norm (&key (mu 0.0d0) (sigma 1d0))
+  "
+  box-muller transform
+  "
+  (declare (double-float mu sigma))
+  (let ((s (* sigma (sqrt (* -2d0 (log (rnd))))))
+        (u (* 2d0 pi (rnd))))
+    (values
+      (+ mu (* s (cos u)))
+      (+ mu (* s (sin u))))))
 
 
 (defun rndbtwn (a b)

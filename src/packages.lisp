@@ -81,6 +81,7 @@
     :in-circ
     :lget
     :mixed
+    :norm
     :on-circ
     :on-line
     :rnd
