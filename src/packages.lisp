@@ -50,6 +50,7 @@
     :int
     :int*
     :iscale
+    :lget
     :linspace
     :make-perspective-transform
     :mult
@@ -246,6 +247,7 @@
     :get-vert-inds
     :get-verts
     :add-path!
+    :add-path*!
     :add-polygon!
     :itr-all-verts
     :itr-edges

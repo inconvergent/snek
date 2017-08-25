@@ -37,6 +37,14 @@
             collect (add-edge! snk (list a b) :g g)))))
 
 
+(defun add-path*! (snk vv &key g closed)
+  (if closed
+    (loop for a in vv and b in (-roll-once vv)
+          collect (add-edge! snk (list a b) :g g))
+    (loop for a in vv and b in (cdr vv)
+          collect (add-edge! snk (list a b) :g g))))
+
+
 (defun draw-verts (snk sand)
   (with-struct (snek- verts num-verts) snk
     (sandpaint:pix* sand verts num-verts)))

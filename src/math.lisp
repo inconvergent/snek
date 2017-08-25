@@ -39,6 +39,14 @@
     (loop for x integer from a below b collect x)))
 
 
+(defun lget (l ii)
+  "
+  avoid using this; it is slow if l is large.
+  "
+  (declare (list l ii))
+  (loop for i in ii collect (nth i l)))
+
+
 (defun inc (x stp)
   (mod (+ x stp) 1.0d0))
 
