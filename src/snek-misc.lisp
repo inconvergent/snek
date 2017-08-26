@@ -1,8 +1,13 @@
 
 (in-package :snek)
 
+
 (defun -roll-once (aa)
   (butlast (append (last aa) aa) 1))
+
+
+(defun get-grp-as-bzspl (snk g)
+  (bzspl:make (snek:get-grp-verts snk :g g)))
 
 
 (defun edge-length (snk e)

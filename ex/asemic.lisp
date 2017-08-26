@@ -29,17 +29,6 @@
     snk))
 
 
-(defun get-state-gen ()
-  (let ((state (make-hash-table :test #'equal)))
-    (lambda (i noise)
-      (multiple-value-bind (curr exists)
-        (gethash i state)
-        (if (not exists)
-          (setf (gethash i state) (setf curr (rnd:get-acc-circ-stp*))))
-        (snek:move-vert? i
-          (funcall curr noise))))))
-
-
 (defun main (size fn)
   (let ((border 100d0)
         (char-num (list 1 7))
@@ -59,7 +48,8 @@
                             (- size (* 2.0 border))
                             line-chars char-num char-rad))
             (drift (rnd:get-acc-circ-stp*))
-            (state-gen (get-state-gen)))
+            (state-gen (math:get-state-gen
+                         (lambda () (rnd:get-acc-circ-stp*)))))
 
         (snek:with (snk)
           (snek:itr-all-verts (snk v)
@@ -69,7 +59,7 @@
           (snek:with (snk)
             ;(snek:mutate (mut)
             (snek:itr-all-verts (snk v)
-              ;(funcall state-gen v 0.00009d0)
+              ;(snek:move-vert? v (funcall state-gen v 0.00009d0))
               (snek:move-vert? v (rnd:in-circ 0.4d0))))
           (sandpaint:pix sand
             (bzspl:rndpos* (bzspl:make (snek:get-all-verts snk)) 2500)))))

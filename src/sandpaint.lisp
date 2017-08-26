@@ -51,6 +51,14 @@
       (-operator-over vals x y r g b a))))
 
 
+(defun -draw-dens-stroke (vals size dens v1 v2 r g b a)
+  (declare (double-float dens r g b a))
+  (declare (type (array double-float) vals))
+  (loop for i integer from 0 below (ceiling (* dens (vec:dst v1 v2))) do
+    (vec:inside* (size (rnd:on-line v1 v2) x y)
+      (-operator-over vals x y r g b a))))
+
+
 (defun copy-rgba-array-to-from (target source size)
   (square-loop (x y size)
     (setf (aref target x y 0) (aref source x y 0)
@@ -233,6 +241,16 @@
     (destructuring-bind (u v)
       line
       (-draw-stroke vals size grains u v r g b a))))
+
+
+(defun dens-stroke (sand line &optional (dens 1d0))
+  (declare (double-float dens))
+  (declare (integer grains))
+  (with-struct (sandpaint- size vals r g b a) sand
+    (declare (type (array double-float) vals))
+    (destructuring-bind (u v)
+      line
+      (-draw-dens-stroke vals size dens u v r g b a))))
 
 
 (defun lin-path (sand path rad grains &key (dens 1d0))

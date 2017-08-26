@@ -46,6 +46,7 @@
     :dfloat
     :dfloat*
     :div
+    :get-state-gen
     :inc
     :int
     :int*
@@ -188,6 +189,7 @@
     :circ
     :circ*
     :clear
+    :dens-stroke
     :lin-path
     :make
     :pix
@@ -227,6 +229,9 @@
     :add-edge!
     :add-edge*?
     :add-grp!
+    :add-path!
+    :add-path*!
+    :add-polygon!
     :add-vert!
     :add-vert?
     :add-verts!
@@ -238,17 +243,16 @@
     :edge-length
     :export-2obj
     :force?
+    :get-all-grps
     :get-all-verts
     :get-edges
+    :get-grp-as-bzspl
     :get-grp-verts
     :get-num-edges
     :get-num-verts
     :get-vert
     :get-vert-inds
     :get-verts
-    :add-path!
-    :add-path*!
-    :add-polygon!
     :itr-all-verts
     :itr-edges
     :itr-grps

@@ -123,20 +123,28 @@
 
 ; WALKERS
 
-
 (defun get-lin-stp (&optional (init 0.0d0))
+  "
+  random linear walker limited to (0 1)
+  "
   (let ((x (math:dfloat init)))
     (lambda (stp)
       (setf x (math:inc x (rnd* stp))))))
 
 
 (defun get-lin-stp* (&optional (init 0.0d0))
+  "
+  random linear walker
+  "
   (let ((x (math:dfloat init)))
     (lambda (stp)
       (incf x (rnd* stp)))))
 
 
 (defun get-acc-lin-stp (&optional (init-x 0.0d0) (init-a 0.0d0))
+  "
+  random accelerated linear walker limited to (0 1)
+  "
   (let ((a (math:dfloat init-a))
         (x (math:dfloat init-x)))
     (lambda (s)
@@ -144,6 +152,9 @@
 
 
 (defun get-acc-lin-stp* (&optional (init-x 0.0d0) (init-a 0.0d0))
+  "
+  random accelerated linear walker
+  "
   (let ((a (math:dfloat init-a))
         (x (math:dfloat init-x)))
     (lambda (s)

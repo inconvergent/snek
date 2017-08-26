@@ -21,6 +21,7 @@
 
 
 ; RANGES
+; TODO: move?
 
 
 (defmacro rep ((i itt) &body body)
@@ -34,6 +35,8 @@
 
 
 (defun range (a &optional (b nil))
+  ; TODO
+  ; (declare (integer a))
   (if (not b)
     (loop for x integer from 0 below a collect x)
     (loop for x integer from a below b collect x)))
@@ -52,11 +55,28 @@
 
 
 (defun linspace (a b n &key (end t))
+  ; TODO
+  ; (declare (double-float a b))
+  ; (declare (integer n))
+  ; (declare (boolean end))
   (if (> n 1)
     (let ((nn (if end (1- n) n)))
       (loop for i from 0 below n
         collect (dfloat (+ a (* i (/ (- b a) nn))))))
     (list (dfloat a))))
+
+
+(defun get-state-gen (get-state-fun)
+  (let ((state (make-hash-table :test #'equal)))
+    (lambda (i noise)
+      (multiple-value-bind (curr exists)
+        (gethash i state)
+        (if (not exists)
+          (setf (gethash i state) (setf curr (funcall get-state-fun))))
+        (funcall curr noise)))))
+
+
+; LIST MATH
 
 
 (defun add (a b)

@@ -80,6 +80,12 @@
       collect (vec:arr-get verts v))))
 
 
+(defun get-all-grps (snk)
+  (loop for g being the hash-keys of (snek-grps snk)
+    if g ; ignores nil (main) grp
+    collect g))
+
+
 (defun get-grp-verts (snk &key g)
   (get-verts snk
     (get-vert-inds snk :g g)))
