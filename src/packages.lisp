@@ -25,15 +25,18 @@
     :mult
     :norm
     :nsub
+    :one
     :perp
     :rep
     :scale
     :sin-cos
     :sub
     :sum
+    :v
     :vec
     :vec*
     :vec-coerce
+    :zero
     :with-xy)
   (:import-from :common-lisp-user
     :with-gensyms))
@@ -58,6 +61,7 @@
     :nrep
     :on-circ
     :on-line
+    :on-spiral
     :polygon
     :range
     :rep

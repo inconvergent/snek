@@ -12,7 +12,7 @@
 (defun make-mutate (&key
                      (prob 0.1d0)
                      (noise 100.0d0)
-                     (xy (vec:vec 0.0d0 0.0d0))
+                     (xy (vec:zero))
                      (ind 0))
   (let ((rules (make-hash-table :test #'equal)))
 

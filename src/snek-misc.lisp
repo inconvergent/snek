@@ -18,14 +18,14 @@
                (vec:arr-get verts b)))))
 
 
-(defun add-circ! (snk num rad &key (xy (vec:vec 0.0d0 0.0d0)) g)
+(defun add-circ! (snk num rad &key (xy (vec:zero)) g)
   (let ((vv (loop for p in (math:linspace 0.0d0 1.0d0 num)
                   collect (add-vert! snk (math:on-circ p rad :xy xy)))))
     (loop for a in vv and b in (-roll-once vv)
           collect (add-edge! snk (list a b) :g g))))
 
 
-(defun add-polygon! (snk rad n &key (xy (vec:vec 0.0d0 0.0d0))
+(defun add-polygon! (snk rad n &key (xy (vec:zero))
                                     (rot (* 0.25 PI)) g)
   (let ((vv (loop for v in (math:polygon n rad :xy xy :rot rot)
                   collect (add-vert! snk v))))

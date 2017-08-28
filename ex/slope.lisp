@@ -15,7 +15,7 @@
                    (vec:norm
                      (vec:mult (vec:flip (vec:sub p1 p2)) (vec:vec -1d0 1d0)))
                    40d0)
-                 (rnd:on-circ 20d0 :xy (vec:vec 0d0 0d0))))
+                 (rnd:on-circ 20d0 :xy (vec:zero))))
          (repeat 10)
          (noise (rnd:rnd 4d0))
          (grains 70)
@@ -28,7 +28,7 @@
         do
           (print-every j 2)
           (let ((snk (snek:make)))
-            (setf va (vec:add va (rnd:in-circ noise :xy (vec:vec 0d0 0d0))))
+            (setf va (vec:add va (rnd:in-circ noise :xy (vec:zero))))
 
             (loop for k from 1 to itt
               do

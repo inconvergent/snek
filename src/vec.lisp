@@ -53,6 +53,19 @@
   (y nil :type double-float :read-only t))
 
 
+(defun zero ()
+  (vec 0d0 0d0))
+
+
+(defun one ()
+  (vec 1d0 1d0))
+
+
+(defun v (v)
+  (declare (double-float v))
+  (vec v v))
+
+
 (defun copy (v)
   (declare (vec v))
   (vec (vec-x v) (vec-y v)))

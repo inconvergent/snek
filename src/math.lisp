@@ -119,20 +119,30 @@
 ; SHAPES
 
 
-(defun on-circ (p rad &key (xy (list 0.0d0 0.0d0)))
+(defun on-circ (p rad &key (xy (vec:zero)))
   (declare (double-float p))
+  (declare (vec:vec xy))
   (vec:add xy (vec:scale (vec:cos-sin (* p PI 2.0d0)) rad)))
 
 
 (defun on-line (p a b)
-  (declare (vec:vec a b))
   (declare (double-float p))
+  (declare (vec:vec a b))
   (vec:add a (vec:scale (vec:sub b a) p)))
 
 
-(defun polygon (n rad &key (xy (list 0.0d0 0.0d0)) (rot 0.0d0))
-  (declare (integer n))
-  (declare (double-float rad))
+(defun on-spiral (p rad &key (xy (vec:zero)) (rot 0.0d0))
+  (declare (double-float p rad rot))
+  (declare (vec:vec xy))
+  (vec:add xy (vec:scale (vec:cos-sin (+ rot (* p 2d0 PI)))
+                         (* p rad))))
+
+
+(defun polygon (i n rad &key (xy (vec:zero)) (rot 0.0d0))
+  ;todo: this is incorrect?
+  (declare (integer i n))
+  (declare (double-float rad rot))
+  (declare (vec:vec xy))
   (loop for i from 0 below n collect (vec:add xy
     (vec:scale
       (vec:cos-sin (+ rot (* (/ i n) 2.0d0 PI)))

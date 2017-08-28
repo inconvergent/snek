@@ -192,6 +192,7 @@
 
 
 (defun pix (sand vv)
+  (declare (list vv))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (loop for v of-type vec:vec in vv do
@@ -200,6 +201,8 @@
 
 
 (defun pix* (sand vv n)
+  (declare (type (array double-float) vv))
+  (declare (integer n))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (loop for i integer from 0 below n do
@@ -208,7 +211,9 @@
 
 
 (defun circ (sand vv rad n)
+  (declare (list vv))
   (declare (double-float rad))
+  (declare (integer n))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (loop for v of-type vec:vec in vv do
@@ -217,7 +222,8 @@
 
 ; draw circ from array
 (defun circ* (sand vv num rad grains)
-  (declare (integer grains))
+  (declare (type (array double-float) vv))
+  (declare (integer grains num))
   (declare (double-float rad))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
@@ -228,6 +234,7 @@
 
 (defun strokes (sand lines grains)
   (declare (integer grains))
+  (declare (list lines))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (loop for (u v) in lines do
@@ -236,6 +243,7 @@
 
 (defun stroke (sand line grains)
   (declare (integer grains))
+  (declare (list line))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (destructuring-bind (u v)
@@ -245,7 +253,7 @@
 
 (defun dens-stroke (sand line &optional (dens 1d0))
   (declare (double-float dens))
-  (declare (integer grains))
+  (declare (list line))
   (with-struct (sandpaint- size vals r g b a) sand
     (declare (type (array double-float) vals))
     (destructuring-bind (u v)

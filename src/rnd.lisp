@@ -161,14 +161,14 @@
       (incf x (incf a (rnd* s))))))
 
 
-(defun get-circ-stp* (&optional (init (vec:vec 0.0d0 0.0d0)))
+(defun get-circ-stp* (&optional (init (vec:zero)))
   (let ((xy (vec:copy init)))
     (lambda (stp)
       (setf xy (vec:add xy (in-circ stp))))))
 
 
-(defun get-acc-circ-stp* (&optional (init (vec:vec 0.0d0 0.0d0))
-                                    (init-a (vec:vec 0.0d0 0.0d0)))
+(defun get-acc-circ-stp* (&optional (init (vec:zero))
+                                    (init-a (vec:zero)))
   (let ((a (vec:copy init-a))
         (xy (vec:copy init)))
     (lambda (stp)
