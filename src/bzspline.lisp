@@ -116,12 +116,10 @@
         (do-t x-loc (do-m (funcall select-pts n pts seg)))))))
 
 
-(defmacro rndpos (b n)
-  `(pos* ,b (rnd:rndspace 0.0d0 1.0d0 ,n)))
-
-
-(defmacro rndpos* (b n)
-  `(pos* ,b (sort (rnd:rndspace 0.0d0 1.0d0 ,n) #'<)))
+(defun rndpos (b n &key order)
+  (pos* b (if order
+            (sort (rnd:rndspace n 0.0d0 1.0d0) #'<)
+            (rnd:rndspace n 0.0d0 1.0d0))))
 
 
 (defun make (pts &key closed &aux (n (length pts)))

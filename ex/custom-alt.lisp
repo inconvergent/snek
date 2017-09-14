@@ -7,7 +7,7 @@
 
 (defun circ-stroke (sand vv)
   (sandpaint:circ sand
-    (lin-path:pos* (lin-path:make vv) (math:linspace 0 0.99 100))
+    (lin-path:pos* (lin-path:make vv) (math:linspace 100 0 0.99))
     1d0 20))
 
 

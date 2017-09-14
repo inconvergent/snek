@@ -9,9 +9,9 @@
 (defun init-snek (n m size xy)
   (let ((snk (snek:make :max-verts 5000)))
     (mapcar
-      (lambda (g) (let ((mid (rnd:in-circ (* 0.5d0 (- size 200)) :xy xy)))
+      (lambda (g) (let ((mid (rnd:in-circ (* 0.5d0 (- size 200d0)) :xy xy)))
                     (snek:add-path! snk
-                      (math:rep (p (math:linspace 0 1 n :end nil))
+                      (math:rep (p (math:linspace n 0 1 :end nil))
                         (math:on-circ p 20d0 :xy mid))
                       :g g
                       :closed t)))

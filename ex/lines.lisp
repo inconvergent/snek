@@ -16,7 +16,7 @@
                 :active (list 0 0 0 0.01)
                 :bg (list 1 1 1 1))))
 
-    (loop for i in (math:linspace 100 900 repeat)
+    (loop for i in (math:linspace repeat 100 900)
           for j from 1 to repeat do
       (print-every j 2)
       (let ((snk (snek:make))
@@ -25,7 +25,7 @@
             (p1 (vec:vec 100d0 i))
             (p2 (vec:vec 900d0 i)))
 
-        (loop for s in (math:linspace 0.0 1.0 itt) do
+        (loop for s in (math:linspace itt 0.0 1.0) do
           (let ((v1 (snek:add-vert! snk (math:on-line s p1 p2)))
                 (v2 (snek:add-vert! snk (vec:add va (math:on-line s p1 p2)))))
 

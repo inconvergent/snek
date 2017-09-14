@@ -13,7 +13,7 @@
   (let ((snk (snek:make)))
     (mapcar (lambda (g)
               (snek:add-path! snk
-                (math:rep (p (math:linspace 0 1 n)) (math:on-circ p 600d0 :xy xy))
+                (math:rep (p (math:linspace n 0 1)) (math:on-circ p 600d0 :xy xy))
                 :g g))
             (math:nrep m (snek:add-grp! snk)))
     snk))

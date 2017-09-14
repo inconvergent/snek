@@ -7,10 +7,10 @@
 
 
 (defun init (snk rep rad)
-  (loop for x in (math:linspace 200 800 rep) for i from 0 do
-    (loop for y in (math:linspace 200 800 rep) for j from 0 do
+  (loop for x in (math:linspace rep 200 800) for i from 0 do
+    (loop for y in (math:linspace rep 200 800) for j from 0 do
       (let ((g (snek:add-grp! snk :type 'path :closed t)))
-        (snek:add-polygon! snk rad (rnd:rndi 3 6)
+        (snek:add-polygon! snk (rnd:rndi 3 6) rad
                            :xy (vec:vec x y)
                            :g g)))))
 

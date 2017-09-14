@@ -8,7 +8,9 @@ importantly it is a programming pattern for applying changes to the structure.
 It is specifically written to be useful for a broad range of ways in which I
 usually write generative algorithms for creating art.
 
-![head](img/img.png?raw=true "head")
+![head](img/lorem-ipsum.lisp.png?raw=true "ex")
+
+![head](img/cells.lisp.png?raw=true "ex")
 
 
 ## About the Name
@@ -33,7 +35,7 @@ I have also written about things related to `snek` at
   - http://inconvergent.net/grains-of-sand/ (about "sandpainting", see `src/sandpaint.lisp`)
 
 Here is and example of manipulating a `snek` instance called `snk` using
-`alterations`. Alteration constructors are postfixed with ?.
+`alterations`. Alteration constructors are postfixed with `?`.
 
 ```lisp
 ; context start
@@ -41,7 +43,7 @@ Here is and example of manipulating a `snek` instance called `snk` using
   ; iterate vertices
   (snek:itr-verts (snk v)
     ; move alteration
-    (snek:move-vert? v (rnd:in-circ))
+    (snek:move-vert? v (rnd:in-circ 1d0))
     ; w will be an arbitrary
     ; vertex in snk
     (snek:with-rnd-vert (snk w)
@@ -68,9 +70,6 @@ There are some examples included. All examples are in the `ex` folder.
 if you don't provide a result name as the first argument, then the resulting
 file will be named `tmp.png`.
 
-This includes a few samples of how to use the plotting functionality. This will
-export a simple vector file and an image to indicate the result.
-
 
 ## Usage
 
@@ -82,7 +81,9 @@ export a simple vector file and an image to indicate the result.
   - https://twitter.com/cronianrings
 
 
-![lines](img/ex-lines.png?raw=true "lines")
+![lines](img/lines.lisp.png?raw=true "ex")
+
+![lines](img/grid-bz-walk.lisp.png?raw=true "ex")
 
 
 ## Dependencies

@@ -54,7 +54,7 @@
   (mod (+ x stp) 1.0d0))
 
 
-(defun linspace (a b n &key (end t))
+(defun linspace (n a b &key (end t))
   ; TODO
   ; (declare (double-float a b))
   ; (declare (integer n))
@@ -120,9 +120,9 @@
 
 
 (defun on-circ (p rad &key (xy (vec:zero)))
-  (declare (double-float p))
+  (declare (double-float p rad))
   (declare (vec:vec xy))
-  (vec:add xy (vec:scale (vec:cos-sin (* p PI 2.0d0)) rad)))
+  (vec:add xy (vec:scale (vec:cos-sin (* p PII)) rad)))
 
 
 (defun on-line (p a b)
@@ -134,18 +134,17 @@
 (defun on-spiral (p rad &key (xy (vec:zero)) (rot 0.0d0))
   (declare (double-float p rad rot))
   (declare (vec:vec xy))
-  (vec:add xy (vec:scale (vec:cos-sin (+ rot (* p 2d0 PI)))
+  (vec:add xy (vec:scale (vec:cos-sin (+ rot (* p PII)))
                          (* p rad))))
 
 
-(defun polygon (i n rad &key (xy (vec:zero)) (rot 0.0d0))
-  ;todo: this is incorrect?
-  (declare (integer i n))
+(defun polygon (n rad &key (xy (vec:zero)) (rot 0.0d0))
+  (declare (integer n))
   (declare (double-float rad rot))
   (declare (vec:vec xy))
   (loop for i from 0 below n collect (vec:add xy
     (vec:scale
-      (vec:cos-sin (+ rot (* (/ i n) 2.0d0 PI)))
+      (vec:cos-sin (+ rot (* (/ i n) PII)))
       rad))))
 
 

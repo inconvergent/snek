@@ -269,7 +269,7 @@
     (loop for u of-type vec:vec in path and w of-type vec:vec in (cdr path) do
       (let ((stps (math:int (floor (+ 1 (* dens (vec:dst u w)))))))
         (declare (integer stps))
-        (math:rep (p (math:linspace 0 1 stps :end nil))
+        (math:rep (p (math:linspace stps 0 1 :end nil))
           (-draw-circ vals size (math:on-line p u w) rad grains r g b a))))))
 
 

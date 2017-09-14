@@ -26,7 +26,7 @@
     (labels ((init (snk n)
                (loop for i from 0 below n do
                  (setf (gethash
-                         (snek:add-vert! snk (rnd:in-box 250 250 :xy (vec:vec 250d0 250d0)))
+                         (snek:add-vert! snk (rnd:in-box 250d0 250d0 :xy (vec:vec 250d0 250d0)))
                          curr)
                        0)))
 
@@ -79,7 +79,7 @@
                 :active (list 0 0 0 0.01)
                 :bg (list 1 1 1 1.0))))
 
-    (hyphae sand size fn 5000 10.0d0 (vec:vec 250d0 250d0))))
+    (hyphae sand size fn 1000 10.0d0 (vec:vec 250d0 250d0))))
 
 (time (main 500 (second (cmd-args))))
 

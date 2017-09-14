@@ -54,19 +54,19 @@
     0.7)
 
   (do-test
-    (math:linspace 0 10 1)
+    (math:linspace 1 0 10)
     (list 0.0))
 
   (do-test
-    (math:linspace 0 10 3)
+    (math:linspace 3 0 10)
     (list 0.0 5.0 10.0))
 
   (do-test
-    (math:linspace 0 10 2 :end nil)
+    (math:linspace 2 0 10 :end nil)
     (list 0.0 5.0))
 
   (do-test
-    (math:linspace 0 10 2 :end t)
+    (math:linspace 2 0 10 :end t)
     (list 0.0 10.0))
 
   (do-test
@@ -81,30 +81,51 @@
 (defun test-rnd ()
 
   (do-test
-    (length (rnd:rndspace 0 10 10))
+    (length (rnd:rndspace 10 0d0 10d0))
     10)
 
   (do-test
-    (rnd:rndspace 0 10 10)
+    (rnd:rndspace 10 0d0 10d0)
      '(3.152262934102661d0 9.411859332177082d0 9.143334482781892d0
         9.707515698488775d0 6.005604715628142d0 2.8377247312878073d0
         8.435221790928992d0 8.314710996278352d0 5.844153198534443d0
         9.189848934771323d0))
 
   (do-test
-    (rnd:rndspace 0 10 10 :order t)
+    (rnd:rndspace 10 0d0 10d0 :order t)
      '(0.7142292146110663d0 3.109552134181708d0 3.1148128311978818d0
         3.4237318221390423d0 3.5746993898250556d0 4.862646815859608d0
         5.154807478401608d0 6.982586020701715d0 7.8445379456298925d0
         8.67986375197924d0))
 
   (do-test
-    (rnd:rndspacei 0 10 10)
+    (rnd:rndspacei 10 0 10)
      '(7 9 2 0 0 2 4 4 9 9))
 
   (do-test
-    (rnd:rndspacei 0 10 10 :order t)
-     '(1 1 3 3 4 6 7 8 8 9)))
+    (rnd:rndspacei 10 0 10 :order t)
+     '(1 1 3 3 4 6 7 8 8 9))
+
+  (do-test
+    (length (rnd:nrndi 9 4))
+    9)
+
+
+  (do-test
+    (length (rnd:nrnd 11 4d0))
+    11)
+
+  (do-test
+    (length (rnd:nrnd 12 4d0))
+    12)
+
+  (do-test
+    (length (rnd:nrnd* 12 4d0))
+    12)
+
+  (do-test
+    (rnd:bernoulli 4 0.5d0)
+    '(1.0d0 0.0d0 1.0d0 1.0d0)))
 
 
 (defun test-bzspl ()
@@ -113,7 +134,7 @@
       (pts-b (list (vec:vec -20.0d0 99.0d0) (vec:vec 0.0d0 1.0d0) (vec:vec 10.0d0 20.0d0)
                    (vec:vec 100.0d0 100.0d0) (vec:vec -3.0d0 -17.0d0) (vec:vec 0.0d0 4.0d0))))
     (do-test
-      (bzspl:pos* (bzspl:make pts-a) (math:linspace 0 1 10))
+      (bzspl:pos* (bzspl:make pts-a) (math:linspace 10 0 1))
       (list (vec:vec -20.0d0 99.0d0)
             (vec:vec -11.851851851851851d0 60.75308641975309d0)
             (vec:vec -5.185185185185184d0 33.12345679012347d0)
@@ -126,7 +147,7 @@
             (vec:vec 100.0d0 100.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-b) (math:linspace 0 1 10))
+      (bzspl:pos* (bzspl:make pts-b) (math:linspace 10 0 1))
       (list (vec:vec -20.0d0 99.0d0)
             (vec:vec -5.185185185185184d0 33.12345679012347d0)
             (vec:vec 3.703703703703706d0 9.716049382716065d0)
@@ -139,7 +160,7 @@
             (vec:vec 0.0d0 4.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-a :closed t) (math:linspace 0 1 10))
+      (bzspl:pos* (bzspl:make pts-a :closed t) (math:linspace 10 0 1))
       (list (vec:vec -10.0d0 50.0d0)
             (vec:vec -2.098765432098765d0 18.000000000000007d0)
             (vec:vec 3.8271604938271615d0 9.111111111111121d0)
@@ -152,7 +173,7 @@
             (vec:vec -10.0d0 50.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-b :closed t) (math:linspace 0 1 10))
+      (bzspl:pos* (bzspl:make pts-b :closed t) (math:linspace 10 0 1))
       (list (vec:vec -10.0d0 50.0d0)
             (vec:vec 1.1111111111111098d0 10.666666666666671d0)
             (vec:vec 12.777777777777777d0 20.22222222222222d0)

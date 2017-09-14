@@ -1,4 +1,7 @@
 
+(defvar PII (* PI 2d0))
+
+
 ;http://cl-cookbook.sourceforge.net/os.html
 (defun cmd-args ()
   (or #+SBCL *posix-argv*

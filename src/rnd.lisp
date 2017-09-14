@@ -21,6 +21,10 @@
     (+ a (random (- (math:int b) a)))))
 
 
+(defun nrndi (n a &optional b)
+  (loop for i from 0 below n collect (rndi a b)))
+
+
 (defun rndi* (ab)
   (declare (list ab))
   (destructuring-bind (a b)
@@ -29,12 +33,22 @@
     (+ a (random (- b a)))))
 
 
+(defun nrndi* (n ab)
+  (loop for i from 0 below n collect (rndi ab)))
+
 
 (defun rnd (&optional (x 1.0d0))
   (declare (double-float x))
   (random x))
 
 
+(defun nrnd (n &optional (x 1.0d0))
+  (declare (integer n))
+  (declare (double-float x))
+  (loop for i from 0 below n collect (rnd x)))
+
+
+; TODO: nnorm
 (defun norm (&key (mu 0.0d0) (sigma 1d0))
   "
   box-muller transform
@@ -52,33 +66,45 @@
   (+ a (random (- b a))))
 
 
+(defun nrndbtwn (n a b)
+  (declare (integer n))
+  (declare (double-float a b))
+  (loop for i from 0 below n collect (rndbtwn a b)))
+
+
 (defun rnd* (&optional (x 1.0d0))
   (declare (double-float x))
   (- x (* 2.0d0 (random x))))
 
 
-(defun mixed (x f)
-  (declare (double-float x f))
-  (+ (random (* f x)) (- x (* 2.0d0 (random x)))))
+(defun nrnd* (n &optional (x 1.0d0))
+  (declare (integer n))
+  (declare (double-float x))
+  (loop for i from 0 below n collect (rnd* x)))
 
 
-(defun rndspace (a b n &key order)
+(defun rndspace (n a b &key order)
+  (declare (integer n))
+  (declare (double-float a b))
   (destructuring-bind (a b)
     (sort (list a b) #'<)
-      (let ((d (math:dfloat (- b a))))
+      (let ((d (- b a)))
         (let ((res (math:nrep n (+ a (random d)))))
           (if order (sort res #'<) res)))))
 
 
-(defun rndspacei (a b n &key order)
+(defun rndspacei (n a b &key order)
+  (declare (integer n a b))
   (destructuring-bind (a b)
     (sort (list a b) #'<)
-      (let ((d (math:int (- b a))))
+      (let ((d (- b a)))
         (let ((res (math:nrep n (+ a (random d)))))
           (if order (sort res #'<) res)))))
 
 
-(defun bernoulli (p n)
+(defun bernoulli (n p)
+  (declare (integer n))
+  (declare (double-float p))
   (loop for i from 0 below n collect
     (if (< (rnd:rnd) p)
       1d0
@@ -93,8 +119,13 @@
 
 
 (defun on-circ (rad &key xy)
-  (-add-if (vec:scale (vec:cos-sin (random (* PI 2.0d0))) rad) xy))
+  (-add-if (vec:scale (vec:cos-sin (random PII)) rad) xy))
 
+
+(defun non-circ (n rad &key xy)
+  (declare (integer n))
+  (declare (double-float rad))
+  (loop for i from 0 below n collect (on-circ rad :xy xy)))
 
 
 (defun in-circ (rad &key xy)
@@ -104,21 +135,37 @@
           (b (random 1.0d0)))
       (declare (double-float a b))
       (if (< a b)
-        (vec:scale (vec:cos-sin (* 2 PI (/ a b))) (* b rad))
-        (vec:scale (vec:cos-sin (* 2 PI (/ b a))) (* a rad))))
+        (vec:scale (vec:cos-sin (* PII (/ a b))) (* b rad))
+        (vec:scale (vec:cos-sin (* PII (/ b a))) (* a rad))))
     xy))
 
 
+(defun nin-circ (n rad &key xy)
+  (declare (integer n))
+  (declare (double-float rad))
+  (loop for i from 0 below n collect (in-circ rad :xy xy)))
+
+
 (defun in-box (sx sy &key xy)
-    (-add-if
-      (vec:vec (rnd* (math:dfloat sx))
-               (rnd* (math:dfloat sy)))
-      xy))
+  (declare (double-float sx sy))
+  (-add-if (vec:vec (rnd* sx) (rnd* sy)) xy))
+
+
+(defun nin-box (n sx sy &key xy)
+  (declare (integer n))
+  (declare (double-float sx sy))
+  (loop for i from 0 below n collect (in-box sx sy :xy xy)))
 
 
 (defun on-line (a b)
   (declare (vec:vec a b))
   (vec:add a (vec:scale (vec:sub b a) (random 1.0d0))))
+
+
+(defun non-line (n a b)
+  (declare (integer n))
+  (declare (vec:vec a b))
+  (loop for i from 0 below n collect (on-line a b)))
 
 
 ; WALKERS

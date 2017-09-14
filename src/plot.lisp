@@ -35,7 +35,7 @@
   (with-struct (plot- size verts coverage) plt
     (destructuring-bind (u v)
       line
-      (loop for xy in (math:nrep num (rnd:on-line u v)) do
+      (loop for xy in (rnd:non-line num u v) do
         (vec:inside* (size xy x y)
           (incf (aref coverage x y))
           (vector-push-extend xy verts))))))
@@ -45,7 +45,7 @@
   (let ((itt (round (* 2.0d0 (vec:len offset))))
         (cov-count 0)
         (cov (make-vec)))
-    (loop for s in (math:linspace 0.0 1.0 itt) do
+    (loop for s in (math:linspace itt 0.0 1.0) do
       (vec:inside* (size (math:on-line s a b) x y)
         (incf cov-count (if (> (aref coverage x y) 0) 1 0))
         (vector-push-extend (list x y) cov)))
@@ -62,7 +62,7 @@
   (loop
     for a in path and b in (cdr path) do
       (let ((n (* 2 (round (vec:dst a b)))))
-        (loop for s in (math:linspace 0.0 1.0 n) do
+        (loop for s in (math:linspace n 0.0 1.0) do
           (vec:inside* (size (math:on-line s a b) x y)
             (incf (aref coverage x y)))))))
 
@@ -105,7 +105,7 @@
     (destructuring-bind (u v)
       line
       (let ((offset (-get-offset u v s perp)))
-        (loop for xy in (math:nrep num (rnd:on-line u v)) do
+        (loop for xy in (rnd:non-line num u v) do
           (vec:inside (size xy x y)
             (incf (plot-discards plt)
                   (-stipple plt xy offset))))))))

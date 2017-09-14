@@ -7,7 +7,9 @@
 
 
 (defun get-grp-as-bzspl (snk g)
-  (bzspl:make (snek:get-grp-verts snk :g g)))
+  (let ((pts (snek:get-grp-verts snk :g g)))
+    (if (> (length pts) 3)
+      (bzspl:make pts))))
 
 
 (defun edge-length (snk e)
@@ -19,14 +21,14 @@
 
 
 (defun add-circ! (snk num rad &key (xy (vec:zero)) g)
-  (let ((vv (loop for p in (math:linspace 0.0d0 1.0d0 num)
+  (let ((vv (loop for p in (math:linspace num 0.0d0 1.0d0)
                   collect (add-vert! snk (math:on-circ p rad :xy xy)))))
     (loop for a in vv and b in (-roll-once vv)
           collect (add-edge! snk (list a b) :g g))))
 
 
-(defun add-polygon! (snk rad n &key (xy (vec:zero))
-                                    (rot (* 0.25 PI)) g)
+(defun add-polygon! (snk n rad &key (xy (vec:zero))
+                                    (rot (* 0.25d0 PI)) g)
   (let ((vv (loop for v in (math:polygon n rad :xy xy :rot rot)
                   collect (add-vert! snk v))))
     (loop for a in vv and b in (-roll-once vv)
