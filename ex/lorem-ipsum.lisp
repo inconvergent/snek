@@ -7,23 +7,23 @@
 (setf *random-state* (make-random-state t))
 
 (defvar *text* "lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-  eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim
-  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-  commodo consequat. duis aute irure dolor in reprehenderit in voluptate velit
-  esse cillum dolore eu fugiat nulla pariatur. excepteur sint occaecat
-  cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-  laborum. sed ut perspiciatis unde omnis iste natus error sit voluptatem
-  accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo
-  inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
-  nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit,
-  sed quia consequuntur magni dolores eos qui ratione voluptatem sequi
-  nesciunt. neque porro quisquam est, qui dolorem ipsum quia dolor sit amet,
-  consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt
-  ut labore et dolore magnam aliquam quaerat voluptatem. ut enim ad minima
-  veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi
-  ut aliquid ex ea commodi consequatur? quis autem vel eum iure reprehenderit
-  qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum
-  qui dolorem eum fugiat quo voluptas nulla pariatur?")
+ eiusmod tempor incididunt ut labore et dolore magna aliqua. ut enim ad minim
+ veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+ commodo consequat. duis aute irure dolor in reprehenderit in voluptate velit
+ esse cillum dolore eu fugiat nulla pariatur. excepteur sint occaecat
+ cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+ laborum. sed ut perspiciatis unde omnis iste natus error sit voluptatem
+ accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo
+ inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.
+ nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit,
+ sed quia consequuntur magni dolores eos qui ratione voluptatem sequi
+ nesciunt. neque porro quisquam est, qui dolorem ipsum quia dolor sit amet,
+ consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt
+ ut labore et dolore magnam aliquam quaerat voluptatem. ut enim ad minima
+ veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi
+ ut aliquid ex ea commodi consequatur? quis autem vel eum iure reprehenderit
+ qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum
+ qui dolorem eum fugiat quo voluptas nulla pariatur?")
 
 (defun -test-centroids (counts nc ncn)
   (reduce (lambda (x y) (and x y))
@@ -40,27 +40,25 @@
             #'< :key #'second)))
 
 
-(defun -glyph-generate-pts (xy bbox centroids nc ncn)
+(defun -glyph-generate-pts (bbox centroids nc ncn)
   (let ((counts (make-hash-table :test #'equal))
         (centroid-pts (make-hash-table :test #'equal)))
 
     (loop for i from 0 do
       (vec:with-xy (bbox bx by)
-        (let ((cand (rnd:in-box bx by :xy xy)))
+        (let ((cand (rnd:in-box bx by)))
           (destructuring-bind (c dst)
             (-get-dst centroids cand)
             (multiple-value-bind (val exists)
               (gethash c counts)
 
               (cond ((and exists (< val ncn))
-                  (progn
-                    (setf (gethash c centroid-pts) (append (list cand)
-                                                           (gethash c centroid-pts)))
-                    (incf (gethash c counts))))
-                  ((not exists)
-                    (progn
-                      (setf (gethash c centroid-pts) (list cand))
-                      (setf (gethash c counts) 1))))))))
+                      (setf (gethash c centroid-pts)
+                            (append (list cand) (gethash c centroid-pts)))
+                      (incf (gethash c counts)))
+                    ((not exists)
+                      (setf (gethash c centroid-pts) (list cand)
+                            (gethash c counts) 1)))))))
       until (-test-centroids counts nc ncn))
 
     (let ((pts (loop for i from 0 below nc
@@ -69,21 +67,21 @@
 
 
 (defun make-glyph (bbox nc ncn)
-  (if (< (rnd:rnd) 0.2d0)
-    (setf bbox (vec:mult bbox (vec:vec 1d0 2d0))))
   (vec:with-xy ((vec:scale bbox 0.5d0) bx by)
     (-glyph-generate-pts
-      (vec:zero)
       bbox
       (rnd:nin-box nc bx by :xy (vec:zero))
-      nc
-      ncn)))
+      nc ncn)))
 
 
-(defun get-alphabet (bbox nc ncn)
+(defun get-alphabet (bbox nc ncn sp sbox)
   (let ((alphabet (make-hash-table :test #'equal)))
     (loop for i from 0 and c across "abcdefghijklmnopqrstuvwxyz.,?" do
-      (setf (gethash c alphabet) (make-glyph bbox nc ncn)))
+      (setf (gethash c alphabet)
+            (make-glyph (if (< (rnd:rnd) sp)
+                          (vec:mult bbox sbox)
+                          bbox)
+                        nc ncn)))
     (setf (gethash " " alphabet) nil)
     alphabet))
 
@@ -126,13 +124,17 @@
         (bottom 950d0)
         (right 950d0)
         (grains 20)
+        (nc 2)
+        (ncn 2)
         (bbox (vec:vec 10d0 20d0))
         (spacebox (vec:vec 12d0 24d0))
+        (sp 0.15d0)
+        (sbox (vec:vec 1d0 2d0))
         (sand (sandpaint:make size
                 :active (color:black 0.009)
                 :bg (color:white))))
 
-    (let ((alphabet (get-alphabet bbox 2 2))
+    (let ((alphabet (get-alphabet bbox nc ncn sp sbox))
           (snk (snek:make))
           (state-gen (math:get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
       (do-write snk alphabet spacebox top right bottom left *text*)
@@ -144,7 +146,7 @@
         (snek:itr-grps (snk g)
           (aif (snek:get-grp-as-bzspl snk g)
                (sandpaint:pix sand (bzspl:rndpos it
-                                                 (* grains (bzspl::bzspl-n it))))))))
+                                     (* grains (bzspl::bzspl-n it))))))))
 
     (sandpaint:pixel-hack sand)
     (sandpaint:save sand fn :gamma 1.5)))
