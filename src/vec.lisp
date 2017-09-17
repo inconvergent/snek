@@ -205,3 +205,9 @@
   (declare (vec a b))
   (norm (sub a b)))
 
+
+(defun rot (v a)
+  (with-xy (v x y)
+    (vec (- (* x (cos a)) (* y (sin a)))
+         (+ (* x (sin a)) (* y (cos a))))))
+

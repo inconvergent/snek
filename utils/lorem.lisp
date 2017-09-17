@@ -17,25 +17,32 @@
             #'< :key #'second)))
 
 
-(defun -glyph-generate-pts (bbox centroids nc ncn)
-  (let ((counts (make-hash-table :test #'equal))
+(defun -pos-weight (dst scale)
+  ;(> (expt (rnd:rnd) 2d0) (/ dst scale))
+  t)
+
+
+(defun make-glyph (fxn scale nc ncn)
+  (let ((centroids (funcall fxn nc))
+        (counts (make-hash-table :test #'equal))
         (centroid-pts (make-hash-table :test #'equal)))
 
     (loop for i from 0 do
-      (vec:with-xy (bbox bx by)
-        (let ((cand (rnd:in-box bx by)))
-          (destructuring-bind (c dst)
-            (-get-dst centroids cand)
-            (multiple-value-bind (val exists)
-              (gethash c counts)
+      (let ((cand (first (funcall fxn 1))))
+        (destructuring-bind (c dst)
+          (-get-dst centroids cand)
+          (multiple-value-bind (val exists)
+            (gethash c counts)
 
-              (cond ((and exists (< val ncn))
-                      (setf (gethash c centroid-pts)
-                            (append (list cand) (gethash c centroid-pts)))
-                      (incf (gethash c counts)))
-                    ((not exists)
-                      (setf (gethash c centroid-pts) (list cand)
-                            (gethash c counts) 1)))))))
+            (cond ((and exists (< val ncn) (-pos-weight dst scale))
+                    (setf (gethash c centroid-pts)
+                          (append (list cand) (gethash c centroid-pts)))
+                    (incf (gethash c counts)))
+                  ((and (not exists) (-pos-weight dst scale))
+                    (setf (gethash c centroid-pts) (list cand)
+                          (gethash c counts) 1))
+                  ;else: exists and has too many pts
+                  ))))
       until (-test-centroids counts nc ncn))
 
     (let ((pts (loop for i from 0 below nc
@@ -43,23 +50,23 @@
       (apply #'append pts))))
 
 
-(defun make-glyph (bbox nc ncn)
+(defun get-fxn (bbox)
   (vec:with-xy ((vec:scale bbox 0.5d0) bx by)
-    (-glyph-generate-pts
-      bbox
-      (rnd:nin-box nc bx by :xy (vec:zero))
-      nc ncn)))
+    (lambda (n) (rnd:nin-box n bx by))))
 
 
-(defun get-alphabet (bbox nc ncn sp sbox)
+(defun scale-fxn (bbox)
+  (if (< (rnd:rnd) 0.15)
+    (vec:mult bbox (vec:vec 1d0 2d0))
+    bbox))
+
+
+(defun get-alphabet (get-fxn scale-fxn bbox nc ncn)
   (let ((alphabet (make-hash-table :test #'equal)))
     (loop for i from 0 and c across "abcdefghijklmnopqrstuvwxyz.,?-'" do
-      (setf (gethash c alphabet)
-            (make-glyph (if (< (rnd:rnd) sp)
-                          (vec:mult bbox sbox)
-                          bbox)
-                        nc ncn)))
-    ;(setf (gethash " " alphabet) nil)
+      (let ((bbox* (funcall scale-fxn bbox)))
+        (setf (gethash c alphabet) (make-glyph (funcall get-fxn bbox*)
+                                               (vec:len bbox*) nc ncn))))
     alphabet))
 
 

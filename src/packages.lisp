@@ -28,6 +28,7 @@
     :one
     :perp
     :rep
+    :rot
     :scale
     :sin-cos
     :sub
