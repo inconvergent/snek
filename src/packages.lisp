@@ -56,7 +56,6 @@
     :iscale
     :lget
     :linspace
-    :make-perspective-transform
     :mult
     :nrep
     :on-circ
@@ -67,7 +66,11 @@
     :rep
     :scale
     :sub
-    :sum)
+    :sum
+    :vadd
+    :vdiv
+    :vmult
+    :vsub)
   (:import-from :common-lisp-user
     :PII
     :with-gensyms))

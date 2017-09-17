@@ -174,6 +174,7 @@
                           num-verts num-edges num-lines discards) plt
         (-write-png coverage size fnimg)
         (-write-2obj verts edges lines fnobj)
+        (format t "~%writing to ~a" fn)
         (format t "~%~%num verts: ~a ~%" num-verts)
         (format t "num edges: ~a ~%" num-edges)
         (format t "num lines ~a ~%" num-lines)
