@@ -5,25 +5,40 @@
 (defun -test-centroids (counts nc ncn)
   (reduce (lambda (x y) (and x y))
           (loop for i from 0 below nc collect
-            (multiple-value-bind (val exists)
-              (gethash i counts)
-              (and exists (>= val ncn))))))
+                (multiple-value-bind (val exists)
+                  (gethash i counts)
+                  (and exists (>= val ncn))))))
 
 
 (defun -get-dst (centroids cand)
   (first (sort (loop for c in centroids
                      and i from 0
                      collect (list i (vec:dst cand c)))
-            #'< :key #'second)))
+               #'< :key #'second)))
 
 
+; TODO: configurable?
 (defun -pos-weight (dst scale)
   ;(> (expt (rnd:rnd) 2d0) (/ dst scale))
   t)
 
 
-(defun make-glyph (fxn scale nc ncn)
-  (let ((centroids (funcall fxn nc))
+(defun get-centroids (fxn dst nc)
+  (let ((hits 1)
+        (centroids (funcall fxn 1)))
+    (loop for i from 0 do
+      (let ((cand (first (funcall fxn 1))))
+        (if (reduce (lambda (a b) (and a b))
+            (mapcar (lambda (d) (> d dst))
+                    (math:vdst centroids cand)))
+          (progn (setf centroids (append (list cand) centroids))
+                 (incf hits))))
+      until (>= hits nc))
+    centroids))
+
+
+(defun make-glyph (fxn scale nc ncn min-dst)
+  (let ((centroids (get-centroids fxn min-dst nc))
         (counts (make-hash-table :test #'equal))
         (centroid-pts (make-hash-table :test #'equal)))
 
@@ -35,19 +50,17 @@
             (gethash c counts)
 
             (cond ((and exists (< val ncn) (-pos-weight dst scale))
-                    (setf (gethash c centroid-pts)
-                          (append (list cand) (gethash c centroid-pts)))
-                    (incf (gethash c counts)))
+                   (setf (gethash c centroid-pts)
+                         (append (list cand) (gethash c centroid-pts)))
+                   (incf (gethash c counts)))
                   ((and (not exists) (-pos-weight dst scale))
-                    (setf (gethash c centroid-pts) (list cand)
-                          (gethash c counts) 1))
+                   (setf (gethash c centroid-pts) (list cand)
+                         (gethash c counts) 1))))))
                   ;else: exists and has too many pts
-                  ))))
       until (-test-centroids counts nc ncn))
 
-    (let ((pts (loop for i from 0 below nc
-                          collect (gethash i centroid-pts))))
-      (apply #'append pts))))
+    (apply #'append (loop for i from 0 below nc
+                        collect (gethash i centroid-pts)))))
 
 
 (defun get-fxn (bbox)
@@ -61,18 +74,20 @@
     bbox))
 
 
-(defun get-alphabet (get-fxn scale-fxn bbox nc ncn)
+(defun get-alphabet (get-fxn scale-fxn bbox nc ncn &key (min-dst 0d0))
   (let ((alphabet (make-hash-table :test #'equal)))
     (loop for i from 0 and c across "abcdefghijklmnopqrstuvwxyz.,?-'" do
       (let ((bbox* (funcall scale-fxn bbox)))
-        (setf (gethash c alphabet) (make-glyph (funcall get-fxn bbox*)
-                                               (vec:len bbox*) nc ncn))))
+        (setf (gethash c alphabet)
+              (make-glyph (funcall get-fxn bbox*)
+                            (vec:len bbox*) nc ncn
+                            min-dst))))
     alphabet))
 
 
 (defun get-words (txt)
-  (loop for word in (split-sequence:split-sequence #\  txt) collect
-        (list word (length word))))
+  (loop for word in (split-sequence:split-sequence #\  txt)
+        collect (list word (length word))))
 
 
 (defun do-write (snk alphabet bbox top right bottom left sentence)

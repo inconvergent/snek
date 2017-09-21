@@ -12,7 +12,7 @@
 (defun get-fxn* (bbox)
   (vec:with-xy ((vec:scale bbox 0.5d0) bx by)
     (lambda (n)
-      (mapcar (lambda (v) (vec:rot v (/ PI 4.0)))
+      (mapcar (lambda (v) (vec:rot v (* PI 0.15d0)))
               (rnd:nin-box n bx by)))))
 
 
@@ -24,19 +24,19 @@
 
 (defun main (size fn)
   (let ((left 55d0)
-        (top 60d0)
+        (top 70d0)
         (bottom 950d0)
         (right 950d0)
         (grains 20)
         (nc 2)
         (ncn 2)
-        (bbox (vec:vec 8d0 40d0))
+        (bbox (vec:vec 10d0 40d0))
         (spacebox (vec:vec 8d0 35d0))
         (sand (sandpaint:make size
                 :active (color:black 0.009)
                 :bg (color:white))))
 
-    (let ((alphabet (get-alphabet #'get-fxn* #'scale-fxn* bbox nc ncn))
+    (let ((alphabet (get-alphabet #'get-fxn* #'scale-fxn* bbox nc ncn :min-dst 10d0))
           (snk (snek:make))
           (state-gen (math:get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
       (do-write snk alphabet spacebox top right bottom left *text*)

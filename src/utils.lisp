@@ -7,7 +7,7 @@
   (or #+SBCL *posix-argv*
       #+LISPWORKS system:*line-arguments-list*
       #+CMU extensions:*command-line-words*
-       nil))
+      nil))
 
 
 (defun append-postfix (fn postfix)

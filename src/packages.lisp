@@ -50,6 +50,7 @@
     :dfloat
     :dfloat*
     :div
+    :dst
     :get-state-gen
     :inc
     :int
@@ -70,6 +71,7 @@
     :sum
     :vadd
     :vdiv
+    :vdst
     :vmult
     :vsub)
   (:import-from :common-lisp-user

@@ -79,6 +79,17 @@
 ; LIST MATH
 
 
+(defun dst (a b)
+  (declare (list a b))
+  (mapcar #'vec:dst a b))
+
+
+(defun vdst (aa b)
+  (declare (list aa))
+  (declare (vec:vec b))
+  (loop for a in aa collect (vec:dst a b)))
+
+
 (defun add (a b)
   (declare (list a b))
   (mapcar #'+ a b))

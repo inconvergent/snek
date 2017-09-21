@@ -2,6 +2,7 @@
 (in-package :color)
 
 
+
 (defun white (&optional (alpha 1.0d0))
   (list 1.0d0 1.0d0 1.0d0 (math:dfloat alpha)))
 

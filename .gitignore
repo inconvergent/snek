@@ -1,10 +1,6 @@
-res
-tmp.lisp
-asdf.png
 tmp.png
-x/res
-ex/res
-ex/*png
-x/*png
+examples/res
+examples/*png
 x-*/*png
+x-*/res
 *.2obj
