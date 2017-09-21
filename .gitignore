@@ -1,6 +1,7 @@
 tmp.png
 examples/res
 examples/*png
-x-*/*png
-x-*/res
-*.2obj
+examples/res/*.2obj
+gen-*/*png
+gen-*/res
+gen-*/*.2obj
