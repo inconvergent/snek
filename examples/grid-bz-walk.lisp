@@ -1,6 +1,7 @@
 #!/usr/bin/sbcl --script
 
 (load "../src/load")
+(load "../utils/grid")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
@@ -9,19 +10,6 @@
 (defun mixed (x f)
   (declare (double-float x f))
   (+ (random (* f x)) (- x (* 2.0d0 (random x)))))
-
-
-(defun get-grid (size edge ngrid)
-  (loop for x in (math:linspace ngrid edge (- size edge)) collect
-    (loop for y in (math:linspace ngrid edge (- size edge)) collect
-      (vec:vec x y))))
-
-;(defun get-grid (size edge ngrid)
-;  (let ((a (- edge))
-;        (b (+ size edge)))
-;    (loop for x in (rnd:rndspace ngrid a b :order t) collect
-;      (loop for y in (rnd:rndspace ngrid a b :order t) collect
-;        (list x y)))))
 
 
 (defun rnd-dir ()

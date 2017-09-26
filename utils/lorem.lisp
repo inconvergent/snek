@@ -90,7 +90,7 @@
         collect (list word (length word))))
 
 
-(defun do-write (snk alphabet bbox top right bottom left sentence)
+(defun do-write (snk alphabet bbox top right bottom left sentence &key (tweak-fxn))
   (vec:with-xy ((vec:scale bbox 2d0) bx by)
     (let ((g nil)
           (cursor (vec:vec left top)))
@@ -109,7 +109,9 @@
           (loop for c across word do
             (format t "~a" c)
             (aif (gethash c alphabet)
-              (snek:add-path! snk (math:vadd (gethash c alphabet) cursor) :g g))
+              (snek:add-path! snk (math:vadd
+                                    (if tweak-fxn (funcall tweak-fxn it) it)
+                                    cursor) :g g))
             (setf cursor (vec:add cursor (vec:vec bx 0d0))))
           (setf cursor (vec:add cursor (vec:vec bx 0d0)))
           (format t " "))))))

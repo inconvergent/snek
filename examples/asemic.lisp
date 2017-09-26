@@ -1,6 +1,7 @@
 #!/usr/bin/sbcl --script
 
 (load "../src/load")
+(load "../utils/state")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
@@ -47,7 +48,7 @@
                             (- size (* 2.0 border))
                             line-chars char-num char-rad))
             (drift (rnd:get-acc-circ-stp*))
-            (state-gen (math:get-state-gen
+            (state-gen (get-state-gen
                          (lambda () (rnd:get-acc-circ-stp*)))))
 
         (snek:with (snk)

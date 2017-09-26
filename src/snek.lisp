@@ -7,7 +7,6 @@
   (verts nil :type array)
   (num-verts 0 :type integer)
   (zmap nil)
-  (zwidth nil)
   (grps (make-hash-table :test #'eql))
   (alt-names nil :read-only t)
   (max-verts nil :type integer :read-only t)
@@ -20,10 +19,7 @@
   (type nil :type symbol :read-only t)
   (closed nil :type boolean :read-only t))
 
-(defun make (&key
-              (max-verts 100000)
-              (grp-size 100)
-              alts)
+(defun make (&key (max-verts 100000) (grp-size 100) alts)
   "
   constructor for snek instances.
 

@@ -139,7 +139,7 @@
 (defun verts-in-rad (snk xy rad)
   (declare (vec:vec xy))
   (declare (double-float rad))
-  (with-struct (snek- verts zmap zwidth) snk
+  (with-struct (snek- verts zmap) snk
     (declare (type (array double-float) verts))
-    (zmap:verts-in-rad verts zmap zwidth xy rad)))
+    (zmap:verts-in-rad zmap verts xy rad)))
 

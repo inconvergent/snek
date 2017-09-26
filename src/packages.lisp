@@ -51,7 +51,6 @@
     :dfloat*
     :div
     :dst
-    :get-state-gen
     :inc
     :int
     :int*
@@ -67,6 +66,8 @@
     :range
     :rep
     :scale
+    :sfloat
+    :sfloat*
     :sub
     :sum
     :vadd
@@ -195,6 +196,7 @@
   (:use :common-lisp)
   (:export
     :make
+    :with*
     :verts-in-rad)
   (:import-from :common-lisp-user
     :get-dfloat-tup

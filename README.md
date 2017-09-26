@@ -119,6 +119,13 @@ to issues, or take requests.
 
  - Randomized order of alteration apply
  - one-ring/ incident edges
+ - test parallel zmap implementation
+ - bzspl with adaptive sampling
+
+
+## Bugs
+
+ - bzspl has lower sample density near the edges in some cases.
 
 
 ## THANKS

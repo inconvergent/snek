@@ -2,6 +2,7 @@
 
 (load "../src/load")
 (load "../utils/lorem")
+(load "../utils/state")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
@@ -38,7 +39,7 @@
 
     (let ((alphabet (get-alphabet #'get-fxn* #'scale-fxn* bbox nc ncn))
           (snk (snek:make))
-          (state-gen (math:get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
+          (state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
 
       (loop for a across "abcdfg" and x in (math:linspace 6 100d0 800d0) do
         (loop for b across "abcdfg" and y in (math:linspace 6 150d0 850d0) do

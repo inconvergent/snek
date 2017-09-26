@@ -5,15 +5,26 @@
 ; TYPES
 
 (defun int (x)
-  (the integer (coerce x 'integer)))
+  (the integer
+       (coerce x 'integer)))
 
 
 (defun int* (xx)
   (mapcar (lambda (x) (int x)) xx))
 
 
+(defun sfloat (x)
+  (the float
+       (coerce x 'float)))
+
+
+(defun sfloat* (xx)
+  (mapcar (lambda (x) (sfloat x)) xx))
+
+
 (defun dfloat (x)
-  (the double-float (coerce x 'double-float)))
+  (the double-float
+       (coerce x 'double-float)))
 
 
 (defun dfloat* (xx)
@@ -21,7 +32,6 @@
 
 
 ; RANGES
-; TODO: move?
 
 
 (defmacro rep ((i itt) &body body)
@@ -51,7 +61,7 @@
 
 
 (defun inc (x stp)
-  (mod (+ x stp) 1.0d0))
+  (mod (+ x stp) 1d0))
 
 
 (defun linspace (n a b &key (end t))
@@ -64,16 +74,6 @@
       (loop for i from 0 below n
         collect (dfloat (+ a (* i (/ (- b a) nn))))))
     (list (dfloat a))))
-
-
-(defun get-state-gen (get-state-fun)
-  (let ((state (make-hash-table :test #'equal)))
-    (lambda (i noise)
-      (multiple-value-bind (curr exists)
-        (gethash i state)
-        (if (not exists)
-          (setf (gethash i state) (setf curr (funcall get-state-fun))))
-        (funcall curr noise)))))
 
 
 ; LIST MATH
@@ -158,6 +158,7 @@
 
 
 ; SHAPES
+; TODO: new package
 
 
 (defun on-circ (p rad &key (xy (vec:zero)))

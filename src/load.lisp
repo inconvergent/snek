@@ -12,7 +12,7 @@
 
 (asdf:defsystem "snek"
   :description "SNEK - A Generative System for Writing Generative Systems"
-  :version "2.3.2"
+  :version "2.3.3"
   :author "inconvergent"
   :licence "MIT"
   :serial t
@@ -20,6 +20,7 @@
   :components ((:file "pg-utils")
                (:file "utils")
                (:file "utils-time")
+               (:file "utils-count")
                (:file "packages")
                (:file "vec")
                (:file "math")

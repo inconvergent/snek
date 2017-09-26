@@ -1,6 +1,7 @@
 #!/usr/bin/sbcl --script
 
 (load "../src/load")
+(load "../utils/state")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
@@ -109,7 +110,7 @@
                             line-chars
                             (vec:vec border y)
                             (vec:vec 17d0 30d0)))
-            (state-gen (math:get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
+            (state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
 
         (loop for i from 0 below 500 do
           (snek:with (snk)

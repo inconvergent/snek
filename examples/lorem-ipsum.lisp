@@ -2,6 +2,7 @@
 
 (load "../src/load")
 (load "../utils/lorem")
+(load "../utils/state")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
@@ -38,7 +39,7 @@
 
     (let ((alphabet (get-alphabet #'get-fxn* #'scale-fxn* bbox nc ncn :min-dst 10d0))
           (snk (snek:make))
-          (state-gen (math:get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
+          (state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
       (do-write snk alphabet spacebox top right bottom left *text*)
       (loop for i from 0 below 500 do
         (snek:with (snk)

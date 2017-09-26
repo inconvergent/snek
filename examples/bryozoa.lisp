@@ -1,6 +1,7 @@
 #!/usr/bin/sbcl --script
 
 (load "../src/load")
+(load "../utils/state")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
@@ -49,9 +50,9 @@
         ;                         100d0))
         (snk (init-fan 40 1400 (vec:vec 500d0 1300d0)))
         ;(snk (init-spiral 20 20 800d0 (vec:vec 500d0 500d0)))
-        (v-state-gen (math:get-state-gen
+        (v-state-gen (get-state-gen
                      (lambda () (rnd:get-acc-circ-stp*))))
-        (h-state-gen (math:get-state-gen
+        (h-state-gen (get-state-gen
                      (lambda () (rnd:get-acc-lin-stp (rnd:rnd)))))
         (sand (sandpaint:make size
                 :active (color:white 0.01)
