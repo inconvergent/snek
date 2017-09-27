@@ -1,40 +1,13 @@
 
-(ql:quickload "split-sequence")
+(load "../utils/text")
+(load "../utils/lorem-common")
 
-
-(defun -test-centroids (counts nc ncn)
-  (reduce (lambda (x y) (and x y))
-          (loop for i from 0 below nc collect
-                (multiple-value-bind (val exists)
-                  (gethash i counts)
-                  (and exists (>= val ncn))))))
-
-
-(defun -get-dst (centroids cand)
-  (first (sort (loop for c in centroids
-                     and i from 0
-                     collect (list i (vec:dst cand c)))
-               #'< :key #'second)))
 
 
 ; TODO: configurable?
 (defun -pos-weight (dst scale)
   ;(> (expt (rnd:rnd) 2d0) (/ dst scale))
   t)
-
-
-(defun get-centroids (fxn dst nc)
-  (let ((hits 1)
-        (centroids (funcall fxn 1)))
-    (loop for i from 0 do
-      (let ((cand (first (funcall fxn 1))))
-        (if (reduce (lambda (a b) (and a b))
-            (mapcar (lambda (d) (> d dst))
-                    (math:vdst centroids cand)))
-          (progn (setf centroids (append (list cand) centroids))
-                 (incf hits))))
-      until (>= hits nc))
-    centroids))
 
 
 (defun make-glyph (fxn scale nc ncn min-dst)
@@ -83,11 +56,6 @@
                             (vec:len bbox*) nc ncn
                             min-dst))))
     alphabet))
-
-
-(defun get-words (txt)
-  (loop for word in (split-sequence:split-sequence #\  txt)
-        collect (list word (length word))))
 
 
 (defun do-write (snk alphabet bbox top right bottom left sentence &key (tweak-fxn))

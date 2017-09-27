@@ -8,6 +8,17 @@
 (setf *random-state* (make-random-state t))
 
 
+(defun place-grid (snk small large mid)
+  (let* ((df (math:dfloat (half (- large small))))
+         (a (rnd:in-box df df :xy mid))
+         (b (rnd:in-box df df :xy mid))
+         (angle (rnd:rnd (* 2d0 PI)))
+         (num (floor (* 0.1d0 (vec:dst a b)))))
+
+    (loop for path in (get-stroke-grid num 100 2000d0 angle a b) do
+      (snek:add-path! snk path :g (snek:add-grp! snk)))))
+
+
 (defun main (size fn)
   (let* ((ngrid 100)
          (snk (snek:make :max-verts 100000))
@@ -17,30 +28,25 @@
                  :active (color:black 0.05)
                  :bg (color:white))))
 
-    (loop for path in (get-stroke-grid
-                        100 100 2000d0 (* PI 0.5d0)
-                        (vec:vec 0d0 0d0) (vec:vec 1000d0 0d0)) do
-          (snek:add-path! snk path :g (snek:add-grp! snk)))
+    (loop for i from 0 below 10 do
+      (place-grid snk 0 size (vec:vec 500d0 500d0)))
 
-    (loop for path in (get-stroke-grid
-                        100 200 2000d0 (* PI 1.2d0)
-                        (vec:vec 1000d0 0d0) (vec:vec 1000d0 2000d0)) do
-          (snek:add-path! snk path :g (snek:add-grp! snk)))
-
-    (loop for i from 0 below 450 do
+    (loop for i from 0 below 50 do
       (print-every i 100)
       (snek:with (snk)
         (snek:itr-all-verts (snk v)
           ;(snek:move-vert? v (funcall state-gen v 0.0009d0))
           (snek:move-vert? v (rnd:in-circ 0.5d0))))
-      (snek:itr-grps (snk g)
-        (sandpaint:pix sand
-          (bzspl:rndpos (snek:get-grp-as-bzspl snk g) 500))))
-
       ;(snek:itr-grps (snk g)
-      ;  (sandpaint:lin-path sand
-      ;    (bzspl:rndpos (snek:get-grp-as-bzspl snk g) 10000 :order t)
-      ;    1d0 30))
+      ;  (sandpaint:pix sand
+      ;    (bzspl:rndpos (snek:get-grp-as-bzspl snk g) 500)))
+
+      )
+
+      (snek:itr-grps (snk g)
+        (sandpaint:lin-path sand
+          (bzspl:rndpos (snek:get-grp-as-bzspl snk g) 10000 :order t)
+          1d0 10))
 
     (sandpaint:pixel-hack sand)
     (sandpaint:save sand fn)))

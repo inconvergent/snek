@@ -138,6 +138,15 @@
           aa))
 
 
+(defun mid (aa)
+  (declare (list aa))
+  (let ((n 0))
+    (vec:iscale
+      (reduce (lambda (a b) (incf n) (vec:add a b))
+              aa)
+      (math:dfloat n))))
+
+
 ; TODO: this is inconsistent
 (defun scale (a s)
   (declare (list a))

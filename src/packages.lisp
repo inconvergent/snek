@@ -57,6 +57,7 @@
     :iscale
     :lget
     :linspace
+    :mid
     :mult
     :nrep
     :on-circ
