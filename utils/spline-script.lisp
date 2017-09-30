@@ -2,11 +2,14 @@
 (load "../utils/lorem-common")
 
 
-(defun make-glyph (bbox-fxn estimate-nc-ncn-fxn &key (min-dst 0d0))
+(defun make-glyph (bbox-fxn estimate-nc-ncn-fxn sort-fxn
+                    &key (min-dst 0d0))
   (destructuring-bind (nc ncn)
     (funcall estimate-nc-ncn-fxn bbox-fxn)
 
-    (let* ((centroids (get-centroids bbox-fxn min-dst nc)))
+    (let* ((centroids (angle-sort-centroids
+                        (get-centroids bbox-fxn min-dst nc)
+                        (funcall sort-fxn))))
       (lambda ()
         (let ((counts (make-hash-table :test #'equal))
               (centroid-pts (make-hash-table :test #'equal)) )
@@ -31,13 +34,17 @@
                               collect (gethash i centroid-pts))))))))
 
 
-(defun get-alphabet (letters get-bbox-fxn estimate-nc-ncn-fxn &key (min-dst 0d0))
+(defun get-alphabet (letters &key bbox-fxn
+                                  nc-ncn-fxn
+                                  (sort-fxn (lambda () #'<))
+                                  (min-dst 0d0))
   (let ((alphabet (make-hash-table :test #'equal)))
     (loop for i from 0 and c across letters do
           (format t "~a ~a ~%" c
                   (setf (gethash c alphabet)
-                        (make-glyph (funcall get-bbox-fxn)
-                                    estimate-nc-ncn-fxn))))
+                        (make-glyph (funcall bbox-fxn)
+                                    nc-ncn-fxn
+                                    sort-fxn))))
     alphabet))
 
 

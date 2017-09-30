@@ -71,6 +71,11 @@
   (vec (vec-x v) (vec-y v)))
 
 
+(defun tolist (v)
+  (declare (vec v))
+  (list (vec-x v) (vec-y v)))
+
+
 (defun vec-coerce (x y)
   (vec (math:dfloat x) (math:dfloat y)))
 

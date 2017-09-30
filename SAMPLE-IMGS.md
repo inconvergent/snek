@@ -1,4 +1,5 @@
 
+![ex](img/20170929-202315-243371-a317a96-6a592e5-003.png?raw=true "ex")
 ![ex](img/asemic-2.lisp.png?raw=true "ex")
 ![ex](img/asemic-3.lisp.png?raw=true "ex")
 ![ex](img/asemic.lisp.png?raw=true "ex")

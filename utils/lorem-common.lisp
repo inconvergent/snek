@@ -26,3 +26,11 @@
                  (incf hits))))
       until (>= hits nc))
     centroids))
+
+
+(defun angle-sort-centroids (centroids order-fxn)
+  (mapcar #'second
+    (print (sort (loop for c in centroids
+                collect (list (apply #'atan (reverse (vec:tolist c))) c))
+          order-fxn :key #'first)) ))
+
