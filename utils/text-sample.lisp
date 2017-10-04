@@ -81,7 +81,7 @@ revision: seashore.
 
 he feels the need to hear a human voice — a fully human voice, like his own. sometimes he laughs like a hyena or roars like a lion — his idea of a hyena, his idea of a lion. he used to watch old dvds of such creatures when he was a child: those animal-behaviour programs featuring copulation and growling and innards, and mothers licking their young. why had he found them so reassuring?
 
-or he grunts and squeals like a pigoon, or howls like a wolvog: aroo! aroo! sometimes in the dusk he runs up and down on the sand, flinging stones at the ocean and screaming, fuck, fuck, fuck, fuck, fuck, fuck! he feels better afterwards.
+or he grunts and squeals like a pigoon, or howls like a wolvog: aroo! aroo! sometimes in the dusk he runs up and down on the sand, flinging stones at the ocean and screaming, shit, shit, shit, shit, shit, shit! he feels better afterwards.
 
 he stands up and raises his arms to stretch, and his sheet falls off. he looks down at his body with dismay: the grimy, bug-bitten skin, the salt-and-pepper tufts of hair, the thickening yellow toenails. naked as the day he was born, not that he can remember a thing about that. so many crucial events take place behind people's backs, when they aren't in a position to watch: birth and death, for instance. and the temporary oblivion of sex.
 
@@ -106,3 +106,83 @@ happen and he can never stop it. his breath is coming in gasps, as if a giant ha
 \"you did this!\" he screams at the ocean.
 
 no answer, which isn't surprising. only the waves, wish-wash, wish-wash. he wipes his fist across his face, across the grime and tears and snot and the derelict's whiskers and sticky mango juice. \"snowman, snowman,\" he says. \"get a life.\"")
+
+
+; first chapter of Alice in Wonderland by Lewis Carroll. via project gutenberg.
+; http://www.gutenberg.org/cache/epub/28885/pg28885.txt
+; not covered by the MIT license
+(defvar *alice*
+"alice was beginning to get very tired of sitting by her sister on the bank, and of having nothing to do: once or twice she had peeped into the book her sister was reading, but it had no pictures or conversations in it, \"and what is the use of a book,\" thought alice, \"without pictures or conversations?\"
+
+so she was considering in her own mind (as well as she could, for the hot day made her feel very sleepy and stupid) whether the pleasure of making a daisy-chain would be worth the trouble of getting up and picking the daisies, when suddenly a white rabbit with pink eyes ran close by her.
+
+there was nothing so very remarkable in that; nor did alice think it so very much out of the way to hear the rabbit say to itself, \"oh dear! oh dear! i shall be too late!\" (when she thought it over afterwards, it occurred to her that she ought to have wondered at this, but at the time it all seemed quite natural); but when the rabbit actually took a watch out of its waistcoat-pocket, and looked at it, and then hurried on, alice started to her feet, for it flashed across her mind that she had never before seen a rabbit with either a waistcoat-pocket, or a watch to take out of it, and burning with curiosity, she ran across the field after it, and was just in time to see it pop down a large rabbit-hole under the hedge.
+
+in another moment down went alice after it, never once considering how in the world she was to get out again.
+
+the rabbit-hole went straight on like a tunnel for some way, and then dipped suddenly down, so suddenly that alice had not a moment to think about stopping herself before she found herself falling down what seemed to be a very deep well.
+
+either the well was very deep, or she fell very slowly, for she had plenty of time as she went down to look about her, and to wonder what was going to happen next. first, she tried to look down and make out what she was coming to, but it was too dark to see anything; then she looked at the sides of the well and noticed that they were filled with cupboards and book-shelves: here and there she saw maps and pictures hung upon pegs. she took down a jar from one of the shelves as she passed; it was labelled \"orange marmalade,\" but to her disappointment it was empty; she did not like to drop the jar for fear of killing somebody underneath, so managed to put it into one of the cupboards as she fell past it.
+
+\"well!\" thought alice to herself. \"after such a fall as this, i shall think nothing of tumbling down stairs! how brave they'll all think me at home! why, i wouldn't say anything about it, even if i fell off the top of the house!\" (which was very likely true.)
+
+down, down, down. would the fall never come to an end? \"i wonder how many miles i've fallen by this time?\" she said aloud. \"i must be getting somewhere near the centre of the earth. let me see: that would be four thousand miles down. i think—\" (for, you see, alice had learnt several things of this sort in her lessons in the schoolroom, and though this was not a very good opportunity for showing off her knowledge, as there was no one to listen to her, still it was good practice to say it over) \"—yes, that's about the right distance—but then i wonder what latitude or longitude i've got to?\" (alice had no idea what latitude was, or longitude either, but thought they were nice grand words to say.)
+
+presently she began again. \"i wonder if i shall fall right through the earth! how funny it'll seem to come out among the people that walk with their heads downwards! the antipathies, i think—\" (she was rather glad there was no one listening, this time, as it didn't sound at all the right word) \"—but i shall have to ask them what the name of the country is, you know. please, ma'am, is this new zealand or australia?\" (and she tried to curtsey as she spoke—fancy curtseying as you're falling through the air! do you think you could manage it?) \"and what an ignorant little girl she'll think me! no, it'll never do to ask: perhaps i shall see it written up somewhere.\"
+
+down, down, down. there was nothing else to do, so alice soon began talking again. \"dinah'll miss me very much to-night, i should think!\" (dinah was the cat.) \"i hope they'll remember her saucer of milk at tea-time. dinah, my dear, i wish you were down here with me! there are no mice in the air, i'm afraid, but you might catch a bat, and that's very like a mouse, you know. but do cats eat bats, i wonder?\" and here alice began to get rather sleepy, and went on saying to herself, in a dreamy sort of way, \"do cats eat bats? do cats eat bats?\" and sometimes, \"do bats eat cats?\" for, you see, as she couldn't answer either question, it didn't much matter which way she put it. she felt that she was dozing off, and had just begun to dream that she was walking hand in hand with dinah, and saying to her very earnestly, \"now, dinah, tell me the truth: did you ever eat a bat?\" when suddenly, thump! thump! down she came upon a heap of sticks and dry leaves, and the fall was over.
+
+alice was not a bit hurt, and she jumped up on to her feet in a moment: she looked up, but it was all dark overhead; before her was another long passage, and the white rabbit was still in sight, hurrying down it. there was not a moment to be lost: away went alice like the wind, and was just in time to hear it say, as it turned a corner, \"oh my ears and whiskers, how late it's getting!\" she was close behind it when she turned the corner, but the rabbit was no longer to be seen: she found herself in a long, low hall, which was lit up by a row of lamps hanging from the roof.
+
+there were doors all round the hall, but they were all locked; and when alice had been all the way down one side and up the other, trying every door, she walked sadly down the middle, wondering how she was ever to get out again.
+
+suddenly she came upon a little three-legged table, all made of solid glass; there was nothing on it but a tiny golden key, and alice's first idea was that this might belong to one of the doors of the hall; but, alas! either the locks were too large, or the key was too small, but at any rate it would not open any of them. however, on the second time round, she came upon a low curtain she had not noticed before, and behind it was a little door about fifteen inches high: she tried the little golden key in the lock, and to her great delight it fitted!
+
+alice opened the door and found that it led into a small passage, not much larger than a rat-hole: she knelt down and looked along the passage into the loveliest garden you ever saw. how she longed to get out of that dark hall, and wander about among those beds of bright flowers and those cool fountains, but she could not even get her head through the doorway; \"and even if my head would go through,\" thought poor alice, \"it would be of very little use without my shoulders. oh, how i wish i could shut up like a telescope! i think i could, if i only knew how to begin.\" for, you see, so many out-of-the-way things had happened lately, that alice had begun to think that very few things indeed were really impossible.
+
+there seemed to be no use in waiting by the little door, so she went back to the table, half hoping she might find another key on it, or at any rate a book of rules for shutting people up like telescopes: this time she found a little bottle on it (\"which certainly was not here before,\" said alice,) and tied round the neck of the bottle was a paper label, with the words \"drink me\" beautifully printed on it in large letters.
+
+it was all very well to say \"drink me,\" but the wise little alice was not going to do that in a hurry. \"no, i'll look first,\" she said, \"and see whether it's marked 'poison' or not;\" for she had read several nice little stories about children who had got burnt, and eaten up by wild beasts, and other unpleasant things, all because they would not remember the simple rules their friends had taught them: such as, that a red-hot poker will burn you if you hold it too long; and that, if you cut your finger very deeply with a knife, it usually bleeds; and she had never forgotten that, if you drink much from a bottle marked \"poison,\" it is almost certain to disagree with you, sooner or later.
+
+however, this bottle was not marked \"poison,\" so alice ventured to taste it, and finding it very nice (it had, in fact, a sort of mixed flavour of cherry-tart, custard, pineapple, roast turkey, coffee, and hot buttered toast,) she very soon finished it off. \"what a curious feeling!\" said alice. \"i must be shutting up like a telescope.\"
+
+and so it was indeed: she was now only ten inches high, and her face brightened up at the thought that she was now the right size for going through that little door into that lovely garden. first, however, she waited for a few minutes to see if she was going to shrink any further: she felt a little nervous about this: \"for it might end, you know,\" said alice to herself, \"in my going out altogether, like a candle. i wonder what i should be like then?\" and she tried to fancy what the flame of a candle looks like after the candle is blown out, for she could not remember ever having seen such a thing.
+
+after a while, finding that nothing more happened, she decided on going into the garden at once; but, alas for poor alice! when she got to the door, she found she had forgotten the little golden key, and when she went back to the table for it, she found she could not possibly reach it: she could see it quite plainly through the glass, and she tried her best to climb up one of the legs of the table, but it was too slippery; and when she had tired herself out with trying, the poor little thing sat down and cried.
+
+\"come, there's no use in crying like that!\" said alice to herself, rather sharply. \"i advise you to leave off this minute!\" she generally gave herself very good advice (though she very seldom followed it), and sometimes she scolded herself so severely as to bring tears into her eyes; and once she remembered trying to box her own ears for having cheated herself in a game of croquet she was playing against herself, for this curious child was very fond of pretending to be two people. \"but it's no use now,\" thought poor alice, \"to pretend to be two people! why there's hardly enough of me left to make one respectable person!\"
+
+soon her eye fell on a little glass box that was lying under the table: she opened it, and found in it a very small cake, on which the words \"eat me\" were beautifully marked in currants. \"well, i'll eat it,\" said alice, \"and if it makes me grow larger, i can reach the key; and if it makes me grow smaller, i can creep under the door; so either way i'll get into the garden, and i don't care which happens!\"
+
+she ate a little bit, and said anxiously to herself, \"which way? which way?\" holding her hand on the top of her head to feel which way it was growing, and she was quite surprised to find that she remained the same size; to be sure, this is what generally happens when one eats cake, but alice had got so much into the way of expecting nothing but out-of-the-way things to happen, that it seemed quite dull and stupid for life to go on in the common way.
+
+so she set to work, and very soon finished off the cake.")
+
+
+; a few sections from the beginning of a study in scarlet by arthur conan doyle. via project gutenberg.
+; http://www.gutenberg.org/files/244/244-0.txt
+; not covered by the MIT license
+
+(defvar *sherlock*
+"in the year 1878 i took my degree of doctor of medicine of the university of london, and proceeded to netley to go through the course prescribed for surgeons in the army. having completed my studies there, i was duly attached to the fifth northumberland fusiliers as assistant surgeon. the regiment was stationed in india at the time, and before i could join it, the second afghan war had broken out. on landing at bombay, i learned that my corps had advanced through the passes, and was already deep in the enemy’s country. i followed, however, with many other officers who were in the same situation as myself, and succeeded in reaching candahar in safety, where i found my regiment, and at once entered upon my new duties.
+
+the campaign brought honours and promotion to many, but for me it had nothing but misfortune and disaster. i was removed from my brigade and attached to the berkshires, with whom i served at the fatal battle of maiwand. there i was struck on the shoulder by a jezail bullet, which shattered the bone and grazed the subclavian artery. i should have fallen into the hands of the murderous ghazis had it not been for the devotion and courage shown by murray, my orderly, who threw me across a pack-horse, and succeeded in bringing me safely to the british lines.
+
+worn with pain, and weak from the prolonged hardships which i had undergone, i was removed, with a great train of wounded sufferers, to the base hospital at peshawar. here i rallied, and had already improved so far as to be able to walk about the wards, and even to bask a little upon the verandah, when i was struck down by enteric fever, that curse of our indian possessions. for months my life was despaired of, and when at last i came to myself and became convalescent, i was so weak and emaciated that a medical board determined that not a day should be lost in sending me back to england. i was dispatched, accordingly, in the troopship \"orontes,\" and landed a month later on portsmouth jetty, with my health irretrievably ruined, but with permission from a paternal government to spend the next nine months in attempting to improve it.
+
+i had neither kith nor kin in england, and was therefore as free as air—or as free as an income of eleven shillings and sixpence a day will permit a man to be. under such circumstances, i naturally gravitated to london, that great cesspool into which all the loungers and idlers of the empire are irresistibly drained. there i stayed for some time at a private hotel in the strand, leading a comfortless, meaningless existence, and spending such money as i had, considerably more freely than i ought. so alarming did the state of my finances become, that i soon realized that i must either leave the metropolis and rusticate somewhere in the country, or that i must make a complete alteration in my style of living. choosing the latter alternative, i began by making up my mind to leave the hotel, and to take up my quarters in some less pretentious and less expensive domicile.
+
+on the very day that i had come to this conclusion, i was standing at the criterion bar, when some one tapped me on the shoulder, and turning round i recognized young stamford, who had been a dresser under me at barts. the sight of a friendly face in the great wilderness of london is a pleasant thing indeed to a lonely man. in old days stamford had never been a particular crony of mine, but now i hailed him with enthusiasm, and he, in his turn, appeared to be delighted to see me. in the exuberance of my joy, i asked him to lunch with me at the holborn, and we started off together in a hansom.
+
+\"whatever have you been doing with yourself, watson?\" he asked in undisguised wonder, as we rattled through the crowded london streets. \"you are as thin as a lath and as brown as a nut.\"
+
+i gave him a short sketch of my adventures, and had hardly concluded it by the time that we reached our destination.
+
+\"poor devil!\" he said, commiseratingly, after he had listened to my misfortunes. \"what are you up to now?\"
+
+\"looking for lodgings.\" i answered. \"trying to solve the problem as to whether it is possible to get comfortable rooms at a reasonable price.\"
+
+\"that’s a strange thing,\" remarked my companion; \"you are the second man to-day that has used that expression to me.\"
+
+\"and who was the first?\" i asked.")
+

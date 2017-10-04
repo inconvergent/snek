@@ -3,23 +3,24 @@
 (load "../src/load")
 (load "../utils/state")
 
+
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
 
 
-(defun -test-centroids (counts nc ncn)
+(defun test-centroids (counts nc ncn)
   (reduce (lambda (x y) (and x y))
           (loop for i from 0 below nc collect
-            (multiple-value-bind (val exists)
-              (gethash i counts)
-              (and exists (>= val ncn))))))
+                (multiple-value-bind (val exists)
+                  (gethash i counts)
+                  (and exists (>= val ncn))))))
 
 
-(defun -get-dst (centroids cand)
+(defun get-dst (centroids cand)
   (first (sort (loop for c in centroids
                      and i from 0
                      collect (list i (vec:dst cand c)))
-            #'< :key #'second)))
+               #'< :key #'second)))
 
 
 (defun -glyph-generate-pts (xy bbox centroids nc ncn)
@@ -30,7 +31,7 @@
       (vec:with-xy (bbox bx by)
         (let ((cand (rnd:in-box bx by :xy xy)))
           (destructuring-bind (c dst)
-            (-get-dst centroids cand)
+            (get-dst centroids cand)
             (multiple-value-bind (val exists)
               (gethash c counts)
 
@@ -43,7 +44,7 @@
                     (progn
                       (setf (gethash c centroid-pts) (list cand))
                       (setf (gethash c counts) 1))))))))
-      until (-test-centroids counts nc ncn))
+      until (test-centroids counts nc ncn))
 
     (let ((pts (loop for i from 0 below nc
                           collect (gethash i centroid-pts))))

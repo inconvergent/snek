@@ -1,4 +1,5 @@
 
+![ex"](img/spline-script.lisp.png?raw=true "ex")
 ![ex](img/20170929-202315-243371-a317a96-6a592e5-003.png?raw=true "ex")
 ![ex](img/asemic-2.lisp.png?raw=true "ex")
 ![ex](img/asemic-3.lisp.png?raw=true "ex")
@@ -17,7 +18,6 @@
 ![ex"](img/grp.lisp.png?raw=true "ex")
 ![ex"](img/grp-path.lisp.png?raw=true "ex")
 ![ex"](img/lines.lisp.png?raw=true "ex")
-![ex"](img/lorem-ipsum.lisp.png?raw=true "ex")
 ![ex"](img/modules.lisp.png?raw=true "ex")
 ![ex"](img/path-step.lisp.png?raw=true "ex")
 ![ex"](img/rnd-path.lisp.png?raw=true "ex")

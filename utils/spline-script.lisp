@@ -1,51 +1,127 @@
 
-(load "../utils/lorem-common")
+(defstruct spline-glyph
+  (name nil :type character :read-only t)
+  (area 0d0 :type double-float :read-only t)
+  (nc 4 :type integer :read-only t)
+  (ncn 1 :type integer :read-only t)
+  (min-dst 0d0 :type double-float :read-only t)
+  (centroids nil :type list)
+  (bbox-fxn nil :type function)
+  (sort-fxn nil :type function)
+  (fxn (lambda (x) nil) :type function))
 
 
-(defun make-glyph (bbox-fxn estimate-nc-ncn-fxn sort-fxn
-                    &key (min-dst 0d0))
-  (destructuring-bind (nc ncn)
-    (funcall estimate-nc-ncn-fxn bbox-fxn)
-
-    (let* ((centroids (angle-sort-centroids
-                        (get-centroids bbox-fxn min-dst nc)
-                        (funcall sort-fxn))))
-      (lambda ()
-        (let ((counts (make-hash-table :test #'equal))
-              (centroid-pts (make-hash-table :test #'equal)) )
-          (loop for i from 0 do
-            (let ((cand (first (funcall bbox-fxn 1))))
-              (destructuring-bind (c dst)
-                (-get-dst centroids cand)
+(defun test-centroids (counts nc ncn)
+  (reduce (lambda (x y) (and x y))
+          (loop for i from 0 below nc collect
                 (multiple-value-bind (val exists)
-                  (gethash c counts)
-
-                  (cond ((and exists (< val ncn))
-                         (setf (gethash c centroid-pts)
-                               (append (list cand) (gethash c centroid-pts)))
-                         (incf (gethash c counts)))
-                        ((not exists)
-                         (setf (gethash c centroid-pts) (list cand)
-                               (gethash c counts) 1))))))
-                        ;else: exists and has too many pts
-            until (-test-centroids counts nc ncn))
-
-          (apply #'append (loop for i from 0 below nc
-                              collect (gethash i centroid-pts))))))))
+                  (gethash i counts)
+                  (and exists (>= val ncn))))))
 
 
-(defun get-alphabet (letters &key bbox-fxn
+(defun get-dst (centroids cand)
+  (first (sort (loop for c in centroids
+                     and i from 0
+                     collect (list i (vec:dst cand c)))
+               #'< :key #'second)))
+
+
+(defun get-centroids (bbox-fxn dst nc)
+  (let ((hits 1)
+        (centroids (funcall bbox-fxn 1)))
+    (loop for i from 0 do
+      (let ((cand (first (funcall bbox-fxn 1))))
+        (if (reduce (lambda (a b) (and a b))
+            (mapcar (lambda (d) (> d dst))
+                    (math:vdst centroids cand)))
+          (progn (setf centroids (append (list cand) centroids))
+                 (incf hits))))
+      until (>= hits nc))
+    centroids))
+
+
+(defun angle-sort-centroids (centroids order-fxn)
+  (mapcar #'second
+    (sort (loop for c in centroids
+                collect (list (apply #'atan (reverse (vec:tolist c))) c))
+          order-fxn :key #'first)))
+
+
+(defun -do-test-cand (gl centroid-pts counts cand)
+  (destructuring-bind (c dst)
+    (get-dst (spline-glyph-centroids gl) cand)
+    (multiple-value-bind (val exists)
+      (gethash c counts)
+
+      (cond ((and exists (< val (spline-glyph-ncn gl)))
+             (setf (gethash c centroid-pts)
+                   (append (list cand) (gethash c centroid-pts)))
+             (incf (gethash c counts)))
+            ((not exists)
+             (setf (gethash c centroid-pts) (list cand)
+                   (gethash c counts) 1))))))
+            ;else: exists and has too many pts
+
+
+(defun make-glyph (name bbox-fxn nc-ncn-fxn sort-fxn
+                    &key (min-dst 0d0))
+  (destructuring-bind (area nc ncn)
+    (funcall nc-ncn-fxn bbox-fxn)
+
+    (let ((gl (make-spline-glyph
+                :name name
+                :area area
+                :nc nc
+                :ncn ncn
+                :min-dst min-dst
+                :centroids (angle-sort-centroids
+                             (get-centroids bbox-fxn min-dst nc)
+                             (funcall sort-fxn))
+                :bbox-fxn bbox-fxn
+                :sort-fxn (if sort-fxn sort-fxn (lambda (x) x)))))
+      (setf (spline-glyph-fxn gl)
+            (lambda ()
+              (let ((counts (make-hash-table :test #'equal))
+                    (centroid-pts (make-hash-table :test #'equal)) )
+                (loop for i from 0 do
+                  (-do-test-cand gl
+                                 centroid-pts
+                                 counts
+                                 (first (funcall (spline-glyph-bbox-fxn gl) 1)))
+                  until (test-centroids counts nc ncn))
+
+                (apply #'append (loop for i from 0 below nc
+                                    collect (gethash i centroid-pts))))))
+      gl)))
+
+
+(defun get-alphabet (letters &key get-bbox-fxn
                                   nc-ncn-fxn
                                   (sort-fxn (lambda () #'<))
                                   (min-dst 0d0))
   (let ((alphabet (make-hash-table :test #'equal)))
     (loop for i from 0 and c across letters do
-          (format t "~a ~a ~%" c
-                  (setf (gethash c alphabet)
-                        (make-glyph (funcall bbox-fxn)
-                                    nc-ncn-fxn
-                                    sort-fxn))))
+          (setf (gethash c alphabet)
+                (make-glyph c
+                            (funcall get-bbox-fxn)
+                            nc-ncn-fxn
+                            sort-fxn
+                            :min-dst min-dst)))
     alphabet))
+
+
+(defun show-alphabet (alphabet)
+  (format t "~%")
+  (loop for c being the hash-keys in alphabet do
+        (let ((a (gethash c alphabet)))
+          (format t "char: ~a area: ~,1f nc: ~a ncn: ~a min-dst: ~,1f~%"
+            (spline-glyph-name a)
+            (spline-glyph-area a)
+            (spline-glyph-nc a)
+            (spline-glyph-ncn a)
+            (spline-glyph-min-dst a))))
+  (format t "~%")
+  alphabet)
 
 
 (defun do-write (snk alphabet bbox trbl words &key (tweak-fxn))
@@ -69,7 +145,7 @@
             (loop for c across word do
               (format t "~a" c)
               (aif (gethash c alphabet)
-                (snek:add-path! snk (math:vadd (funcall it) cursor) :g g))
+                (snek:add-path! snk (math:vadd (funcall (spline-glyph-fxn it)) cursor) :g g))
               (setf cursor (vec:add cursor (vec:vec bx 0d0))))
             (setf cursor (vec:add cursor (vec:vec bx 0d0)))
             (format t " ")))))))

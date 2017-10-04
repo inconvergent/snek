@@ -8,7 +8,7 @@ importantly it is a programming pattern for applying changes to the structure.
 It is specifically written to be useful for a broad range of ways in which I
 usually write generative algorithms for creating art.
 
-![head](img/lorem-ipsum.lisp.png?raw=true "ex")
+![head](img/spline-script.lisp.png?raw=true "ex")
 
 ![head](img/cells.lisp.png?raw=true "ex")
 

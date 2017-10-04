@@ -10,18 +10,14 @@
 (setf *random-state* (make-random-state t))
 
 
-;(vec:vec 1d0 (+ 1d0 (* 2d0 (rnd:norm))))
 (defun scale ()
   (if (< (rnd:rnd) 0.15)
-    (vec:vec 1d0 3.5d0)
+    (vec:vec 1.3d0 4.5d0)
     (vec:vec 1d0 1d0)))
 
 
-;(defun shape (n bx by)
-;  (rnd:nin-box n bx by))
-
-
 (defun shape (n bx by)
+  ;(rnd:nin-box n bx by)
   (math:vmult (rnd:nin-circ n 1d0) (vec:vec bx by)))
 
 
@@ -48,8 +44,9 @@
 
 (defun main (size fn)
   (let ((trbl (list 70d0 950d0 950d0 55d0))
-        (bbox (vec:vec 20d0 35d0))
-        (spacebox (vec:vec 14d0 30d0)) (sand (sandpaint:make size
+        (bbox (vec:vec 15d0 20d0))
+        (spacebox (vec:vec 10d0 25d0))
+        (sand (sandpaint:make size
                 :active (color:black 0.009)
                 :bg (color:white))))
 
@@ -63,18 +60,20 @@
        (estimate-nc-ncn-fxn (bbox-fxn)
          (let* ((samples (funcall bbox-fxn 1000))
                 (mid (math:mid samples))
-                (ma (apply #'max (mapcar (lambda (a) (vec:dst a mid)) samples))))
-           (if (< ma 30d0)
-             (list 4 1)
-             (list 7 1)))))
+                (area (apply #'max (mapcar (lambda (a) (vec:dst a mid)) samples))))
+           (if (< area 30d0)
+             (list area 4 1)
+             (list area 7 1)))))
 
-      (let ((alphabet (get-alphabet "abcdefghijklmnopqrstuvwxyz.,?-—:'"
-                                    :bbox-fxn #'get-bbox-fxn
-                                    :nc-ncn-fxn #'estimate-nc-ncn-fxn
-                                    :sort-fxn (lambda () (if (< (rnd:rnd) 0.5) #'< #'>))
-                                    ;:sort-fxn (lambda () #'>)
-                                    :min-dst 16d0))
-            (words (apply #'append (get-words* *snowman*)))
+      (let ((alphabet (show-alphabet (get-alphabet
+                        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?-—:'"
+                        :get-bbox-fxn #'get-bbox-fxn
+                        :nc-ncn-fxn #'estimate-nc-ncn-fxn
+                        ;:sort-fxn (lambda () (if (< (rnd:rnd) 0.5) #'< #'>))
+                        :sort-fxn (lambda () #'>)
+                        :min-dst 5d0)) )
+            (words (remove-if (lambda (x) (= 0 (second x)))
+                              (apply #'append (get-words* *alice*))) )
             (wind 0))
 
         (loop for k from 0 do
