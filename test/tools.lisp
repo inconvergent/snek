@@ -1,7 +1,7 @@
 #!/usr/bin/sbcl --script
 
 (load "../src/load")
-(load "../src/test-utils")
+(load "../utils/test")
 
 (setf *print-pretty* t)
 ;(setf *random-state* (make-random-state t))
@@ -75,7 +75,24 @@
 
   (do-test
     (math:range 5)
-    (list 0 1 2 3 4)))
+    (list 0 1 2 3 4))
+
+  (do-test
+    (let ((a (list)))
+      (math:with-linspace (10 0 7 v)
+        (setf a (append a (list v))))
+      a)
+   '(0.0d0 0.7777777777777778d0 1.5555555555555556d0 2.3333333333333335d0
+     3.111111111111111d0 3.888888888888889d0 4.666666666666667d0
+     5.444444444444445d0 6.222222222222222d0 7.0d0))
+
+  (do-test
+    (let ((a (list)))
+      (math:with-linspace (10 0 7 v :end nil)
+        (setf a (append a (list v))))
+      a)
+   '(0.0d0 0.7d0 1.4d0 2.0999999999999996d0 2.8d0 3.5d0 4.199999999999999d0
+     4.8999999999999995d0 5.6d0 6.3d0)))
 
 
 (defun test-rnd ()
@@ -125,14 +142,57 @@
 
   (do-test
     (rnd:bernoulli 4 0.5d0)
-    '(1.0d0 0.0d0 1.0d0 1.0d0)))
+    '(1.0d0 0.0d0 1.0d0 1.0d0))
+
+  (do-test
+    (let ((a (list)))
+      (rnd:with-rndspace (10 0 7 v)
+        (setf a (append a (list v))))
+      a)
+   '(2.73326206290543d0 2.5174792293563932d0 5.492487217048299d0
+     0.8618046408852795d0 2.912954306365479d0 0.3832001981545001d0
+     5.658914926195944d0 4.938674655516505d0 1.2995342771249945d0
+     4.988832033228634d0))
+
+  (do-test
+    (let ((a (list)))
+      (rnd:with-on-line (10 (vec:vec 1d0 1d0) (vec:vec 4d0 3d0) v)
+        (setf a (append a (list v))))
+      a)
+   (list (vec:vec 3.7897981545625967d0 2.8598654363750646d0)
+     (vec:vec 1.9266297402105108d0 1.6177531601403405d0)
+     (vec:vec 3.369449051067272d0 2.5796327007115147d0)
+     (vec:vec 3.32377437182065d0 2.5491829145471d0)
+     (vec:vec 2.361727725379886d0 1.9078184835865906d0)
+     (vec:vec 3.3314165940732083d0 2.554277729382139d0)
+     (vec:vec 3.564957983831045d0 2.7099719892206964d0)
+     (vec:vec 3.6167039238406335d0 2.744469282560422d0)
+     (vec:vec 3.1760698181146694d0 2.450713212076446d0)
+     (vec:vec 1.722159859605987d0 1.4814399064039914d0)))
+
+  (do-test
+    (let ((a (list)))
+      (rnd:with-in-circ (10 4d0 v)
+        (setf a (append a (list v))))
+      a)
+   (list (vec:vec -0.07830617141453823d0 3.774842729366861d0)
+    (vec:vec 2.3187613674262915d0 1.4252420586175507d0)
+    (vec:vec -3.6546913702638513d0 1.3813556993510603d0)
+    (vec:vec -3.223689839141369d0 -0.7084515558056096d0)
+    (vec:vec 0.3865758976293442d0 0.2604878618572206d0)
+    (vec:vec 3.6963189738171387d0 0.16029456431539973d0)
+    (vec:vec 2.841691265696788d0 2.1785347320092394d0)
+    (vec:vec -0.7750888988507254d0 2.7276191111527326d0)
+    (vec:vec 3.8790493728853868d0 -0.9273296463132351d0)
+    (vec:vec 3.4327330352383156d0 1.666830970905641d0))))
 
 
 (defun test-bzspl ()
 (let ((pts-a (list (vec:vec -20.0d0 99.0d0) (vec:vec 0.0d0 1.0d0)
                    (vec:vec 10.0d0 20.0d0) (vec:vec 100.0d0 100.0d0)))
-      (pts-b (list (vec:vec -20.0d0 99.0d0) (vec:vec 0.0d0 1.0d0) (vec:vec 10.0d0 20.0d0)
-                   (vec:vec 100.0d0 100.0d0) (vec:vec -3.0d0 -17.0d0) (vec:vec 0.0d0 4.0d0))))
+      (pts-b (list (vec:vec -20.0d0 99.0d0) (vec:vec 0.0d0 1.0d0)
+                   (vec:vec 10.0d0 20.0d0) (vec:vec 100.0d0 100.0d0)
+                   (vec:vec -3.0d0 -17.0d0) (vec:vec 0.0d0 4.0d0))))
     (do-test
       (bzspl:pos* (bzspl:make pts-a) (math:linspace 10 0 1))
       (list (vec:vec -20.0d0 99.0d0)
@@ -183,7 +243,19 @@
             (vec:vec -1.5d0 -6.5d0)
             (vec:vec -4.611111111111115d0 23.944444444444468d0)
             (vec:vec -14.444444444444446d0 72.44444444444446d0)
-            (vec:vec -10.0d0 50.0d0)))))
+            (vec:vec -10.0d0 50.0d0)))
+
+    (do-test
+      (let ((a (list)))
+        (bzspl:with-rndpos ((bzspl:make pts-b :closed t) 5 v)
+          (setf a (append a (list v))))
+        a)
+      (list (vec:vec -1.9011495477473404d0 5.771529193705514d0)
+       (vec:vec 66.58564568777904d0 69.99570477122477d0)
+       (vec:vec -1.3111764746287196d0 -2.3624798058613172d0)
+       (vec:vec -1.5299632552458968d0 1.887867752425192d0)
+       (vec:vec -0.6475631585093453d0 14.113732660191175d0))))
+)
 
 
 (defun test-hset ()

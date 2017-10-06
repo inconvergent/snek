@@ -47,14 +47,10 @@
           ))
 
       (snek:itr-grps (snk g)
-        (sandpaint:pix sand
-          (bzspl:rndpos (snek:get-grp-as-bzspl snk g) 100)))
-
-      )
+        (sandpaint:bzspl-stroke sand (snek:get-grp-as-bzspl snk g) 100)))
 
       (snek:itr-grps (snk g)
-        (sandpaint:pix sand
-          (bzspl:rndpos (snek:get-grp-as-bzspl snk g) 50000)))
+        (sandpaint:bzspl-stroke sand (snek:get-grp-as-bzspl snk g) 50000))
 
       ;(snek:itr-grps (snk g)
       ;  (sandpaint:lin-path sand

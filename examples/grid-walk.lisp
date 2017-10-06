@@ -47,7 +47,7 @@
           (if (< x 0.0d0)
             (-swap n* m* n m))
           (setf x (mod x 1.0d0))
-          (math:on-line x
+          (vec:on-line x
             (nth (mod m ngrid) (nth (mod n ngrid) grid))
             (nth (mod m* ngrid) (nth (mod n* ngrid) grid))))))))
 

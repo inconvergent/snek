@@ -75,8 +75,9 @@
             (snek:itr-all-verts (snk v)
               (snek:move-vert? v (rnd:in-circ 0.4d0))))
           (snek:itr-grps (snk g)
-            (sandpaint:pix sand
-              (bzspl:rndpos (bzspl:make (snek:get-grp-verts snk :g g)) 200))))))
+            (sandpaint:bzspl-stroke sand
+              (bzspl:make (snek:get-grp-verts snk :g g))
+              200)))))
 
     (sandpaint:save sand fn :gamma 1.5)))
 

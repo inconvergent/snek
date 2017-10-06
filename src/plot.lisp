@@ -46,7 +46,7 @@
         (cov-count 0)
         (cov (make-vec)))
     (loop for s in (math:linspace itt 0.0 1.0) do
-      (vec:inside* (size (math:on-line s a b) x y)
+      (vec:inside* (size (vec:on-line s a b) x y)
         (incf cov-count (if (> (aref coverage x y) 0) 1 0))
         (vector-push-extend (list x y) cov)))
 
@@ -63,7 +63,7 @@
     for a in path and b in (cdr path) do
       (let ((n (* 2 (round (vec:dst a b)))))
         (loop for s in (math:linspace n 0.0 1.0) do
-          (vec:inside* (size (math:on-line s a b) x y)
+          (vec:inside* (size (vec:on-line s a b) x y)
             (incf (aref coverage x y)))))))
 
 

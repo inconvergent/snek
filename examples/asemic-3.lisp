@@ -120,7 +120,7 @@
               (snek:move-vert? v (funcall state-gen v 0.00001d0))))
           (snek:itr-grps (snk g)
             ;(sandpaint:set-rgba sand (funcall r))
-            (sandpaint:pix sand (bzspl:rndpos (snek:get-grp-as-bzspl snk g) grains))))))
+            (sandpaint:bzspl-stroke sand (snek:get-grp-as-bzspl snk g) grains)))))
 
     ;(draw-grid size border line-chars line-num 18d0 33d0 0.8d0 60 sand)
 

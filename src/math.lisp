@@ -64,6 +64,19 @@
   (mod (+ x stp) 1d0))
 
 
+(defmacro with-linspace ((n a b rn &key (end t)) &body body)
+  (with-gensyms (a* b* n* nn i ba)
+  `(let* ((,n* (int ,n))
+          (,nn (dfloat (if ,end (1- ,n*) ,n*)))
+          (,a* (dfloat ,a))
+          (,b* (dfloat ,b))
+          (,ba (- ,b* ,a*)))
+    (loop for ,i from 0 below ,n* do
+      (let ((,rn (dfloat (+ ,a* (* ,i (/ ,ba ,nn))))))
+        (progn ,@body))))))
+
+
+
 (defun linspace (n a b &key (end t))
   ; TODO
   ; (declare (double-float a b))
@@ -79,27 +92,9 @@
 ; LIST MATH
 
 
-(defun dst (a b)
-  (declare (list a b))
-  (mapcar #'vec:dst a b))
-
-
-(defun vdst (aa b)
-  (declare (list aa))
-  (declare (vec:vec b))
-  (loop for a in aa collect (vec:dst a b)))
-
-
 (defun add (a b)
   (declare (list a b))
   (mapcar #'+ a b))
-
-
-(defun vadd (aa b)
-  (declare (list aa))
-  (declare (vec:vec b))
-  (mapcar (lambda (a) (vec:add a b))
-          aa))
 
 
 (defun sub (a b)
@@ -107,23 +102,9 @@
   (mapcar #'- a b))
 
 
-(defun vsub (aa b)
-  (declare (list aa))
-  (declare (vec:vec b))
-  (mapcar (lambda (a) (vec:sub a b))
-          aa))
-
-
 (defun mult (a b)
   (declare (list a b))
   (mapcar #'* a b))
-
-
-(defun vmult (aa b)
-  (declare (list aa))
-  (declare (vec:vec b))
-  (mapcar (lambda (a) (vec:mult a b))
-          aa))
 
 
 (defun div (a b)
@@ -131,70 +112,31 @@
   (mapcar #'/ a b))
 
 
-(defun vdiv (aa b)
+(defun scale (aa bb)
+  (declare (list aa bb))
+  (mapcar (lambda (a b) (* a b)) aa bb))
+
+
+(defun scale* (aa s)
   (declare (list aa))
-  (declare (vec:vec b))
-  (mapcar (lambda (a) (vec:div a b))
-          aa))
+  (declare (double-float s))
+  (mapcar (lambda (a) (* a s)) aa))
 
 
-(defun mid (aa)
+(defun iscale (aa bb)
+  (declare (list aa bb))
+  (mapcar (lambda (a b) (/ a b)) aa bb))
+
+
+(defun iscale* (aa s)
   (declare (list aa))
-  (let ((n 0))
-    (vec:iscale
-      (reduce (lambda (a b) (incf n) (vec:add a b))
-              aa)
-      (math:dfloat n))))
-
-
-; TODO: this is inconsistent
-(defun scale (a s)
-  (declare (list a))
   (declare (double-float s))
-  (mapcar (lambda (i) (* i s)) a))
-
-
-; TODO: this is inconsistent
-(defun iscale (a s)
-  (declare (list a))
-  (declare (double-float s))
-  (mapcar (lambda (i) (/ i s)) a))
+  (mapcar (lambda (a) (/ a s)) aa))
 
 
 (defun sum (a)
   (declare (list a))
   (reduce #'+ a))
 
-
-; SHAPES
-; TODO: new package
-
-
-(defun on-circ (p rad &key (xy (vec:zero)))
-  (declare (double-float p rad))
-  (declare (vec:vec xy))
-  (vec:add xy (vec:scale (vec:cos-sin (* p PII)) rad)))
-
-
-(defun on-line (p a b)
-  (declare (double-float p))
-  (declare (vec:vec a b))
-  (vec:add a (vec:scale (vec:sub b a) p)))
-
-
-(defun on-spiral (p rad &key (xy (vec:zero)) (rot 0.0d0))
-  (declare (double-float p rad rot))
-  (declare (vec:vec xy))
-  (vec:add xy (vec:scale (vec:cos-sin (+ rot (* p PII)))
-                         (* p rad))))
-
-
-(defun polygon (n rad &key (xy (vec:zero)) (rot 0.0d0))
-  (declare (integer n))
-  (declare (double-float rad rot))
-  (declare (vec:vec xy))
-  (loop for i from 0 below n collect (vec:add xy
-    (vec:scale
-      (vec:cos-sin (+ rot (* (/ i n) PII)))
-      rad))))
+; TODO: expt, sqrt, ...
 

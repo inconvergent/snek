@@ -33,7 +33,7 @@
       (let ((cand (first (funcall bbox-fxn 1))))
         (if (reduce (lambda (a b) (and a b))
             (mapcar (lambda (d) (> d dst))
-                    (math:vdst centroids cand)))
+                    (vec:ldst* centroids cand)))
           (progn (setf centroids (append (list cand) centroids))
                  (incf hits))))
       until (>= hits nc))
@@ -145,7 +145,7 @@
             (loop for c across word do
               (format t "~a" c)
               (aif (gethash c alphabet)
-                (snek:add-path! snk (math:vadd (funcall (spline-glyph-fxn it)) cursor) :g g))
+                (snek:add-path! snk (vec:ladd* (funcall (spline-glyph-fxn it)) cursor) :g g))
               (setf cursor (vec:add cursor (vec:vec bx 0d0))))
             (setf cursor (vec:add cursor (vec:vec bx 0d0)))
             (format t " ")))))))

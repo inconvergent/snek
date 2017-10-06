@@ -42,14 +42,10 @@
                         (r2 (rnd:rnd)))
                     ;(sandpaint:lin-path sand (lin-path:pos* pa (math:linspace 100 r1 r2)) 1.0 20)
                     ;(sandpaint:lin-path sand (lin-path:pos* pb (math:linspace 100 r1 r2)) 1.0 20)
-                    (math:rep (i (rnd:rndspace nsteps r1 r2))
+                    (rnd:with-rndspace (nsteps r1 r2 v)
                       (sandpaint:stroke sand
-                        (list
-                          (lin-path:pos pa i)
-                          (lin-path:pos pb i))
-                        grains)
-                      )
-                  ))))
+                        (list (lin-path:pos pa v) (lin-path:pos pb v))
+                        grains))))))
 
     (sandpaint:save sand fn)))
 

@@ -121,9 +121,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defmacro with-graph-edges ((grph e) &body body)
-  (let ((adj (gensym))
-        (a (gensym))
-        (b (gensym)))
+  (with-gensyms (adj a b)
     `(let ((,adj (graph-adj ,grph)))
       (loop for ,a integer being the hash-keys of ,adj collect
         (loop for ,b integer in (hset:to-list (gethash ,a ,adj))

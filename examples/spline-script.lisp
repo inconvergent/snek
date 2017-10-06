@@ -18,16 +18,27 @@
 
 (defun shape (n bx by)
   ;(rnd:nin-box n bx by)
-  (math:vmult (rnd:nin-circ n 1d0) (vec:vec bx by)))
+  (vec:lmult* (rnd:nin-circ n 1d0) (vec:vec bx by)))
+
+
+(defun draw-pix (sand bzs grains)
+  (sandpaint:bzspl-stroke sand bzs (* grains (bzspl::bzspl-n bzs))))
+
+
+(defun draw-varying-pix (sand bzs grains)
+  (sandpaint:pix sand (bzspl:pos* bzs
+    (mapcar (lambda (x) (expt x 0.6d0))
+      (rnd:rndspace (* grains (bzspl::bzspl-n bzs)) 0d0 1d0)))))
 
 
 (defun draw (snk sand plt)
   (let ((state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*))))
-        (grains 20))
+        (grains 15))
     (loop for p in (math:linspace 500 0 1)
           and i from 0 do
       (snek:with (snk)
         (snek:itr-all-verts (snk v)
+          (snek:move-vert? v (vec:scale (vec:sin-cos 0.1d0) 0.005d0))
           (snek:move-vert? v (rnd:in-circ 0.1d0))
           (snek:move-vert? v (funcall state-gen v 0.000008d0))))
       ;(sandpaint:set-rgba sand (color:hsv 0.55 (- 1.0 i) (- 1.0 i) 0.009))
@@ -37,9 +48,9 @@
             (when (= i 200)
               (plot:path plt (bzspl:rndpos it (* 50 (bzspl::bzspl-n it))
                                            :order t)))
-            (sandpaint:pix sand (bzspl:rndpos it
-                                 (* (rnd:rndi (- grains 5) (+ grains 5))
-                                    (bzspl::bzspl-n it))))))))))
+            (draw-pix sand it grains)
+            ;(draw-varying-pix sand it grains)
+            ))))))
 
 
 (defun main (size fn)
@@ -59,7 +70,7 @@
                       (shape n bx by))))))
        (estimate-nc-ncn-fxn (bbox-fxn)
          (let* ((samples (funcall bbox-fxn 1000))
-                (mid (math:mid samples))
+                (mid (vec:lmid samples))
                 (area (apply #'max (mapcar (lambda (a) (vec:dst a mid)) samples))))
            (if (< area 30d0)
              (list area 4 1)

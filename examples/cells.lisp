@@ -12,7 +12,7 @@
       (lambda (g) (let ((mid (rnd:in-circ (* 0.5d0 (- size 200d0)) :xy xy)))
                     (snek:add-path! snk
                       (math:rep (p (math:linspace n 0 1 :end nil))
-                        (math:on-circ p 20d0 :xy mid))
+                        (vec:on-circ p 20d0 :xy mid))
                       :g g
                       :closed t)))
       (math:nrep m (snek:add-grp! snk)))
@@ -38,14 +38,7 @@
                        (snek:verts-in-rad snk (snek:get-vert snk v) 60.0d0)))
           (snek:itr-grps (snk g)
             (snek:itr-edges (snk e :g g)
-              (snek:force? snk (first e) (second e) 0.1))))
-
-        (snek:itr-grps (snk g)
-          (sandpaint:pix
-            sand
-            (bzspl:rndpos
-              (bzspl:make (snek:get-grp-verts snk :g g) :closed t)
-              grains))))
+              (snek:force? snk (first e) (second e) 0.1)))))
 
     (sandpaint:save sand fn :gamma 1.5)))
 

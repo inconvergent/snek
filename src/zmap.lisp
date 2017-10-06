@@ -6,9 +6,7 @@
 ; regardless of whether we are using the parallel version of zmap (not yet
 ; implemented)
 (defmacro with* ((zw verts num-verts context-fxn) &body body)
-  (let ((zw* (gensym))
-        (verts* (gensym))
-        (num-verts* (gensym)))
+  (with-gensyms (zw* verts* num-verts*)
     `(let ((,zw* ,zw))
       (when ,zw*
         (let ((,verts* ,verts)
@@ -18,8 +16,7 @@
 
 
 (defmacro -extend ((za zb z) &body body)
-  (let ((a (gensym))
-        (b (gensym)))
+  (with-gensyms (a b)
     `(let ((,z nil))
       (declare (list ,z))
       (dolist (,a '(-1 0 1))

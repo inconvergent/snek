@@ -32,7 +32,7 @@
 ;  (let ((snk (snek:make :max-verts (* snum n))))
 ;    (loop for rot in (math:linspace snum 0d0 (* 2d0 pi) :end nil) collect
 ;      (snek:add-path! snk (math:rep (p (math:linspace n 0d0 10d0))
-;                            (math:on-spiral p rad :rot rot :xy xy))
+;                            (vec:on-spiral p rad :rot rot :xy xy))
 ;                      :g (snek:add-grp! snk)))
 ;  snk))
 
@@ -78,8 +78,8 @@
                   (bzb (snek:get-grp-as-bzspl snk gb)))
               (sandpaint:dens-stroke sand
                 (list (bzspl:pos bza m) (bzspl:pos bzb m)) dens )
-              (sandpaint:pix sand (bzspl:rndpos bza vgrains))
-              (sandpaint:pix sand (bzspl:rndpos bzb vgrains)))))))
+              (sandpaint:bzspl-stroke sand bza vgrains)
+              (sandpaint:bzspl-stroke sand bzb vgrains))))))
 
     (sandpaint:save sand fn :gamma 1.1)))
 

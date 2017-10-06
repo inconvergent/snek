@@ -13,7 +13,7 @@
   (let ((snk (snek:make)))
     (mapcar (lambda (g)
               (snek:add-path! snk
-                (math:rep (p (math:linspace n 0 1)) (math:on-circ p 600d0 :xy xy))
+                (math:rep (p (math:linspace n 0 1)) (vec:on-circ p 600d0 :xy xy))
                 :g g))
             (math:nrep m (snek:add-grp! snk)))
     snk))
@@ -65,12 +65,9 @@
             ;(sandpaint:set-rgba sand (color:hsv 0.51 1 1 0.05))
             (snek:itr-grps (snk g)
               ; draw random dots along the bezier spline.
-              (sandpaint:pix
-                sand
-                (bzspl:rndpos
-                  ; make a bezier spline through the verts of g
-                  (bzspl:make (snek:get-grp-verts snk :g g) :closed t)
-                  grains)))))
+              (sandpaint:bzspl-stroke sand
+                (bzspl:make (snek:get-grp-verts snk :g g) :closed t)
+                grains))))
 
     (sandpaint:save sand fn :gamma 1.5)))
 

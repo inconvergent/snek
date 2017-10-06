@@ -26,8 +26,8 @@
             (p2 (vec:vec 900d0 i)))
 
         (loop for s in (math:linspace itt 0.0 1.0) do
-          (let ((v1 (snek:add-vert! snk (math:on-line s p1 p2)))
-                (v2 (snek:add-vert! snk (vec:add va (math:on-line s p1 p2)))))
+          (let ((v1 (snek:add-vert! snk (vec:on-line s p1 p2)))
+                (v2 (snek:add-vert! snk (vec:add va (vec:on-line s p1 p2)))))
 
             (setf va (vec:add va (rnd:in-circ (* 0.7d0 j))))
             (setf vb (vec:add vb (rnd:in-circ (* 0.001d0 j))))

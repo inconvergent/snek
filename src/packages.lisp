@@ -17,23 +17,38 @@
     :inside*
     :iscale
     :isub
-    :tolist
+    :ladd
+    :ladd*
+    :ldiv
+    :ldiv*
+    :ldst
+    :ldst*
     :len
     :len2
     :lmid
+    :lmid
+    :lmult
+    :lmult*
     :lround
+    :lsub
+    :lsub*
     :mid
     :mult
     :norm
     :nsub
+    :on-circ
+    :on-line
+    :on-spiral
     :one
     :perp
+    :polygon
     :rep
     :rot
     :scale
     :sin-cos
     :sub
     :sum
+    :tolist
     :v
     :vec
     :vec*
@@ -41,6 +56,7 @@
     :zero
     :with-xy)
   (:import-from :common-lisp-user
+    :PII
     :with-gensyms))
 
 (defpackage :math
@@ -56,29 +72,21 @@
     :int
     :int*
     :iscale
+    :iscale*
     :lget
     :linspace
-    :mid
     :mult
     :nrep
-    :on-circ
-    :on-line
-    :on-spiral
-    :polygon
     :range
     :rep
     :scale
+    :scale*
     :sfloat
     :sfloat*
     :sub
     :sum
-    :vadd
-    :vdiv
-    :vdst
-    :vmult
-    :vsub)
+    :with-linspace)
   (:import-from :common-lisp-user
-    :PII
     :with-gensyms))
 
 
@@ -103,7 +111,6 @@
     :norm
     :nrnd
     :nrnd*
-    :nrndbtwn
     :nrndi
     :nrndi*
     :on-circ
@@ -114,7 +121,10 @@
     :rndi
     :rndi*
     :rndspace
-    :rndspacei)
+    :rndspacei
+    :with-on-line
+    :with-in-circ
+    :with-rndspace)
   (:import-from :common-lisp-user
     :PII
     :with-gensyms))
@@ -165,7 +175,8 @@
   (:import-from :common-lisp-user
     :flatten
     :make-vec
-    :with-struct))
+    :with-struct
+    :with-gensyms))
 
 
 (defpackage :bzspl
@@ -175,8 +186,10 @@
     :pos*
     :rndpos
     :make
-    :move)
+    :move
+    :with-rndpos)
   (:import-from :common-lisp-user
+    :with-gensyms
     :make-dfloat-array
     :with-struct))
 
@@ -203,7 +216,8 @@
   (:import-from :common-lisp-user
     :get-dfloat-tup
     :make-int-vec
-    :with-struct))
+    :with-struct
+    :with-gensyms))
 
 (defpackage :sandpaint
   (:use :common-lisp)
@@ -215,6 +229,7 @@
     :dens-stroke
     :lin-path
     :make
+    :bzspl-stroke
     :pix
     :pix*
     :pixel-hack

@@ -46,7 +46,7 @@
           (if (< x 0.0d0)
             (-swap n* m* n m))
           (setf x (mod x 1.0d0))
-          (math:on-line x
+          (vec:on-line x
             (nth (mod m ngrid) (nth (mod n ngrid) grid))
             (nth (mod m* ngrid) (nth (mod n* ngrid) grid))))))))
 
@@ -70,17 +70,16 @@
       (loop for i from 0 below itt do
         (print-every i 100000)
         (sandpaint:set-rgba sand (color:hsv 0.51 1 1 0.05))
-        (sandpaint:pix sand
-          (bzspl:rndpos
-            (bzspl:make (loop for w in walkers-a collect
-                           (funcall w noise)) :closed t)
-            grains))
+        (sandpaint:bzspl-stroke sand
+          (bzspl:make (loop for w in walkers-a collect (funcall w noise))
+                      :closed t)
+          grains)
+
         (sandpaint:set-rgba sand (color:hsv 0.91 1 1 0.05))
-        (sandpaint:pix sand
-          (bzspl:rndpos
-            (bzspl:make (loop for w in walkers-b collect
-                           (funcall w noise)) :closed t)
-            grains))))
+        (sandpaint:bzspl-stroke sand
+          (bzspl:make (loop for w in walkers-b collect (funcall w noise))
+                      :closed t)
+          grains)))
 
     (sandpaint:save sand fn :gamma 1.5)))
 

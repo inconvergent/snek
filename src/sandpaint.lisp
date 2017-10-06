@@ -46,16 +46,16 @@
   (declare (integer grains))
   (declare (double-float r g b a))
   (declare (type (array double-float) vals))
-  (loop for i integer from 0 below grains do
-    (vec:inside* (size (rnd:on-line v1 v2) x y)
+  (rnd:with-on-line (grains v1 v2 rn)
+    (vec:inside* (size rn x y)
       (-operator-over vals x y r g b a))))
 
 
 (defun -draw-dens-stroke (vals size dens v1 v2 r g b a)
   (declare (double-float dens r g b a))
   (declare (type (array double-float) vals))
-  (loop for i integer from 0 below (ceiling (* dens (vec:dst v1 v2))) do
-    (vec:inside* (size (rnd:on-line v1 v2) x y)
+  (rnd:with-on-line ((ceiling (* dens (vec:dst v1 v2))) v1 v2 rn)
+    (vec:inside* (size rn x y)
       (-operator-over vals x y r g b a))))
 
 
@@ -76,11 +76,12 @@
   (a 1.0d0 :type double-float :read-only nil))
 
 
+; TODO: with-in-circ
 (defun -draw-circ (vals size xy rad grains r g b a)
   (declare (integer grains))
   (declare (double-float rad r g b a))
   (declare (type (array double-float) vals))
-  (loop for i integer below grains do
+  (loop repeat grains do
     (vec:inside* (size (vec:add xy (rnd:in-circ rad)) x y)
       (-operator-over vals x y r g b a))))
 
@@ -220,6 +221,14 @@
       (-draw-circ vals size v rad n r g b a))))
 
 
+(defun bzspl-stroke (sand bz n)
+  (declare (integer n))
+  (with-struct (sandpaint- size vals r g b a) sand
+    (bzspl:with-rndpos (bz n v)
+      (vec:inside* (size v x y)
+        (-operator-over vals x y r g b a)))))
+
+
 ; draw circ from array
 (defun circ* (sand vv num rad grains)
   (declare (type (array double-float) vv))
@@ -261,6 +270,7 @@
       (-draw-dens-stroke vals size dens u v r g b a))))
 
 
+; TODO: this is slow
 (defun lin-path (sand path rad grains &key (dens 1d0))
   (declare (double-float rad dens))
   (declare (integer grains))
@@ -270,7 +280,7 @@
       (let ((stps (math:int (floor (+ 1 (* dens (vec:dst u w)))))))
         (declare (integer stps))
         (math:rep (p (math:linspace stps 0 1 :end nil))
-          (-draw-circ vals size (math:on-line p u w) rad grains r g b a))))))
+          (-draw-circ vals size (vec:on-line p u w) rad grains r g b a))))))
 
 
 ; TODO: 16 bit?

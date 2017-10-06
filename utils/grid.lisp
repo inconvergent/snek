@@ -15,8 +15,8 @@
 
 (defun get-stroke-grid (n m rad angle v w)
   (loop for i in (math:linspace n 0d0 1d0) collect
-    (let* ((ivw (math:on-line i v w))
+    (let* ((ivw (vec:on-line i v w))
            (p (vec:add ivw (vec:scale (vec:cos-sin angle) rad))))
       (loop for ip in (math:linspace m 0d0 1d0) collect
-        (math:on-line ip ivw p)))))
+        (vec:on-line ip ivw p)))))
 

@@ -1,6 +1,7 @@
 #!/usr/bin/sbcl --script
 
 (load "../src/load")
+(load "../utils/time")
 
 (setf *print-pretty* t)
 ;(setf *random-state* (make-random-state t))
@@ -11,7 +12,7 @@
 
     (snek:add-path! snk
                     (math:rep (p (math:linspace n 0 1 :end nil))
-                         (math:on-circ p 20d0 :xy xy))
+                         (vec:on-circ p 20d0 :xy xy))
                     :closed t)
     snk))
 

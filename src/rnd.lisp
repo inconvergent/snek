@@ -22,7 +22,7 @@
 
 
 (defun nrndi (n a &optional b)
-  (loop for i from 0 below n collect (rndi a b)))
+  (loop repeat n collect (rndi a b)))
 
 
 (defun rndi* (ab)
@@ -34,7 +34,7 @@
 
 
 (defun nrndi* (n ab)
-  (loop for i from 0 below n collect (rndi ab)))
+  (loop repeat n collect (rndi ab)))
 
 
 (defun rnd (&optional (x 1.0d0))
@@ -45,10 +45,10 @@
 (defun nrnd (n &optional (x 1.0d0))
   (declare (integer n))
   (declare (double-float x))
-  (loop for i from 0 below n collect (rnd x)))
+  (loop repeat n collect (rnd x)))
 
 
-; TODO: nnorm
+; TODO: nnorm, with-norm
 (defun norm (&key (mu 0.0d0) (sigma 1d0))
   "
   box-muller transform
@@ -66,12 +66,6 @@
   (+ a (random (- b a))))
 
 
-(defun nrndbtwn (n a b)
-  (declare (integer n))
-  (declare (double-float a b))
-  (loop for i from 0 below n collect (rndbtwn a b)))
-
-
 (defun rnd* (&optional (x 1.0d0))
   (declare (double-float x))
   (- x (* 2.0d0 (random x))))
@@ -80,7 +74,17 @@
 (defun nrnd* (n &optional (x 1.0d0))
   (declare (integer n))
   (declare (double-float x))
-  (loop for i from 0 below n collect (rnd* x)))
+  (loop repeat n collect (rnd* x)))
+
+
+(defmacro with-rndspace ((n a b rn) &body body)
+  (with-gensyms (a* b* d)
+    `(destructuring-bind (,a* ,b*)
+      (sort (list (math:dfloat ,a) (math:dfloat ,b)) #'<)
+      (let ((,d (- ,b* ,a*)))
+        (loop repeat ,n do
+          (let ((,rn (+ ,a* (random ,d))))
+            (progn ,@body)))))))
 
 
 (defun rndspace (n a b &key order)
@@ -105,7 +109,7 @@
 (defun bernoulli (n p)
   (declare (integer n))
   (declare (double-float p))
-  (loop for i from 0 below n collect
+  (loop repeat n collect
     (if (< (rnd:rnd) p)
       1d0
       0d0)))
@@ -125,7 +129,16 @@
 (defun non-circ (n rad &key xy)
   (declare (integer n))
   (declare (double-float rad))
-  (loop for i from 0 below n collect (on-circ rad :xy xy)))
+  (loop repeat n collect (on-circ rad :xy xy)))
+
+
+(defmacro with-in-circ ((n rad v &key xy) &body body)
+  (with-gensyms (rad* xy*)
+    `(let ((,rad* ,rad)
+           (,xy* ,xy))
+      (loop repeat ,n do
+        (let ((,v (in-circ ,rad* :xy ,xy*)))
+          (progn ,@body))))))
 
 
 (defun in-circ (rad &key xy)
@@ -143,7 +156,7 @@
 (defun nin-circ (n rad &key xy)
   (declare (integer n))
   (declare (double-float rad))
-  (loop for i from 0 below n collect (in-circ rad :xy xy)))
+  (loop repeat n collect (in-circ rad :xy xy)))
 
 
 (defun in-box (sx sy &key xy)
@@ -154,7 +167,16 @@
 (defun nin-box (n sx sy &key xy)
   (declare (integer n))
   (declare (double-float sx sy))
-  (loop for i from 0 below n collect (in-box sx sy :xy xy)))
+  (loop repeat n collect (in-box sx sy :xy xy)))
+
+
+(defmacro with-on-line ((n a b rn) &body body)
+  (with-gensyms (sub a*)
+    `(let* ((,a* ,a)
+            (,sub (vec:sub ,b ,a*)))
+      (loop repeat ,n do
+        (let ((,rn (vec:add ,a* (vec:scale ,sub (random 1d0)))))
+          (progn ,@body))))))
 
 
 (defun on-line (a b)
@@ -165,7 +187,7 @@
 (defun non-line (n a b)
   (declare (integer n))
   (declare (vec:vec a b))
-  (loop for i from 0 below n collect (on-line a b)))
+  (loop repeat n collect (on-line a b)))
 
 
 ; WALKERS

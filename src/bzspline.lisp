@@ -38,24 +38,24 @@
 
 (defun do-m (pts)
   (loop for mrow in *m* collect
-    (let ((s (vec:Vec 0.0d0 0.0d0)))
+    (let ((s (vec:Vec 0d0 0d0)))
       (loop for p in pts and mr in mrow do
         (setf s (vec:add s (vec:scale p mr))))
       s)))
 
 
 (defun do-t (x pk)
-  (let ((s (vec:vec 0.0d0 0.0d0)))
-    (loop for p in pk and xi in (list 1.0d0 x (* x x)) do
+  (let ((s (vec:vec 0d0 0d0)))
+    (loop for p in pk and xi in (list 1d0 x (* x x)) do
       (setf s (vec:add s (vec:scale p xi))))
     s))
 
 
 (defun -get-seg-open (n x)
-  (let ((s (/ 1.0d0 (math:dfloat (- n 2)))))
-    (if (>= x 1.0d0)
+  (let ((s (/ 1d0 (math:dfloat (- n 2)))))
+    (if (>= x 1d0)
       (list
-        1.0d0
+        1d0
         (- (floor (/ x s)) 1))
       (list
         (/ (mod x s) s)
@@ -63,7 +63,7 @@
 
 
 (defun -get-seg-closed (n x)
-  (let ((s (/ 1.0d0 (math:dfloat n))))
+  (let ((s (/ 1d0 (math:dfloat n))))
     (list
       (/ (mod x s) s)
       (floor (/ x s)))))
@@ -116,10 +116,25 @@
         (do-t x-loc (do-m (funcall select-pts n pts seg)))))))
 
 
+(defmacro with-rndpos ((b n rn) &body body)
+  (with-gensyms (x-loc seg n* b* bn get-seg select-pts pts)
+    `(let* ((,b* ,b)
+            (,n* ,n)
+            (,bn (bzspl-n ,b*))
+            (,pts (bzspl-pts ,b*))
+            (,get-seg (bzspl-get-seg ,b*))
+            (,select-pts (bzspl-select-pts ,b*)))
+      (loop repeat ,n* do
+        (destructuring-bind (,x-loc ,seg)
+          (funcall ,get-seg ,bn (rnd:rnd))
+          (let ((,rn (do-t ,x-loc (do-m (funcall ,select-pts ,bn ,pts ,seg)))))
+            (progn ,@body)))))))
+
+
 (defun rndpos (b n &key order)
   (pos* b (if order
-            (sort (rnd:rndspace n 0.0d0 1.0d0) #'<)
-            (rnd:rndspace n 0.0d0 1.0d0))))
+            (sort (rnd:rndspace n 0d0 1d0) #'<)
+            (rnd:rndspace n 0d0 1d0))))
 
 
 (defun make (pts &key closed &aux (n (length pts)))
