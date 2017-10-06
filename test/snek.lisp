@@ -435,6 +435,10 @@
       '(0 1 2 3 4 5 6 7 8 9 10 11))
 
     (do-test
+      (flatten (snek:itr-all-verts (snk i :collect nil) i))
+      nil)
+
+    (do-test
       (sort (flatten (snek:itr-verts (snk i) i)) #'<)
       '(0 1 2 3 5 6 7 11))
 
@@ -501,8 +505,22 @@
         #(6 7))
 
       (do-test
+        (let ((a (list)))
+          (snek:with-verts-in-rad (snk (vec:vec 800d0 800d0) 200d0 v)
+            (setf a (append a (list v))))
+          a)
+        (list 6 7))
+
+      (do-test
         (sort (snek:verts-in-rad snk (vec:vec 500d0 500d0) 200.0d0) #'<)
-        #(3 4)))
+        #(3 4))
+
+      (do-test
+        (let ((a (list)))
+          (snek:with-verts-in-rad (snk (vec:vec 500d0 500d0) 200d0 v)
+            (setf a (append a (list v))))
+          a)
+        (list 3 4)))
 
     (snek:with (snk :zwidth 1000.0d0)
       (do-test

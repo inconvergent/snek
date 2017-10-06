@@ -42,7 +42,7 @@
                   (vec:add ns
                     (rnd:in-circ 0.05d0)))))))
 
-        (snek:itr-grps (snk g)
+        (snek:itr-grps (snk g :collect nil)
           (snek:draw-edges snk sand grains :g g))))
 
     (sandpaint:chromatic-aberration sand (vec:vec 500d0 500d0) :s 200d0)

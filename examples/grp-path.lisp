@@ -42,7 +42,7 @@
 
       (loop for i from 0 to itt do
         (print-every i 1000)
-        (snek:itr-grps (snk g)
+        (snek:itr-grps (snk g :collect nil)
           (destructuring-bind (path lina linb)
             (gethash g grp-states)
             (sandpaint:stroke sand

@@ -136,6 +136,13 @@
         (graph:del grph a b)))))
 
 
+(defmacro with-verts-in-rad ((snk xy rad v) &body body)
+  (with-gensyms (sname)
+    `(let ((,sname ,snk))
+      (zmap:with-verts-in-rad ((snek-zmap ,sname) (snek-verts ,sname) ,xy ,rad ,v)
+        (progn ,@body)))))
+
+
 (defun verts-in-rad (snk xy rad)
   (declare (vec:vec xy))
   (declare (double-float rad))

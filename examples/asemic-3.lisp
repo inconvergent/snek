@@ -118,7 +118,7 @@
             (snek:itr-all-verts (snk v)
               (snek:move-vert? v (rnd:in-circ 0.1d0))
               (snek:move-vert? v (funcall state-gen v 0.00001d0))))
-          (snek:itr-grps (snk g)
+          (snek:itr-grps (snk g :collect nil)
             ;(sandpaint:set-rgba sand (funcall r))
             (sandpaint:bzspl-stroke sand (snek:get-grp-as-bzspl snk g) grains)))))
 

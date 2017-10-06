@@ -112,7 +112,7 @@
 
 
 (defun arr-set (a i v)
-  (declare (vec:vec v))
+  (declare (vec v))
   (declare (integer i))
   (declare (type (array double-float) a))
   (setf (aref a i 0) (vec::vec-x v)
@@ -232,8 +232,8 @@
 
 (defun len2 (a)
   (declare (vec a))
-  (+ (expt (vec-x a) 2.d0)
-     (expt (vec-y a) 2.d0)))
+  (+ (expt (vec-x a) 2d0)
+     (expt (vec-y a) 2d0)))
 
 (defun len (a)
   (declare (vec a))
@@ -242,7 +242,7 @@
 
 (defun mid (a b)
   (declare (vec a b))
-  (iscale (add a b) 2.0d0))
+  (iscale (add a b) 2d0))
 
 
 (defun lmid (aa)
@@ -271,14 +271,14 @@
 
 (defun ldst* (aa b)
   (declare (list aa))
-  (declare (vec:vec b))
+  (declare (vec b))
   (loop for a in aa collect (dst a b)))
 
 
 (defun norm (a)
   (declare (vec a))
   (let ((l (len a)))
-    (if (> l 0.0d0) (iscale a l) a)))
+    (if (> l 0d0) (iscale a l) a)))
 
 
 (defun nsub (a b)
@@ -286,10 +286,20 @@
   (norm (sub a b)))
 
 
+(defun sum (aa)
+  (declare (list aa))
+  (reduce (lambda (a b) (declare (vec a b)) (add a b))
+          aa))
+
+
 (defun rot (v a)
-  (with-xy (v x y)
-    (vec (- (* x (cos a)) (* y (sin a)))
-         (+ (* x (sin a)) (* y (cos a))))))
+  (declare (vec v))
+  (declare (double-float a))
+  (let ((cosa (cos a))
+        (sina (sin a)))
+    (with-xy (v x y)
+      (vec (- (* x cosa) (* y sina))
+           (+ (* x sina) (* y cosa))))))
 
 ; TODO: cross
 
@@ -299,27 +309,27 @@
 
 (defun on-circ (p rad &key (xy (vec:zero)))
   (declare (double-float p rad))
-  (declare (vec:vec xy))
+  (declare (vec xy))
   (vec:add xy (vec:scale (vec:cos-sin (* p PII)) rad)))
 
 
 (defun on-line (p a b)
   (declare (double-float p))
-  (declare (vec:vec a b))
+  (declare (vec a b))
   (vec:add a (vec:scale (vec:sub b a) p)))
 
 
-(defun on-spiral (p rad &key (xy (vec:zero)) (rot 0.0d0))
+(defun on-spiral (p rad &key (xy (vec:zero)) (rot 0d0))
   (declare (double-float p rad rot))
-  (declare (vec:vec xy))
+  (declare (vec xy))
   (vec:add xy (vec:scale (vec:cos-sin (+ rot (* p PII)))
                          (* p rad))))
 
 
-(defun polygon (n rad &key (xy (vec:zero)) (rot 0.0d0))
+(defun polygon (n rad &key (xy (vec:zero)) (rot 0d0))
   (declare (integer n))
   (declare (double-float rad rot))
-  (declare (vec:vec xy))
+  (declare (vec xy))
   (loop for i from 0 below n collect (vec:add xy
     (vec:scale
       (vec:cos-sin (+ rot (* (/ i n) PII)))

@@ -40,13 +40,6 @@
     centroids))
 
 
-(defun angle-sort-centroids (centroids order-fxn)
-  (mapcar #'second
-    (sort (loop for c in centroids
-                collect (list (apply #'atan (reverse (vec:tolist c))) c))
-          order-fxn :key #'first)))
-
-
 (defun -do-test-cand (gl centroid-pts counts cand)
   (destructuring-bind (c dst)
     (get-dst (spline-glyph-centroids gl) cand)
@@ -74,11 +67,11 @@
                 :nc nc
                 :ncn ncn
                 :min-dst min-dst
-                :centroids (angle-sort-centroids
-                             (get-centroids bbox-fxn min-dst nc)
-                             (funcall sort-fxn))
+                :centroids (mapcar #'second
+                                   (funcall sort-fxn
+                                     (get-centroids bbox-fxn min-dst nc)))
                 :bbox-fxn bbox-fxn
-                :sort-fxn (if sort-fxn sort-fxn (lambda (x) x)))))
+                :sort-fxn sort-fxn)))
       (setf (spline-glyph-fxn gl)
             (lambda ()
               (let ((counts (make-hash-table :test #'equal))
@@ -97,7 +90,7 @@
 
 (defun get-alphabet (letters &key get-bbox-fxn
                                   nc-ncn-fxn
-                                  (sort-fxn (lambda () #'<))
+                                  sort-fxn
                                   (min-dst 0d0))
   (let ((alphabet (make-hash-table :test #'equal)))
     (loop for i from 0 and c across letters do
@@ -105,7 +98,7 @@
                 (make-glyph c
                             (funcall get-bbox-fxn)
                             nc-ncn-fxn
-                            sort-fxn
+                            (funcall sort-fxn)
                             :min-dst min-dst)))
     alphabet))
 
@@ -138,7 +131,8 @@
                 (format t "~%")
                 (setf cursor (vec:vec left (+ by (vec::vec-y cursor))))))
 
-            (if (> (vec::vec-y cursor) bottom) (return-from outer i))
+            (when (> (vec::vec-y cursor) bottom)
+                  (return-from outer i))
 
             (setf g (snek:add-grp! snk))
 

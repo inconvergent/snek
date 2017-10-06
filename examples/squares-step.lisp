@@ -42,7 +42,7 @@
         ;    (snek:itr-verts (snk v :g g)
         ;      (snek:move-vert? v (rnd:in-circ 0.3d0) :rel t))))
 
-        (snek:itr-grps (snk g)
+        (snek:itr-grps (snk g :collect nil)
           (destructuring-bind (path lina linb ns)
             (gethash g grp-states)
             ;(lin-path:move path (get-grp-vert-vals snk :g g) :rel nil) ;closed must be set in constr.

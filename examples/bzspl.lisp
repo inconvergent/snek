@@ -63,7 +63,7 @@
                     (funcall state-gen v noise))));)
 
             ;(sandpaint:set-rgba sand (color:hsv 0.51 1 1 0.05))
-            (snek:itr-grps (snk g)
+            (snek:itr-grps (snk g :collect nil)
               ; draw random dots along the bezier spline.
               (sandpaint:bzspl-stroke sand
                 (bzspl:make (snek:get-grp-verts snk :g g) :closed t)

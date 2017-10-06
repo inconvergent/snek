@@ -186,7 +186,6 @@
     :pos*
     :rndpos
     :make
-    :move
     :with-rndpos)
   (:import-from :common-lisp-user
     :with-gensyms
@@ -212,7 +211,8 @@
   (:export
     :make
     :with*
-    :verts-in-rad)
+    :verts-in-rad
+    :with-verts-in-rad)
   (:import-from :common-lisp-user
     :get-dfloat-tup
     :make-int-vec
@@ -307,7 +307,8 @@
     :with-grp
     :with-prob
     :with-rnd-edge
-    :with-rnd-vert)
+    :with-rnd-vert
+    :with-verts-in-rad)
   (:import-from :common-lisp-user
     :append-postfix
     :flatten

@@ -188,11 +188,18 @@
 
 
 (defun test-bzspl ()
-(let ((pts-a (list (vec:vec -20.0d0 99.0d0) (vec:vec 0.0d0 1.0d0)
-                   (vec:vec 10.0d0 20.0d0) (vec:vec 100.0d0 100.0d0)))
-      (pts-b (list (vec:vec -20.0d0 99.0d0) (vec:vec 0.0d0 1.0d0)
-                   (vec:vec 10.0d0 20.0d0) (vec:vec 100.0d0 100.0d0)
-                   (vec:vec -3.0d0 -17.0d0) (vec:vec 0.0d0 4.0d0))))
+(let ((pts-a (list (vec:vec -20.0d0 99.0d0)
+                   (vec:vec 0.0d0 1.0d0)
+                   (vec:vec 10.0d0 20.0d0)
+                   (vec:vec 100.0d0 100.0d0)))
+
+      (pts-b (list (vec:vec -20.0d0 99.0d0)
+                   (vec:vec 0.0d0 1.0d0)
+                   (vec:vec 10.0d0 20.0d0)
+                   (vec:vec 100.0d0 100.0d0)
+                   (vec:vec -3.0d0 -17.0d0)
+                   (vec:vec 0.0d0 4.0d0))))
+
     (do-test
       (bzspl:pos* (bzspl:make pts-a) (math:linspace 10 0 1))
       (list (vec:vec -20.0d0 99.0d0)
@@ -254,8 +261,8 @@
        (vec:vec 66.58564568777904d0 69.99570477122477d0)
        (vec:vec -1.3111764746287196d0 -2.3624798058613172d0)
        (vec:vec -1.5299632552458968d0 1.887867752425192d0)
-       (vec:vec -0.6475631585093453d0 14.113732660191175d0))))
-)
+       (vec:vec -0.6475631585093453d0 14.113732660191175d0)))
+    ))
 
 
 (defun test-hset ()
