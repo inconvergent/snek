@@ -12,11 +12,10 @@
 
 
 (defun test-centroids (counts nc ncn)
-  (reduce (lambda (x y) (and x y))
-          (loop for i from 0 below nc collect
-                (multiple-value-bind (val exists)
-                  (gethash i counts)
-                  (and exists (>= val ncn))))))
+  (loop for i from 0 below nc always
+        (multiple-value-bind (val exists)
+          (gethash i counts)
+          (and exists (>= val ncn)))))
 
 
 (defun get-dst (centroids cand)
@@ -31,9 +30,8 @@
         (centroids (funcall bbox-fxn 1)))
     (loop for i from 0 do
       (let ((cand (first (funcall bbox-fxn 1))))
-        (if (reduce (lambda (a b) (and a b))
-            (mapcar (lambda (d) (> d dst))
-                    (vec:ldst* centroids cand)))
+        (if (every (lambda (d) (> d dst))
+                   (vec:ldst* centroids cand))
           (progn (setf centroids (append (list cand) centroids))
                  (incf hits))))
       until (>= hits nc))

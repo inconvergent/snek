@@ -5,6 +5,7 @@
     :add
     :arr-get
     :arr-set
+    :angle
     :copy
     :cos-sin
     :div
@@ -122,8 +123,8 @@
     :rndi*
     :rndspace
     :rndspacei
-    :with-on-line
     :with-in-circ
+    :with-on-line
     :with-rndspace)
   (:import-from :common-lisp-user
     :PII
@@ -134,6 +135,7 @@
   (:use :common-lisp)
   (:export
     :black
+    :cmyk
     :dark
     :gray
     :hsv
@@ -165,6 +167,7 @@
     :add
     :del
     :get-edges
+    :get-incident-edges
     :get-num-edges
     :get-num-verts
     :get-verts
@@ -182,6 +185,7 @@
 (defpackage :bzspl
   (:use :common-lisp)
   (:export
+    :adaptive-pos
     :pos
     :pos*
     :rndpos
@@ -286,6 +290,7 @@
     :get-edges
     :get-grp-as-bzspl
     :get-grp-verts
+    :get-incident-edges
     :get-num-edges
     :get-num-verts
     :get-vert

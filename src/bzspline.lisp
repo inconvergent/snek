@@ -78,13 +78,17 @@
           (aref vpts (+ i 2)))))
 
 
+(defmacro -x-to-pt (vpts n ns x)
+  `(multiple-value-bind (x-loc seg)
+    (-get-seg ,ns ,x)
+    (do-t x-loc (do-m (-select-pts ,n ,vpts seg)))))
+
+
 (defun pos (b x)
   (declare (bzspl b))
   (declare (double-float x))
   (with-struct (bzspl- n ns vpts) b
-    (multiple-value-bind (x-loc seg)
-      (-get-seg ns x)
-      (do-t x-loc (do-m (-select-pts n vpts seg))))))
+    (-x-to-pt vpts n ns x)))
 
 
 (defun pos* (b xx)
@@ -92,9 +96,18 @@
   (declare (list xx))
   (with-struct (bzspl- n ns vpts) b
     (loop for x double-float in xx collect
-      (multiple-value-bind (x-loc seg)
-        (-get-seg ns x)
-        (do-t x-loc (do-m (-select-pts n vpts seg)))))))
+      (-x-to-pt vpts n ns x))))
+
+
+(defun adaptive-pos (b &key (dens 1d0) (end t))
+  (let ((res (make-array 10 :fill-pointer 0 :element-type 'vec:vec)))
+    (with-struct (bzspl- n ns vpts) b
+      (loop for s from 0 below ns collect
+        (loop for x-loc in (math:linspace
+                             (ceiling (* (-get-segment-length vpts n s) dens))
+                             0d0 1d0 :end (and end (>= s (1- ns)))) do
+          (vector-push-extend  (do-t x-loc (do-m (-select-pts n vpts s))) res))))
+       (coerce res 'list)))
 
 
 (defmacro with-rndpos ((b n rn) &body body)
@@ -152,14 +165,36 @@
     (-set-v-mean vpts opts 0 1 (- n* 1))))
 
 
+(defun -get-segment-length (vpts n seg)
+
+  (let ((curr nil)
+        (prev 0d0)
+        (err 10d0))
+
+    (block iterations
+      (loop for c from 3 do
+        (setf curr
+              (let ((samples (loop for xi in (math:linspace (expt 2 c) 0d0 1d0) collect
+                                (do-t xi (do-m (-select-pts n vpts seg))))))
+                (loop for sa in samples and sb in (cdr samples)
+                      summing (vec:dst sa sb) into l
+                      finally (return l))))
+        (setf err (abs (- prev curr)))
+        (setf prev curr)
+        (when (< err 1d-7)
+          (return-from iterations))))
+    curr))
+
+
+
 (defun make (pts &key closed &aux (n (length pts)))
   (declare (list pts))
   (declare (boolean closed))
   (declare (integer n))
-  (assert (>= n 4) (n) "must have at least 4 pts. has ~a." n)
-  (let* ((vpts (make-array (if closed (+ (* 2 n) 1) (- (* 2 n) 3))
-                           :element-type 'vec:vec))
-         (ns (if closed n (- n 2))))
+  (assert (>= n 3) (n) "must have at least 3 pts. has ~a." n)
+  (let ((vpts (make-array (if closed (+ (* 2 n) 1) (- (* 2 n) 3))
+                          :element-type 'vec:vec))
+        (ns (if closed n (- n 2))))
 
     (if closed
       (-set-vpts-closed vpts pts n)

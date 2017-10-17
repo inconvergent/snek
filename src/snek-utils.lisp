@@ -14,6 +14,7 @@
     - to get indices of verts (in a grp): (get-vert-inds ...)
   "
 
+  (declare (snek snk))
   (with-struct (snek- grps grp-size) snk
     (let ((name (gensym)))
       (setf
@@ -32,7 +33,7 @@
       (declare (integer ,v))
       (if (and (> ,v -1) (< ,v ,num))
         (progn ,@body)
-        (if ,err (error "vert does not exist: ~a" ,v))))))
+        (when ,err (error "vert does not exist: ~a" ,v))))))
 
 
 (defmacro -valid-verts ((num vv v) &body body)
@@ -46,6 +47,7 @@
 
 
 (defun add-vert! (snk xy)
+  (declare (snek snk))
   (declare (vec:vec xy))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
@@ -55,11 +57,13 @@
 
 
 (defun add-verts! (snk vv)
+  (declare (snek snk))
   (loop for xy of-type vec:vec in vv collect
     (add-vert! snk xy)))
 
 
 (defun get-vert (snk v)
+  (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
     (-valid-vert (num-verts v)
@@ -67,6 +71,7 @@
 
 
 (defun get-verts (snk vv)
+  (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
     (-valid-verts (num-verts vv v)
@@ -74,6 +79,7 @@
 
 
 (defun get-all-verts (snk)
+  (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
     (loop for v integer from 0 below num-verts
@@ -81,17 +87,20 @@
 
 
 (defun get-all-grps (snk)
+  (declare (snek snk))
   (loop for g being the hash-keys of (snek-grps snk)
     if g ; ignores nil (main) grp
     collect g))
 
 
 (defun get-grp-verts (snk &key g)
+  (declare (snek snk))
   (get-verts snk
     (get-vert-inds snk :g g)))
 
 
 (defun get-vert-inds (snk &key g)
+  (declare (snek snk))
   (with-struct (snek- grps) snk
     (multiple-value-bind (grp exists)
       (gethash g grps)
@@ -101,32 +110,51 @@
 
 
 (defun get-num-edges (snk &key g)
+  (declare (snek snk))
   (with-grp (snk grp g)
     (graph:get-num-edges (grp-grph grp))))
 
 
 ; TODO: option to include both directions?
 (defun get-edges (snk &key g)
+  (declare (snek snk))
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
       (graph:get-edges grph))))
 
 
+(defun get-incident-edges (snk v &key g)
+  (declare (snek snk))
+  (declare (snek snk))
+  (declare (integer v))
+  (with-grp (snk grp g)
+    (with-struct (grp- grph) grp
+      (graph:get-incident-edges grph v)
+      (let ((edg (graph:get-incident-edges grph v)))
+        (if edg
+          edg
+          (error "vert ~a does does not belong to an edge in grp ~a" v g))))))
+
+; TODO: get-all-incident-edges?
+
+
 (defun add-edge! (snk ee &key g)
+  (declare (snek snk))
   (with-grp (snk grp g)
     (with-struct (snek- num-verts) snk
       (with-struct (grp- grph) grp
         (destructuring-bind (a b)
           ee
           (declare (integer a b))
-          (if (and (< a num-verts)
+          (when (and (< a num-verts)
                    (< b num-verts)
                    (not (eql a b)))
-            (if (graph:add grph a b)
+            (when (graph:add grph a b)
               (sort (list a b) #'<))))))))
 
 
 (defun del-edge! (snk ee &key g)
+  (declare (snek snk))
   (declare (list ee))
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
@@ -144,6 +172,7 @@
 
 
 (defun verts-in-rad (snk xy rad)
+  (declare (snek snk))
   (declare (vec:vec xy))
   (declare (double-float rad))
   (with-struct (snek- verts zmap) snk

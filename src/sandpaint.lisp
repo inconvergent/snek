@@ -12,7 +12,7 @@
 
 (defun -scale-convert (v &key (s 1.0d0) (gamma 1.0d0))
   (declare (double-float v s gamma))
-  (setf v (expt (/ v s) gamma)))
+  (setf v (expt (max 0d0 (/ v s)) gamma)))
 
 
 (defun -unsigned-256 (v)

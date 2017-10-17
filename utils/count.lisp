@@ -1,24 +1,16 @@
 
 (defun make-counter (&optional ll)
   (let ((c (make-hash-table :test #'equal)))
-    (if ll (loop for a in ll do (counter-add c a)))
+    (loop for a in ll do (counter-add c a))
     c))
 
 
 (defun counter-add (c a)
-  (multiple-value-bind (val exists)
-            (gethash a c)
-            (if (not exists)
-              (setf (gethash a c) 1)
-              (incf (gethash a c)))))
+  (incf (gethash a c 0)))
 
 
 (defun counter-show (c)
-  (let ((tot (loop for a being the hash-keys of c
-                   summing (gethash a c) into tot
-                   finally (return tot))))
-    (loop for a being the hash-keys of c do
-      (format t "~a: ~a, ~a~%" a
-              (gethash a c)
-              (coerce (/ (gethash a c) tot) 'float)))))
+  (loop with tot = (float (loop for n being the hash-values of c summing n))
+        for a being the hash-keys of c using (hash-value n)
+        do (format t "~a: ~a, ~a~%" a n (/ (gethash a c) tot))))
 

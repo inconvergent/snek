@@ -118,6 +118,11 @@
   (setf (aref a i 0) (vec::vec-x v)
         (aref a i 1) (vec::vec-y v)))
 
+(defun angle (v)
+  (declare (vec v))
+  (with-xy ((norm v) x y)
+    (atan y x)))
+
 
 ; MATHS
 

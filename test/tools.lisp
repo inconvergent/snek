@@ -192,13 +192,30 @@
                    (vec:vec 0.0d0 1.0d0)
                    (vec:vec 10.0d0 20.0d0)
                    (vec:vec 100.0d0 100.0d0)))
-
       (pts-b (list (vec:vec -20.0d0 99.0d0)
                    (vec:vec 0.0d0 1.0d0)
                    (vec:vec 10.0d0 20.0d0)
                    (vec:vec 100.0d0 100.0d0)
                    (vec:vec -3.0d0 -17.0d0)
-                   (vec:vec 0.0d0 4.0d0))))
+                   (vec:vec 0.0d0 4.0d0)))
+      (pts-c (list (vec:vec -32.0d0 79.0d0)
+                   (vec:vec 0.3d0 3.0d0)
+                   (vec:vec 10.1d0 25.0d0))))
+    (do-test
+      (bzspl:pos* (bzspl:make pts-c) (math:linspace 5 0 1))
+      (list (vec:vec -32.0d0 79.0d0)
+            (vec:vec -17.25625d0 47.125d0)
+            (vec:vec -5.325000000000003d0 27.5d0)
+            (vec:vec 3.7937499999999957d0 20.125d0)
+            (vec:vec 10.099999999999994d0 25.0d0)))
+
+    (do-test
+      (bzspl:pos* (bzspl:make pts-c :closed t) (math:linspace 5 0 1))
+      (list (vec:vec -15.85d0 41.0d0)
+        (vec:vec  2.0468749999999982d0 11.5625d0)
+        (vec:vec 3.612499999999999d0 29.0d0)
+        (vec:vec -19.150000000000002d0 61.4375d0)
+        (vec:vec -15.850000000000001d0 41.0d0)))
 
     (do-test
       (bzspl:pos* (bzspl:make pts-a) (math:linspace 10 0 1))
@@ -262,7 +279,10 @@
        (vec:vec -1.3111764746287196d0 -2.3624798058613172d0)
        (vec:vec -1.5299632552458968d0 1.887867752425192d0)
        (vec:vec -0.6475631585093453d0 14.113732660191175d0)))
-    ))
+
+    (do-test
+      (length (bzspl:adaptive-pos (bzspl:make pts-a)))
+      226)))
 
 
 (defun test-hset ()

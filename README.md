@@ -118,17 +118,16 @@ to issues, or take requests.
 ## Planned Changes
 
  - Randomized order of alteration apply
- - one-ring/ incident edges
  - test parallel zmap implementation
- - bzspl with adaptive sampling
 
 
 ## Bugs
 
  - bzspl has lower sample density near the edges in some cases.
+ - aif does not work properly when used in packages.
 
 
-## THANKS
+## Thanks
 
 I would like to thank
 
