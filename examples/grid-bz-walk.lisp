@@ -59,7 +59,7 @@
         (grains 10)
         (edge 60)
         (sand (sandpaint:make size
-                :active (color:white 0.05)
+                :fg (color:white 0.05)
                 :bg (color:dark))))
 
 
@@ -69,13 +69,13 @@
 
       (loop for i from 0 below itt do
         (print-every i 100000)
-        (sandpaint:set-rgba sand (color:hsv 0.51 1 1 0.05))
+        (sandpaint:set-fg-color sand (color:hsv 0.51 1 1 0.05))
         (sandpaint:bzspl-stroke sand
           (bzspl:make (loop for w in walkers-a collect (funcall w noise))
                       :closed t)
           grains)
 
-        (sandpaint:set-rgba sand (color:hsv 0.91 1 1 0.05))
+        (sandpaint:set-fg-color sand (color:hsv 0.91 1 1 0.05))
         (sandpaint:bzspl-stroke sand
           (bzspl:make (loop for w in walkers-b collect (funcall w noise))
                       :closed t)

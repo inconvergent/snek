@@ -44,7 +44,7 @@
                (half size)
                (vec:rep (* 0.5d0 size))))
         (sand (sandpaint:make size
-                :active (color:white 0.05)
+                :fg (color:white 0.05)
                 :bg (color:dark)))
         (mut (snek:make-mutate :noise 100 :prob 0.000005)))
 
@@ -62,7 +62,7 @@
                     ; get an alteration for vert v
                     (funcall state-gen v noise))));)
 
-            ;(sandpaint:set-rgba sand (color:hsv 0.51 1 1 0.05))
+            ;(sandpaint:set-fg-color sand (color:hsv 0.51 1 1 0.05))
             (snek:itr-grps (snk g :collect nil)
               ; draw random dots along the bezier spline.
               (sandpaint:bzspl-stroke sand

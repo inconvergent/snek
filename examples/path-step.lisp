@@ -18,7 +18,7 @@
         (points-b (close-path (rnd:nin-box 3 1500d0 1500d0 :xy (vec:vec 1000d0 1000d0))))
         (points-c (close-path (rnd:nin-box 3 1500d0 1500d0 :xy (vec:vec 1000d0 1000d0))))
         (sand (sandpaint:make size
-                :active (list 0 0 0 0.01)
+                :fg (list 0 0 0 0.01)
                 :bg (list 1 1 1 1.0))))
 
     (let ((v1 (snek:add-vert! snk (vec:vec 0d0 0d0)))
@@ -43,7 +43,7 @@
           (snek:move-vert? v3 (lin-path:pos path-c (funcall lsc noise)) :rel nil))
         (snek:draw-edges snk sand grains))
 
-      ;(sandpaint:set-rgba sand (list 1 0 0 0.01))
+      ;(sandpaint:set-fg-color sand (list 1 0 0 0.01))
       ;(sandpaint:pix sand (lin-path:pos* path-a (rnd:rndspace 10 0d0 1d0)))
       ;(sandpaint:pix sand (lin-path:pos* path-c (rnd:rndspace 10 0d0 1d0)))
 

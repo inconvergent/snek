@@ -31,9 +31,9 @@
                        0)))
 
              (draw (snk a w)
-               (sandpaint:set-rgba sand (list 0.0 0.7 0.7 0.1))
+               (sandpaint:set-fg-color sand (color:rgb 0.0 0.7 0.7 0.1))
                (sandpaint:circ sand (list (snek::append-edge-alt-xy a)) 4d0 300)
-               (sandpaint:set-rgba sand (list 0.0 0.0 0.0 0.1))
+               (sandpaint:set-fg-color sand (color:black 0.1))
                (sandpaint:lin-path sand
                  (snek:get-verts snk (list w (snek::append-edge-alt-v a)))
                  2d0
@@ -76,8 +76,8 @@
 
 (defun main (size fn)
   (let ((sand (sandpaint:make size
-                :active (list 0 0 0 0.01)
-                :bg (list 1 1 1 1.0))))
+                :fg (color:black 0.01)
+                :bg (color:white))))
 
     (hyphae sand size fn 1000 10.0d0 (vec:vec 250d0 250d0))))
 

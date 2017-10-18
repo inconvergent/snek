@@ -23,7 +23,7 @@
         (rep 7)
         (snk (snek:make :max-verts 100000))
         (sand (sandpaint:make size
-                :active (color:black 0.01)
+                :fg (color:black 0.01)
                 :bg (color:white))))
 
     (snek:add-verts! snk (rnd:nin-box 100 450d0 450d0 :xy (vec:vec 500d0 500d0)))

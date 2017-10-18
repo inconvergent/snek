@@ -137,13 +137,20 @@
     :black
     :cmyk
     :dark
+    :from-list
     :gray
     :hsv
     :mdark
     :rgb
+    :rgba
+    :show
+    :show
+    :to-list
+    :to-list*
     :transparent
     :vdark
-    :white)
+    :white
+    :with)
   (:import-from :common-lisp-user
     :with-gensyms))
 
@@ -238,7 +245,7 @@
     :pix*
     :pixel-hack
     :save
-    :set-rgba
+    :set-fg-color
     :stroke
     :strokes)
   (:import-from :common-lisp-user

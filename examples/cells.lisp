@@ -25,7 +25,7 @@
         (grains 30)
         (snk (init-snek 5 800 size (vec:rep (* 0.5d0 size))))
         (sand (sandpaint:make size
-                :active (color:white 0.05)
+                :fg (color:white 0.05)
                 :bg (color:dark))))
 
     (loop for i from 0 below itt do

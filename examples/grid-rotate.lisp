@@ -25,7 +25,7 @@
          (grid )
          (state-gen (get-state-gen (lambda () (rnd:get-circ-stp*))))
          (sand (sandpaint:make size
-                 :active (color:black 0.05)
+                 :fg (color:black 0.05)
                  :bg (color:white))))
 
     (loop for i from 0 below 10 do

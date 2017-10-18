@@ -97,13 +97,13 @@
                        (color:hsv 0.51 1 1 0.01)
                        (color:hsv 0.91 1 1 0.01))))
         (sand (sandpaint:make size
-                :active (color:white 0.009)
+                :fg (color:white 0.009)
                 :bg (color:white))))
 
-    (sandpaint:set-rgba sand (color:vdark 0.009))
+    (sandpaint:set-fg-color sand (color:vdark 0.009))
     (draw-block-grid size border line-chars line-num 19d0 34d0 600000 sand)
 
-    (sandpaint:set-rgba sand (color:white 0.009))
+    (sandpaint:set-fg-color sand (color:white 0.009))
 
     (loop for y in (math:linspace line-num border (- size border)) do
       (format t "~a ~%" y)
@@ -119,7 +119,7 @@
               (snek:move-vert? v (rnd:in-circ 0.1d0))
               (snek:move-vert? v (funcall state-gen v 0.00001d0))))
           (snek:itr-grps (snk g :collect nil)
-            ;(sandpaint:set-rgba sand (funcall r))
+            ;(sandpaint:set-fg-color sand (funcall r))
             (sandpaint:bzspl-stroke sand (snek:get-grp-as-bzspl snk g) grains)))))
 
     ;(draw-grid size border line-chars line-num 18d0 33d0 0.8d0 60 sand)

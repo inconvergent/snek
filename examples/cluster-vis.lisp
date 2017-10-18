@@ -30,7 +30,7 @@
 
 (defun draw-circ (sand colors circs)
   (loop for c in circs and color in colors do
-    (sandpaint:set-rgba sand color)
+    (sandpaint:set-fg-color sand color)
     (sandpaint:circ sand (list c) 15d0 10000)))
 
 
@@ -41,9 +41,9 @@
         (colors (math:nrep 20 (color:hsv (rnd:rnd) 0.7 0.8 0.09))))
 
     (let ((sand (sandpaint:make size
-                :active (color:black 0.08)
+                :fg (color:black 0.08)
                 :bg (color:white))))
-      (sandpaint:set-rgba sand (color:black 0.009))
+      (sandpaint:set-fg-color sand (color:black 0.009))
       (loop for pt in (get-distributed-pts centroids size 450d0 300000) do
         (destructuring-bind (i dst)
          (get-dst centroids pt)
@@ -55,9 +55,9 @@
       (sandpaint:save sand (append-postfix fn "-1") :gamma 1.5))
 
     (let ((sand (sandpaint:make size
-                :active (color:black 0.08)
+                :fg (color:black 0.08)
                 :bg (color:white))))
-      (sandpaint:set-rgba sand (color:black 0.009))
+      (sandpaint:set-fg-color sand (color:black 0.009))
       (loop for pt in (get-distributed-pts centroids size 450d0 300000) do
         (destructuring-bind (i dst)
          (get-dst centroids pt)

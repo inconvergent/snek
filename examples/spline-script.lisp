@@ -54,7 +54,7 @@
           (snek:move-vert? v (rnd:in-circ 0.1d0))
           ;(snek:move-vert? v (funcall state-gen v 0.000008d0))
           ))
-      ;(sandpaint:set-rgba sand (color:hsv 0.55 (- 1.0 i) (- 1.0 i) 0.009))
+      ;(sandpaint:set-fg-color sand (color:hsv 0.55 (- 1.0 i) (- 1.0 i) 0.009))
       (snek:itr-grps (snk g :collect nil)
         (aif (snek:get-grp-as-bzspl snk g)
           (progn
@@ -71,7 +71,7 @@
         (bbox (vec:vec 20d0 25d0))
         (spacebox (vec:vec 10d0 25d0))
         (sand (sandpaint:make size
-                :active (color:black 0.009)
+                :fg (color:black 0.009)
                 :bg (color:white))))
 
     (labels

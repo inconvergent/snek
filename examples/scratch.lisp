@@ -34,8 +34,8 @@
         (itt 8000)
         (mut (snek:make-mutate))
         (sand (sandpaint:make size
-                 :active (list 0.0 0.0 0.0 0.08)
-                 :bg (list 1.0 1.0 1.0 1.0))))
+                 :fg (color:black 0.08)
+                 :bg (color:white))))
 
     (setf verts (loop for i from 1 to 100
       collect (snek:add-vert! snk (rnd:lget lattice))))

@@ -27,7 +27,7 @@
         (rad 85d0)
         (snk (snek:make :max-verts 10000))
         (sand (sandpaint:make size
-                :active (color:black 0.005)
+                :fg (color:black 0.005)
                 :bg (color:white))))
 
     (init snk rep rad)

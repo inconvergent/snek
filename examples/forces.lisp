@@ -14,8 +14,8 @@
         (grains 100)
         (rad 1d0)
         (sand (sandpaint:make size
-                :active (list 1.0 1.0 1.0 0.024)
-                :bg (list 0.1 0.1 0.1 1.0))))
+                :fg (color:white 0.024)
+                :bg (color:vdark))))
 
         (math:nrep 3000 (snek:add-vert! snk (rnd:on-line (vec:vec 200d0 200d0)
                                                          (vec:vec 800d0 800d0))))

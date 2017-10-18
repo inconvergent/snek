@@ -25,7 +25,7 @@
         (farl 100d0)
         (stp 0.004d0)
         (sand (sandpaint:make size
-                :active (color:white 0.05)
+                :fg (color:white 0.05)
                 :bg (color:dark))))
 
     (start-timer "total")

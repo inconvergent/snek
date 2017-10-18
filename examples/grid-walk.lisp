@@ -60,7 +60,7 @@
         (grains 2)
         (edge 0d0)
         (sand (sandpaint:make size
-                :active (color:white 0.05)
+                :fg (color:white 0.05)
                 :bg (color:dark))))
 
     (let* ((grid (get-grid size edge (rnd:rndi 5 11)))

@@ -29,8 +29,8 @@
         (nsteps 1000)
         (grains 50)
         (sand (sandpaint:make size
-                :active (list 1 1 1 0.05)
-                :bg (list 0.2 0.2 0.2 1))))
+                :fg (color:white 0.05)
+                :bg (color:dark))))
           (let ((lines (get-lines -500d0 1500d0 40)))
 
             (loop

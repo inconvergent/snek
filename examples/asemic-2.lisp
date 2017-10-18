@@ -46,7 +46,7 @@
         (num-words 10)
         (char-scale (vec:vec 0.5d0 1.5d0))
         (sand (sandpaint:make size
-                :active (color:black 0.009)
+                :fg (color:black 0.009)
                 :bg (color:white))))
 
 

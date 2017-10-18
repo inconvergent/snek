@@ -13,8 +13,8 @@
         (snk (snek:make))
         (grains 3)
         (sand (sandpaint:make size
-                :active (list 0.0 0.0 0.0 0.01)
-                :bg (list 1.0 1.0 1.0 1.0))))
+                :fg (color:black 0.01)
+                :bg (color:white))))
 
       (math:nrep 1000 (snek:add-vert! snk (rnd:in-box 500d0 500d0 :xy (vec:vec mid mid))))
 

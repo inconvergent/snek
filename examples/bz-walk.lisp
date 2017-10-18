@@ -11,7 +11,7 @@
         (noise 0.000000005d0)
         (grains 20)
         (sand (sandpaint:make size
-                :active (color:white 0.05)
+                :fg (color:white 0.05)
                 :bg (color:dark))))
 
 
@@ -34,7 +34,7 @@
         for i from 0
         do
           (print-every i 100000)
-          (sandpaint:set-rgba sand (color:hsv p 1 1 0.05))
+          (sandpaint:set-fg-color sand (color:hsv p 1 1 0.05))
           (sandpaint:stroke sand
             (list
              (bzspl:pos b p)
