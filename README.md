@@ -3,17 +3,29 @@
 
 ## About
 
-`snek` is a simple data structure for working with vertices and edges. More
-importantly it is a programming pattern for applying changes to the structure.
-It is specifically written to be useful for a broad range of ways in which I
-usually write generative algorithms for creating art.
+`snek` is three things:
+
+1. A simple (graph) data structure for working with vertices and edges The
+   structure is named `snek`; the name is explained below. This structure is
+   combined with a programming pattern for applying changes to the structure.
+   The pattern relies on `alterations`, see below.
+
+2. A tool for drawing things called `sandpaint`. `sandpaint` uses random
+   sampling to draw it's primitives. This creates a fairly distinct and gritty
+   look in many cases.
+
+3. A series of useful data structures and tools. E.g. a 2D vector `vec` and a
+   package for generating different kinds of random numbers: `rnd`.
+
+This library is specifically written to be useful for a broad range of ways in
+which I create art using various generative algorithms.
 
 ![head](img/spline-script.lisp.png?raw=true "ex")
 
 ![head](img/cells.lisp.png?raw=true "ex")
 
 
-## About the Name
+### About the Name
 
 A while back someone on twitter suggested that if Python 3 was named "snek" it
 would avoid naming confusion. I found that amusing at the time, and picked snek
@@ -65,25 +77,31 @@ http://inconvergent.net/arbitrary-alterations/
 
 ## Examples
 
-There are some examples included. All examples are in the `ex` folder.
+There are some examples included. All examples are in the `examples` folder.
 
-if you don't provide a result name as the first argument, then the resulting
-file will be named `tmp.png`.
+If you don't provide a filename (with full or relative path) as the first
+argument, the resulting file will be named `./tmp.png`.
 
 
 ## Usage
 
-`snek` is used in
+Among other places, `snek` is used in
 
   - http://moment.inconvergent.net/
   - https://twitter.com/sandpaintbot
   - https://twitter.com/scratchpaintbot
   - https://twitter.com/cronianrings
-
+  - https://twitter.com/rndshep
 
 ![lines](img/lines.lisp.png?raw=true "ex")
 
 ![lines](img/grid-bz-walk.lisp.png?raw=true "ex")
+
+I also use it to create mechanical plotter drawings:
+
+ - http://inconvergent.net/mechanical-plotter-drawings/
+ - http://inconvergent.net/mechanical-plotter-drawings/3/
+ - http://inconvergent.net/spline-script/plots/
 
 
 ## Dependencies
