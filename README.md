@@ -3,7 +3,12 @@
 
 ## About
 
-`snek` is three things:
+This library is specifically written to be useful for a broad range of ways in
+which I create art using various generative algorithms.
+
+![head](img/cells.lisp.png?raw=true "ex")
+
+In short `snek` is three things:
 
 1. A simple (graph) data structure for working with vertices and edges The
    structure is named `snek`; the name is explained below. This structure is
@@ -17,12 +22,7 @@
 3. A series of useful data structures and tools. E.g. a 2D vector `vec` and a
    package for generating different kinds of random numbers: `rnd`.
 
-This library is specifically written to be useful for a broad range of ways in
-which I create art using various generative algorithms.
-
 ![head](img/spline-script.lisp.png?raw=true "ex")
-
-![head](img/cells.lisp.png?raw=true "ex")
 
 
 ### About the Name
@@ -31,6 +31,7 @@ A while back someone on twitter suggested that if Python 3 was named "snek" it
 would avoid naming confusion. I found that amusing at the time, and picked snek
 as the placeholder name for this project. I've been looking for a better name,
 but I haven't found one yet.
+
 
 ## Alterations
 
