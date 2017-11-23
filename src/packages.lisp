@@ -233,16 +233,16 @@
 (defpackage :sandpaint
   (:use :common-lisp)
   (:export
+    :arr-circ
+    :arr-pix
     :chromatic-aberration
     :circ
-    :circ*
     :clear
     :dens-stroke
     :lin-path
     :make
     :bzspl-stroke
     :pix
-    :pix*
     :pixel-hack
     :save
     :set-fg-color
@@ -277,6 +277,7 @@
   (:export
     :add-edge!
     :add-edge*?
+    :add-edges!
     :add-grp!
     :add-path!
     :add-path*!

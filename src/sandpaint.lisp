@@ -187,7 +187,7 @@
         (-operator-over vals x y rgba)))))
 
 
-(defun pix* (sand vv n)
+(defun arr-pix (sand vv n)
   (declare (type (array double-float) vv))
   (declare (integer n))
   (with-struct (sandpaint- size vals rgba) sand
@@ -215,8 +215,7 @@
         (-operator-over vals x y rgba)))))
 
 
-; draw circ from array
-(defun circ* (sand vv num rad grains)
+(defun arr-circ (sand vv num rad grains)
   (declare (type (array double-float) vv))
   (declare (integer grains num))
   (declare (double-float rad))

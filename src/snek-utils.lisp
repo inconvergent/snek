@@ -58,6 +58,7 @@
 
 (defun add-verts! (snk vv)
   (declare (snek snk))
+  (declare (list vv))
   (loop for xy of-type vec:vec in vv collect
     (add-vert! snk xy)))
 
@@ -131,9 +132,10 @@
     (with-struct (grp- grph) grp
       (graph:get-incident-edges grph v)
       (let ((edg (graph:get-incident-edges grph v)))
-        (if edg
-          edg
-          (error "vert ~a does does not belong to an edge in grp ~a" v g))))))
+        edg
+        #|(if edg|#
+          ;edg
+          #|(error "vert ~a does does not belong to an edge in grp ~a" v g))|#))))
 
 ; TODO: get-all-incident-edges?
 
@@ -151,6 +153,13 @@
                    (not (eql a b)))
             (when (graph:add grph a b)
               (sort (list a b) #'<))))))))
+
+
+(defun add-edges! (snk ee)
+  (declare (snek snk))
+  (declare (list ee))
+  (loop for e list in ee collect
+    (add-edge! snk e)))
 
 
 (defun del-edge! (snk ee &key g)

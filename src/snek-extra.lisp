@@ -54,12 +54,12 @@
 
 (defun draw-verts (snk sand)
   (with-struct (snek- verts num-verts) snk
-    (sandpaint:pix* sand verts num-verts)))
+    (sandpaint:arr-pix sand verts num-verts)))
 
 
 (defun draw-circ (snk sand rad grains)
   (with-struct (snek- verts num-verts) snk
-    (sandpaint:circ* sand verts num-verts rad grains)))
+    (sandpaint:arr-circ sand verts num-verts rad grains)))
 
 
 ; SANDPAINT

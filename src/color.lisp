@@ -36,7 +36,8 @@ Colors are stored internally with premultiplied alpha.
             (/ (rgba-r c) a)
             (/ (rgba-g c) a)
             (/ (rgba-b c) a)
-            a)))
+            a))
+  c)
 
 
 (defun to-list (c)
