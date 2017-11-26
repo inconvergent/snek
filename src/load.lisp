@@ -8,15 +8,16 @@
 
 
 (ql:quickload "zpng")
+(ql:quickload "cl-svg")
 
 
 (asdf:defsystem "snek"
   :description "SNEK - A Generative System for Writing Generative Systems"
-  :version "2.6.0"
+  :version "2.7.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t
-  :depends-on ("zpng")
+  :depends-on ("zpng" "cl-svg")
   :components ((:file "pg-utils")
                (:file "various")
                (:file "packages")
@@ -30,6 +31,7 @@
                (:file "linear-path")
                (:file "sandpaint")
                (:file "plot")
+               (:file "plot-svg")
                (:file "zmap")
                (:file "snek-macros")
                (:file "snek")

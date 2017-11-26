@@ -22,7 +22,7 @@
   (size nil :type integer :read-only nil))
 
 
-(defun make (size)
+(defun make (&optional (size 1000))
   (make-plot
     :size size
     :verts (make-vec)
@@ -76,6 +76,38 @@
     (incf (plot-num-verts plt) n)
     (incf (plot-num-lines plt))
     (-coverage-path size coverage path)))
+
+
+(defun line (plt a b)
+  (with-struct (plot- size verts lines num-verts coverage) plt
+    (dolist (p (list a b))
+      (vector-push-extend p verts))
+    (vector-push-extend
+      (math:range num-verts (+ num-verts 2)) lines)
+    (incf (plot-num-verts plt) 2)
+    (incf (plot-num-lines plt))
+    (-coverage-path size coverage (list a b))))
+
+
+(defun -get-path-from-circ (size xy rad)
+  (let ((n (math:int (floor (* 2.0d0 PI rad)))))
+    (values
+      (loop for i in (math:linspace n 0d0 1d0)
+            collect (vec:on-circ i rad :xy xy))
+      n)))
+
+(defun circ (plt xy rad)
+  (with-struct (plot- size verts lines num-verts coverage) plt
+    (multiple-value-bind (path n)
+      (-get-path-from-circ size xy rad)
+      (print path)
+        (dolist (p path)
+          (vector-push-extend p verts))
+        (vector-push-extend
+          (math:range num-verts (+ num-verts n)) lines)
+        (incf (plot-num-verts plt) n)
+        (incf (plot-num-lines plt))
+        (-coverage-path size coverage path))))
 
 
 (defun -stipple (plt xy offset)

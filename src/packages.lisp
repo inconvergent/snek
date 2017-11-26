@@ -55,7 +55,8 @@
     :vec*
     :vec-coerce
     :zero
-    :with-xy)
+    :with-xy
+    :with-xy-short)
   (:import-from :common-lisp-user
     :PII
     :with-gensyms))
@@ -258,7 +259,9 @@
 (defpackage :plot
   (:use :common-lisp)
   (:export
+    :circ
     :dot-stroke
+    :line
     :make
     :path
     :save
@@ -270,6 +273,23 @@
     :half
     :make-vec
     :square-loop
+    :with-struct))
+
+
+(defpackage :plot-svg
+  (:use :common-lisp)
+  (:export
+    :a4-portrait
+    :a4-landscape
+    :make
+    :circ
+    :path
+    :save
+    :wcirc
+    :wpath)
+  (:import-from :common-lisp-user
+    :aif
+    :append-postfix
     :with-struct))
 
 (defpackage :snek

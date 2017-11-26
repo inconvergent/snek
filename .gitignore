@@ -6,3 +6,4 @@ examples/res/*.2obj
 gen-*/*png
 gen-*/res
 gen-*/*.2obj
+*.svg

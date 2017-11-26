@@ -41,6 +41,12 @@
     (progn ,@body)))
 
 
+(defmacro with-xy-short ((v x y) &body body)
+  `(let ((,x (math:sfloat (vec-x ,v)))
+         (,y (math:sfloat (vec-y ,v))))
+    (progn ,@body)))
+
+
 (defmacro rep (&body body)
   `(vec
      (progn ,@body)
