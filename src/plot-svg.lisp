@@ -37,7 +37,7 @@
   (with-struct (plot-svg- scene stroke-width) psvg
     (let ((pth (cl-svg:make-path)))
       (cl-svg:with-path pth
-        (vec:with-xy-short ((first pts) x y) (cl-svg:move-to x y)) )
+        (vec:with-xy-short ((first pts) x y) (cl-svg:move-to x y)))
       (loop for p in (cdr pts) do
         (cl-svg:with-path pth
           (vec:with-xy-short (p x y) (cl-svg:line-to x y))))
@@ -47,23 +47,39 @@
         :stroke-width stroke-width))))
 
 
+
 (defun wpath (psvg pts width)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
-    (let ((pth (cl-svg:make-path))
+    (let ((dir 0)
+          (prev nil)
+          (pth (cl-svg:make-path))
           (rep (math:int (floor (* 1.5 width))))
           (rup (/ width 2d0))
           (rdown (- (/ width 2d0))))
 
       (loop for a in pts and b in (cdr pts) do
+        (setf prev nil)
         (loop for s in (math:linspace rep rdown rup) do
-          (let ((offset (vec:scale (vec:norm (vec:perp (vec:sub b a))) s)))
-            (cl-svg:with-path pth
-              (vec:with-xy-short ((vec:add a offset) x y)
-                  (cl-svg:move-to x y))
-              (vec:with-xy-short ((vec:add b offset) x y)
-                    (cl-svg:move-to x y))))))
+          (incf dir)
+          (let ((offset (vec:scale (vec:norm (vec:perp (vec:sub b a))) s))
+                (a* (if (= (mod dir 2) 0) a b))
+                (b* (if (= (mod dir 2) 0) b a)))
+            ; TODO: this code is bad. rewrite?
+            (if prev
+              (cl-svg:with-path pth
+                (cl-svg:line-to (first prev) (second prev))
+                (vec:with-xy-short ((vec:add a* offset) x y)
+                    (cl-svg:line-to x y)))
+
+              (cl-svg:with-path pth
+                (vec:with-xy-short ((vec:add a* offset) x y)
+                    (cl-svg:move-to x y))))
+            (vec:with-xy-short ((vec:add b* offset) x y)
+              (setf prev (list x y))
+              (cl-svg:with-path pth
+                (cl-svg:line-to x y))))))
 
       (cl-svg:draw scene (:path :d (cl-svg:path pth))
         :fill "none"
@@ -99,6 +115,6 @@
     (let ((fnobj (append-postfix fn* ".svg")))
       (with-struct (plot-svg- scene) psvg
         (with-open-file (s fnobj :direction :output :if-exists :supersede)
-          (cl-svg:stream-out s scene))
-      (format t "~%file ~a~%~%" fnobj)))))
+          (cl-svg:stream-out s scene)))
+      (format t "~%file ~a~%~%" fnobj))))
 
