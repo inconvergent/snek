@@ -196,21 +196,13 @@
 
 
 (defun save (plt fn)
-  (let ((fn* (aif fn fn
-                     (progn
-                        (warn "missing file name, using: tmp.png")
-                        "tmp"))))
-    (let ((fnimg (append-postfix fn* ".png"))
-          (fnobj (append-postfix fn* ".2obj")))
-      (with-struct (plot- size verts edges lines coverage
-                          num-verts num-edges num-lines discards) plt
-        (-write-png coverage size fnimg)
-        (-write-2obj verts edges lines fnobj)
-        (format t "~%writing to ~a" fn)
-        (format t "~%~%num verts: ~a ~%" num-verts)
-        (format t "num edges: ~a ~%" num-edges)
-        (format t "num lines ~a ~%" num-lines)
-        (format t "num discards: ~a ~%" discards))
-      (format t "~%files ~a" fnimg)
-      (format t "~%      ~a~%~%" fnobj))))
+  (with-struct (plot- size verts edges lines coverage
+                      num-verts num-edges num-lines discards) plt
+    (format t "~%writing result ...")
+    (format t "~%~%num verts: ~a ~%" num-verts)
+    (format t "num edges: ~a ~%" num-edges)
+    (format t "num lines ~a ~%" num-lines)
+    (format t "num discards: ~a ~%" discards)
+    (-write-png coverage size (ensure-filename fn ".png"))
+    (-write-2obj verts edges lines (ensure-filename fn ".2obj"))))
 

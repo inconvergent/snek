@@ -251,7 +251,7 @@
     :strokes)
   (:import-from :common-lisp-user
     :aif
-    :append-postfix
+    :ensure-filename
     :get-dfloat-tup
     :square-loop
     :with-struct))
@@ -269,7 +269,7 @@
     :stipple-strokes)
   (:import-from :common-lisp-user
     :aif
-    :append-postfix
+    :ensure-filename
     :half
     :make-vec
     :square-loop
@@ -289,7 +289,8 @@
     :wpath)
   (:import-from :common-lisp-user
     :aif
-    :append-postfix
+    :ensure-filename
+    :make-vec
     :with-struct))
 
 (defpackage :snek

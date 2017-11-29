@@ -143,7 +143,6 @@ to issues, or take requests.
 ## Bugs
 
  - bzspl has lower sample density near the edges in some cases.
- - aif does not work properly when used in packages.
 
 
 ## Thanks

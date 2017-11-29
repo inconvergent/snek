@@ -269,31 +269,24 @@
 
 
 ; TODO: 16 bit?
-(defun save (sand fn &key (gamma 1.0d0))
-  (let ((fnimg (append-postfix
-                 (aif fn fn
-                      (progn
-                        (warn "missing file name, using: tmp.png")
-                        "tmp"))
-                 ".png"))
-        (gamma* (math:dfloat gamma)))
-    (with-struct (sandpaint- size vals) sand
-      (declare (type (array double-float) vals))
-      (let ((png (make-instance
-                   'zpng::pixel-streamed-png
-                   :color-type :truecolor-alpha
-                   :width size
-                   :height size)))
+(defun save (sand fn &key (gamma 1.0d0)
+                     &aux (gamma* (math:dfloat gamma)))
+  (with-struct (sandpaint- size vals) sand
+    (declare (type (array double-float) vals))
+    (let ((png (make-instance
+                 'zpng::pixel-streamed-png
+                 :color-type :truecolor-alpha
+                 :width size
+                 :height size)))
 
-        (with-open-file
-          (stream fnimg
-            :direction :output
-            :if-exists :supersede
-            :if-does-not-exist :create
-            :element-type '(unsigned-byte 8))
-          (zpng:start-png png stream)
-          (square-loop (x y size)
-            (zpng:write-pixel (-png-tuple vals y x gamma*) png))
-          (zpng:finish-png png))))
-    (format t "~%file: ~a~%~%" fnimg)))
+      (with-open-file
+        (stream (ensure-filename fn ".png")
+          :direction :output
+          :if-exists :supersede
+          :if-does-not-exist :create
+          :element-type '(unsigned-byte 8))
+        (zpng:start-png png stream)
+        (square-loop (x y size)
+          (zpng:write-pixel (-png-tuple vals y x gamma*) png))
+        (zpng:finish-png png)))))
 

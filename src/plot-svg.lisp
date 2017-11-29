@@ -31,57 +31,64 @@
                                   'plot-svg:a4-landscape.")))))
 
 
+(defun accumulate-path (pth a &optional b (offset (vec:zero)))
+  (vector-push-extend
+    (vec:with-xy-short ((vec:add a offset) x y)
+      (if (> (length pth) 0)
+        (cl-svg:line-to x y)
+        (cl-svg:move-to x y)))
+    pth)
+
+  (when b
+    (vector-push-extend
+      (vec:with-xy-short ((vec:add b offset) x y)
+        (cl-svg:line-to x y))
+      pth)))
+
+
+(defun finalize-path (pth)
+  (let ((res (cl-svg:make-path)))
+    (loop for x across pth do
+      (cl-svg:with-path res x))
+    res))
+
+
 (defun path (psvg pts)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
-    (let ((pth (cl-svg:make-path)))
-      (cl-svg:with-path pth
-        (vec:with-xy-short ((first pts) x y) (cl-svg:move-to x y)))
-      (loop for p in (cdr pts) do
-        (cl-svg:with-path pth
-          (vec:with-xy-short (p x y) (cl-svg:line-to x y))))
-      (cl-svg:draw scene (:path :d (cl-svg:path pth))
-        :fill "none"
-        :stroke "black"
-        :stroke-width stroke-width))))
-
-
+    (cl-svg:draw scene
+      (:path :d (cl-svg:path (finalize-path
+                               (let ((pth (make-vec)))
+                                     (loop for p in pts do
+                                       (accumulate-path pth p))
+                                     pth))))
+      :fill "none"
+      :stroke "black"
+      :stroke-width stroke-width)))
 
 (defun wpath (psvg pts width)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
-    (let ((dir 0)
-          (prev nil)
-          (pth (cl-svg:make-path))
+    (let ((pth (make-vec))
           (rep (math:int (floor (* 1.5 width))))
           (rup (/ width 2d0))
           (rdown (- (/ width 2d0))))
 
-      (loop for a in pts and b in (cdr pts) do
-        (setf prev nil)
+      (loop for a in pts
+            and b in (cdr pts)
+            and i from 0
+            do
         (loop for s in (math:linspace rep rdown rup) do
-          (incf dir)
-          (let ((offset (vec:scale (vec:norm (vec:perp (vec:sub b a))) s))
-                (a* (if (= (mod dir 2) 0) a b))
-                (b* (if (= (mod dir 2) 0) b a)))
-            ; TODO: this code is bad. rewrite?
-            (if prev
-              (cl-svg:with-path pth
-                (cl-svg:line-to (first prev) (second prev))
-                (vec:with-xy-short ((vec:add a* offset) x y)
-                    (cl-svg:line-to x y)))
+          (accumulate-path
+              pth
+              (if (= (mod i 2) 0) a b)
+              (if (= (mod i 2) 0) b a)
+              (vec:scale (vec:norm (vec:perp (vec:sub b a))) s))))
 
-              (cl-svg:with-path pth
-                (vec:with-xy-short ((vec:add a* offset) x y)
-                    (cl-svg:move-to x y))))
-            (vec:with-xy-short ((vec:add b* offset) x y)
-              (setf prev (list x y))
-              (cl-svg:with-path pth
-                (cl-svg:line-to x y))))))
-
-      (cl-svg:draw scene (:path :d (cl-svg:path pth))
+      (cl-svg:draw scene
+        (:path :d (cl-svg:path (finalize-path pth)))
         :fill "none"
         :stroke "black"
         :stroke-width stroke-width))))
@@ -108,13 +115,8 @@
 
 (defun save (psvg fn)
   (declare (plot-svg psvg))
-  (let ((fn* (aif fn fn
-                     (progn
-                        (warn "missing file name, using: tmp.png")
-                        "tmp"))))
-    (let ((fnobj (append-postfix fn* ".svg")))
-      (with-struct (plot-svg- scene) psvg
-        (with-open-file (s fnobj :direction :output :if-exists :supersede)
-          (cl-svg:stream-out s scene)))
-      (format t "~%file ~a~%~%" fnobj))))
+  (with-struct (plot-svg- scene) psvg
+    (with-open-file (s (ensure-filename fn ".svg")
+                       :direction :output :if-exists :supersede)
+      (cl-svg:stream-out s scene))))
 

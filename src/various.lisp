@@ -18,6 +18,12 @@
   (format nil "~a-~8,'0d" fn i))
 
 
+(defun ensure-filename (fn postfix)
+  (let ((fn* (append-postfix (if fn fn "tmp") postfix)))
+    (format t "~%file: ~a~%~%" fn*)
+    fn*))
+
+
 (defmacro print-every (i n)
   `(if (= 0 (mod ,i ,n)) (format t "~%itt: ~a~%" ,i)))
 
