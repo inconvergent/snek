@@ -282,6 +282,7 @@
     :a4-portrait
     :a4-landscape
     :make
+    :make*
     :circ
     :path
     :save

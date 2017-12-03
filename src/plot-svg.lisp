@@ -31,6 +31,16 @@
                                   'plot-svg:a4-landscape.")))))
 
 
+(defun make* (&key height width stroke-width)
+  (make-plot-svg
+    :layout 'custom
+    :stroke-width stroke-width
+    :scene (cl-svg:make-svg-toplevel
+              'cl-svg:svg-1.1-toplevel
+              :height height
+              :width width)))
+
+
 (defun accumulate-path (pth a &optional b (offset (vec:zero)))
   (vector-push-extend
     (vec:with-xy-short ((vec:add a offset) x y)
@@ -53,7 +63,7 @@
     res))
 
 
-(defun path (psvg pts)
+(defun path (psvg pts &key stroke-width*)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
@@ -65,9 +75,9 @@
                                      pth))))
       :fill "none"
       :stroke "black"
-      :stroke-width stroke-width)))
+      :stroke-width (if stroke-width* stroke-width* stroke-width))))
 
-(defun wpath (psvg pts width)
+(defun wpath (psvg pts width &key stroke-width*)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
@@ -78,30 +88,33 @@
 
       (loop for a in pts
             and b in (cdr pts)
-            and i from 0
             do
-        (loop for s in (math:linspace rep rdown rup) do
+        (accumulate-path pth a)
+        (loop for s in (math:linspace rep rdown rup)
+              and i from 0
+              do
           (accumulate-path
               pth
               (if (= (mod i 2) 0) a b)
               (if (= (mod i 2) 0) b a)
-              (vec:scale (vec:norm (vec:perp (vec:sub b a))) s))))
+              (vec:scale (vec:norm (vec:perp (vec:sub b a))) s)))
+        (accumulate-path pth b))
 
       (cl-svg:draw scene
         (:path :d (cl-svg:path (finalize-path pth)))
         :fill "none"
         :stroke "black"
-        :stroke-width stroke-width))))
+        :stroke-width (if stroke-width* stroke-width* stroke-width)))))
 
 
-(defun circ (psvg xy rad &key fill)
+(defun circ (psvg xy rad &key fill stroke-width*)
   (declare (plot-svg psvg))
   (with-struct (plot-svg- scene stroke-width) psvg
     (let ((pth (cl-svg:make-path)))
       (vec:with-xy-short (xy x y)
         (cl-svg:draw scene (:circle :cx x :cy y :r rad)
           :fill (if fill "black" "none")
-          :stroke "black" :stroke-width stroke-width)))))
+          :stroke "black" :stroke-width (if stroke-width* stroke-width* stroke-width))))))
 
 
 (defun wcirc (psvg xy rad &optional outer-rad)
