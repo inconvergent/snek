@@ -101,7 +101,7 @@
     (with-struct (join-verts-alt- v w g) a
       (-valid-vert (num-verts v :err nil)
         (-valid-vert (num-verts w :err nil)
-          (add-edge! snk (list v w)) :g g)))))
+          (add-edge! snk (list v w) :g g))))))
 
 
 ; SPLIT EDGE
