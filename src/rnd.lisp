@@ -10,6 +10,19 @@
   (aref l (random (length l))))
 
 
+(defun nrnd-u-from (n a)
+  (let ((res nil)
+        (resind nil)
+        (anum (length a)))
+    (loop until (> (hset:num (hset:make :init resind)) (1- n))
+          do (setf resind (nrndi n 0 anum)))
+    (loop for i in resind collect (aref a i))))
+
+
+(defun nrnd-from (n a)
+  (loop for i in (nrndi n 0 (length a)) collect (aref a i)))
+
+
 ; NUMBERS AND RANGES
 
 
@@ -64,6 +77,12 @@
 (defun rndbtwn (a b)
   (declare (double-float a b))
   (+ a (random (- b a))))
+
+
+(defun nrndbtwn (n a b)
+  (declare (integer n))
+  (declare (double-float a b))
+  (loop for i from 0 below n collect (rndbtwn a b)))
 
 
 (defun rnd* (&optional (x 1.0d0))

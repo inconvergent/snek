@@ -115,6 +115,9 @@
     :nrnd*
     :nrndi
     :nrndi*
+    :nrndbtwn
+    :nrnd-u-from
+    :nrnd-from
     :on-circ
     :on-line
     :rnd
@@ -279,13 +282,15 @@
 (defpackage :plot-svg
   (:use :common-lisp)
   (:export
-    :a4-portrait
     :a4-landscape
+    :a4-portrait
+    :bzspl
+    :circ
     :make
     :make*
-    :circ
     :path
     :save
+    :wbzspl
     :wcirc
     :wpath)
   (:import-from :common-lisp-user
