@@ -282,7 +282,15 @@
 
     (do-test
       (length (bzspl:adaptive-pos (bzspl:make pts-a)))
-      226)))
+      226)
+
+    (do-test
+      (bzspl:len (bzspl:make pts-a))
+      225.14997459916276d0)
+
+    (do-test
+      (bzspl:len (bzspl:make pts-a :closed t))
+      275.13771955943105d0)))
 
 
 (defun test-hset ()

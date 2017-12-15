@@ -11,8 +11,7 @@
 
 
 (defun nrnd-u-from (n a)
-  (let ((res nil)
-        (resind nil)
+  (let ((resind nil)
         (anum (length a)))
     (loop until (> (hset:num (hset:make :init resind)) (1- n))
           do (setf resind (nrndi n 0 anum)))
@@ -261,4 +260,36 @@
         (xy (vec:copy init)))
     (lambda (stp)
       (setf xy (vec:add xy (setf a (vec:add a (in-circ stp))))))))
+
+
+; MACROS
+
+
+(defmacro with-prob (p &body body)
+  "
+  executes body with probability p.
+  "
+  (with-gensyms (pname)
+    `(let ((,pname ,p))
+       (when (< (random 1d0) ,p)
+         (list ,@body)))))
+
+
+(defmacro prob (p a &optional b)
+  `(if (< (rnd) ,p)
+     ,a ,b))
+
+
+(defmacro either (a b)
+  `(prob 0.5d0 ,a ,b))
+
+
+(defmacro rcond (&rest clauses)
+  (with-gensyms (val)
+    (let* ((tot 0d0)
+           (clauses* (loop for (prob . body) in clauses
+                           do (incf tot (math:dfloat prob))
+                           collect `((< ,val ,tot) ,@body))))
+    `(let ((,val (rnd ,tot)))
+      (cond ,@clauses*)))))
 

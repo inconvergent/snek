@@ -97,6 +97,7 @@
   (:export
     :aget
     :bernoulli
+    :either
     :get-acc-circ-stp*
     :get-acc-lin-stp
     :get-acc-lin-stp*
@@ -113,13 +114,15 @@
     :norm
     :nrnd
     :nrnd*
+    :nrnd-from
+    :nrnd-u-from
+    :nrndbtwn
     :nrndi
     :nrndi*
-    :nrndbtwn
-    :nrnd-u-from
-    :nrnd-from
     :on-circ
     :on-line
+    :prob
+    :rcond
     :rnd
     :rnd*
     :rndbtwn
@@ -129,6 +132,7 @@
     :rndspacei
     :with-in-circ
     :with-on-line
+    :with-prob
     :with-rndspace)
   (:import-from :common-lisp-user
     :PII
@@ -197,10 +201,11 @@
   (:use :common-lisp)
   (:export
     :adaptive-pos
+    :len
+    :make
     :pos
     :pos*
     :rndpos
-    :make
     :with-rndpos)
   (:import-from :common-lisp-user
     :with-gensyms
@@ -345,7 +350,6 @@
     :with
     :with-dx
     :with-grp
-    :with-prob
     :with-rnd-edge
     :with-rnd-vert
     :with-verts-in-rad)

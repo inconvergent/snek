@@ -53,6 +53,13 @@
   (make-array s :fill-pointer 0 :initial-element nil))
 
 
+(defun to-vec (init)
+  (declare (list init))
+  (make-array
+    (length init)
+    :initial-contents init))
+
+
 (defun make-int-vec (&optional (s 100))
   (make-array s :fill-pointer 0 :element-type 'integer))
 

@@ -70,60 +70,71 @@
         (floor (/ x s))))))
 
 
-(defun -select-pts (n vpts seg)
-  (declare (integer n seg))
+(defun -select-pts (vpts seg)
+  (declare (integer seg))
   (let ((i (* 2 seg)))
     (list (aref vpts i)
           (aref vpts (+ i 1))
           (aref vpts (+ i 2)))))
 
 
-(defmacro -x-to-pt (vpts n ns x)
+(defmacro -x-to-pt (vpts ns x)
   `(multiple-value-bind (x-loc seg)
     (-get-seg ,ns ,x)
-    (do-t x-loc (do-m (-select-pts ,n ,vpts seg)))))
+    (do-t x-loc (do-m (-select-pts ,vpts seg)))))
 
 
 (defun pos (b x)
   (declare (bzspl b))
   (declare (double-float x))
-  (with-struct (bzspl- n ns vpts) b
-    (-x-to-pt vpts n ns x)))
+  (with-struct (bzspl- ns vpts) b
+    (-x-to-pt vpts ns x)))
 
 
 (defun pos* (b xx)
   (declare (bzspl b))
   (declare (list xx))
-  (with-struct (bzspl- n ns vpts) b
+  (with-struct (bzspl- ns vpts) b
     (loop for x double-float in xx collect
-      (-x-to-pt vpts n ns x))))
+      (-x-to-pt vpts ns x))))
 
 
+(defun len (b)
+  (declare (bzspl b))
+  (let ((res 0d0))
+    (with-struct (bzspl- ns vpts) b
+      (loop for seg integer from 0 below ns do
+        (incf res (-get-segment-length vpts seg))))
+    res))
+
+
+; TODO: this is rather messy.
 (defun adaptive-pos (b &key (dens 1d0) (end t))
+  (declare (bzspl b))
   (let ((res (make-array 10 :fill-pointer 0 :element-type 'vec:vec)))
-    (with-struct (bzspl- n ns vpts) b
-      (loop for s from 0 below ns collect
-        (loop for x-loc in (math:linspace
-                             (ceiling (* (-get-segment-length vpts n s) dens))
-                             0d0 1d0 :end (and end (>= s (1- ns)))) do
-          (vector-push-extend  (do-t x-loc (do-m (-select-pts n vpts s))) res))))
+    (with-struct (bzspl- ns vpts) b
+      (loop for seg integer from 0 below ns collect
+        (loop for x-loc double-float in
+              (math:linspace (ceiling (* (-get-segment-length vpts seg) dens))
+                             0d0 1d0 :end (and end (>= seg (1- ns)))) do
+          (vector-push-extend  (do-t x-loc (do-m (-select-pts vpts seg))) res))))
        (coerce res 'list)))
 
 
 (defmacro with-rndpos ((b n rn) &body body)
-  (with-gensyms (x-loc seg b* bn bns vpts)
+  (with-gensyms (x-loc seg b* bns vpts)
     `(let* ((,b* ,b)
             (,bns (bzspl-ns ,b*))
-            (,bn (bzspl-n ,b*))
             (,vpts (bzspl-vpts ,b*)))
       (loop repeat ,n do
         (multiple-value-bind (,x-loc ,seg)
           (-get-seg ,bns (rnd:rnd))
-          (let ((,rn (do-t ,x-loc (do-m (-select-pts ,bn ,vpts ,seg)))))
+          (let ((,rn (do-t ,x-loc (do-m (-select-pts ,vpts ,seg)))))
             (progn ,@body)))))))
 
 
 (defun rndpos (b n &key order)
+  (declare (bzspl b))
   (declare (integer n))
   (pos* b (if order
             (sort (rnd:rndspace n 0d0 1d0) #'<)
@@ -165,18 +176,19 @@
     (-set-v-mean vpts opts 0 1 (- n* 1))))
 
 
-(defun -get-segment-length (vpts n seg)
-
+(defun -get-segment-length (vpts seg)
   (let ((curr nil)
         (prev 0d0)
         (err 10d0))
-
     (block iterations
-      (loop for c from 3 do
+      (loop for c integer from 3 do
         (setf curr
-              (let ((samples (loop for xi in (math:linspace (expt 2 c) 0d0 1d0) collect
-                                (do-t xi (do-m (-select-pts n vpts seg))))))
-                (loop for sa in samples and sb in (cdr samples)
+              (let ((samples (loop for xi double-float in
+                                     (math:linspace (expt 2 c) 0d0 1d0)
+                                   collect
+                                     (do-t xi (do-m (-select-pts vpts seg))))))
+                (loop for sa of-type vec:vec in samples
+                      and sb in (cdr samples)
                       summing (vec:dst sa sb) into l
                       finally (return l))))
         (setf err (abs (- prev curr)))
@@ -193,6 +205,7 @@
   (declare (integer n))
   (assert (>= n 3) (n) "must have at least 3 pts. has ~a." n)
   (let ((vpts (make-array (if closed (+ (* 2 n) 1) (- (* 2 n) 3))
+                          :initial-element (vec:zero)
                           :element-type 'vec:vec))
         (ns (if closed n (- n 2))))
 
@@ -201,6 +214,4 @@
       (-set-vpts-open vpts pts n))
 
     (make-bzspl :n n :ns ns :vpts vpts :closed closed)))
-
-; TODO: implement move?
 

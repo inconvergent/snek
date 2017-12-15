@@ -15,7 +15,7 @@
 
 
 (defmacro inside* ((size xy x y) &body body)
-  (with-gensyms (xname sname)
+  (with-gensyms (sname)
     `(let ((,sname ,size))
       (destructuring-bind (,x ,y)
         (vround ,xy)

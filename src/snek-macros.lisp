@@ -7,7 +7,7 @@
   all alterations created in this context will be flattened
   and applied to snk at the end of the context.
   "
-  (with-gensyms (sname zw aname recursive-do-alts x y bdy)
+  (with-gensyms (sname zw aname recursive-do-alts x y)
     `(let* ((,sname ,snk)
             (,zw ,zwidth)
             (,aname (snek-alt-names ,sname)))
@@ -141,14 +141,4 @@
         (loop for ,g being the hash-keys of ,grps
           if ,g ; ignores nil (main) grp
           ,(if collect 'collect 'do) (list ,@body))))))
-
-
-(defmacro with-prob (p &body body)
-  "
-  executes body with probability p.
-  "
-  (with-gensyms (pname)
-    `(let ((,pname ,p))
-       (when (< (random 1d0) ,p)
-         (list ,@body)))))
 

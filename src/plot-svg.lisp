@@ -14,13 +14,13 @@
   (make-plot-svg
     :layout layout
     :stroke-width stroke-width
-    :scene (case layout ('a4-landscape
+    :scene (case layout (a4-landscape
                           (cl-svg:make-svg-toplevel
                             'cl-svg:svg-1.1-toplevel
                             :height "210mm"
                             :width "297mm"
                             :view-box "0 0 1414.285 1000"))
-                        ('a4-portrait
+                        (a4-portrait
                           (cl-svg:make-svg-toplevel
                             'cl-svg:svg-1.1-toplevel
                             :height "297mm"
@@ -116,7 +116,7 @@
 
 (defun wbzspl (psvg pts offset width &key stroke-width*)
   (loop for s in (math:linspace
-                   (math:int (floor (* 1.5 width)))
+                   (math:int (* 1.5 width))
                    (- (/ width 2d0))
                    (/ width 2d0)) do
       (bzspl psvg (vec:lsub* pts (vec:scale offset s))
@@ -128,7 +128,7 @@
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
     (let ((pth (make-vec))
-          (rep (math:int (floor (* 1.5 width))))
+          (rep (math:int (* 1.5 width)))
           (rup (/ width 2d0))
           (rdown (- (/ width 2d0))))
 
@@ -156,18 +156,17 @@
 (defun circ (psvg xy rad &key fill stroke-width*)
   (declare (plot-svg psvg))
   (with-struct (plot-svg- scene stroke-width) psvg
-    (let ((pth (cl-svg:make-path)))
-      (vec:with-xy-short (xy x y)
-        (cl-svg:draw scene (:circle :cx x :cy y :r rad)
-          :fill (if fill "black" "none")
-          :stroke "black" :stroke-width (if stroke-width* stroke-width* stroke-width))))))
+    (vec:with-xy-short (xy x y)
+      (cl-svg:draw scene (:circle :cx x :cy y :r rad)
+        :fill (if fill "black" "none")
+        :stroke "black" :stroke-width (if stroke-width* stroke-width* stroke-width)))))
 
 
 (defun wcirc (psvg xy rad &optional outer-rad)
   (let* ((inner-rad (if outer-rad rad 1d0))
          (outer-rad* (if outer-rad outer-rad rad))
-         (n (math:int (floor (* (abs (- outer-rad* inner-rad))
-                                1.5d0)))))
+         (n (math:int (* (abs (- outer-rad* inner-rad))
+                               1.5d0))))
     (loop for r in (math:linspace n inner-rad outer-rad*) do
       (circ psvg xy r))))
 

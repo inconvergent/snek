@@ -6,11 +6,11 @@
 
 (defun int (x)
   (the integer
-       (coerce x 'integer)))
+       (coerce (floor x) 'integer)))
 
 
 (defun int* (xx)
-  (mapcar (lambda (x) (int x)) xx))
+  (mapcar (lambda (x) (int (floor x))) xx))
 
 
 (defun sfloat (x)

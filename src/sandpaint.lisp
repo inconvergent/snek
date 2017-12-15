@@ -262,7 +262,7 @@
   (with-struct (sandpaint- size vals rgba) sand
     (declare (type (array double-float) vals))
     (loop for u of-type vec:vec in path and w of-type vec:vec in (cdr path) do
-      (let ((stps (math:int (floor (+ 1 (* dens (vec:dst u w)))))))
+      (let ((stps (math:int (+ 1 (* dens (vec:dst u w))))))
         (declare (integer stps))
         (math:rep (p (math:linspace stps 0 1 :end nil))
           (-draw-circ vals size (vec:on-line p u w) rad grains rgba))))))

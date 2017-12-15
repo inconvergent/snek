@@ -68,8 +68,7 @@
 
 
 (defmacro with-verts-in-rad ((zm verts xy rad v) &body body)
-  (with-gensyms (rad2 zm* zwidth zone-to-verts xy* a b za zb
-                 vals verts* exists z)
+  (with-gensyms (rad2 zm* zwidth zone-to-verts xy* za zb vals verts* exists z)
     `(let* ((,rad2 (expt ,rad 2d0))
             (,verts* ,verts)
             (,zm* ,zm)

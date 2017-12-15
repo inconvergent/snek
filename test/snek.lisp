@@ -466,15 +466,7 @@
 
     (do-test
       (snek::snek-num-verts snk)
-      13)
-
-    (do-test
-      (snek:with-prob 1.0 1)
-      '(1))
-
-    (do-test
-      (snek:with-prob 0.5 1)
-      nil)))
+      13)))
 
 (defun test-snek-zmap ()
   (let ((snk (snek:make)))
