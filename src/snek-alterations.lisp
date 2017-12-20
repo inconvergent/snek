@@ -56,7 +56,8 @@
       (-valid-vert (num-verts v :err nil)
         (let ((fxy (if rel (vec:add (vec:arr-get verts v) xy) xy)))
           (setf (aref verts v 0) (vec::vec-x fxy)
-                (aref verts v 1) (vec::vec-y fxy)))))))
+                (aref verts v 1) (vec::vec-y fxy))
+          fxy)))))
 
 
 ; APPEND EDGE

@@ -1,6 +1,6 @@
 
 (proclaim '(optimize speed))
-(proclaim '(optimize (space 0)))
+(proclaim '(optimize (space 2)))
 (proclaim '(inline last1 single append1 conc1 mklist))
 ;(declaim '(optimize (debug 3)))
 
@@ -13,7 +13,7 @@
 
 (asdf:defsystem "snek"
   :description "SNEK - A Generative System for Writing Generative Systems"
-  :version "2.8.0"
+  :version "2.9.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t

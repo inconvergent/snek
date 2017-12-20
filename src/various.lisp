@@ -60,6 +60,10 @@
     :initial-contents init))
 
 
+(defun to-list (a)
+  (coerce a 'list))
+
+
 (defun make-int-vec (&optional (s 100))
   (make-array s :fill-pointer 0 :element-type 'integer))
 
@@ -127,4 +131,7 @@
       (loop for ,x integer from 0 below ,sname do
         (loop for ,y integer from 0 below ,sname do
           ,@body)))))
+
+
+(abbrev vpe vector-push-extend)
 

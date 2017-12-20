@@ -9,30 +9,28 @@
 
 (defmacro test-title (&body body)
   `(progn
-     (format t "~%~a ##############~%" ',@body)
+     (format t "~%~%@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@> ~a~%" ',@body)
      ,@body))
 
 
-(defmacro do-test (a &optional (b nil))
+(defmacro do-test (a b)
   (with-gensyms (aname bname)
-    (incf *tests*)
     `(let ((,aname ,a)
            (,bname ,b))
+      (incf *tests*)
       (if (funcall #'equalp ,aname ,bname)
         (progn
           (incf *passes*)
-          (format t "~%~a ~%--> ok" ',a))
+          (format t "~%~a ~%-----------------------------------------> ok" ',a
+                  :pretty t))
         (progn
           (incf *fails*)
-          (format t "~%~a ~%#-> not ok. #################################### ~%--  wanted: ~% ~a ~%--  got: ~% ~a"
-            ',a
-            ',b
-            ,aname)))
-      (format t "~%---------------------------~%"))))
+          (format t "~%~a ~%#########################################> not ok ~%--  wanted: ~% ~a ~%--  got: ~% ~a~%-----------------------------------------~%"
+            ',a ',b ,aname
+            :pretty t))))))
 
 
 (defun test-summary ()
   (format t "~% tests:  ~a~% fails:  ~a~% passes: ~a~%"
-          *tests* *fails* *passes*))
-
+    *tests* *fails* *passes*))
 

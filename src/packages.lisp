@@ -136,6 +136,7 @@
     :with-rndspace)
   (:import-from :common-lisp-user
     :PII
+    :to-vec
     :with-gensyms))
 
 
@@ -189,6 +190,7 @@
     :make
     :mem
     :to-list
+    :vmem
     :with-graph-edges)
   (:import-from :common-lisp-user
     :flatten
@@ -336,6 +338,7 @@
     :get-vert
     :get-vert-inds
     :get-verts
+    :is-vert-in-grp
     :itr-all-verts
     :itr-edges
     :itr-grps
@@ -352,12 +355,16 @@
     :with-grp
     :with-rnd-edge
     :with-rnd-vert
+    :zwith
     :with-verts-in-rad)
   (:import-from :common-lisp-user
     :append-postfix
     :flatten
     :get-dfloat-tup
     :make-dfloat-array
+    :make-vec
+    :to-list
+    :vpe
     :with-gensyms
     :with-struct))
 

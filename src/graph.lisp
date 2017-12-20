@@ -138,6 +138,12 @@ a simple (undirected) graph structure based on adjacency lists.
   (hset:to-list (graph-verts grph)))
 
 
+(defun vmem (grph v)
+  (declare (graph grph))
+  (declare (integer v))
+  (hset:mem (graph-verts grph) v))
+
+
 (defmacro with-graph-edges ((grph e) &body body)
   (with-gensyms (adj a b)
     `(let ((,adj (graph-adj ,grph)))

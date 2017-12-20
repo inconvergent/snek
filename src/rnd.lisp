@@ -11,11 +11,14 @@
 
 
 (defun nrnd-u-from (n a)
-  (let ((resind nil)
-        (anum (length a)))
-    (loop until (> (hset:num (hset:make :init resind)) (1- n))
+  (let* ((a* (if (eql (type-of a) 'cons) (to-vec a) a))
+         (resind nil)
+         (anum (length a*)))
+    (when (> n anum)
+      (error "not enough distinct elements in a."))
+    (loop until (>= (hset:num (hset:make :init resind)) n)
           do (setf resind (nrndi n 0 anum)))
-    (loop for i in resind collect (aref a i))))
+    (loop for i in resind collect (aref a* i))))
 
 
 (defun nrnd-from (n a)

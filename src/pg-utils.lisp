@@ -61,3 +61,7 @@
                      fields)
          ,@body))))
 
+
+(defmacro abbrev (short long)
+  `(defmacro ,short (&rest args)
+     `(,',long ,@ARGS)))

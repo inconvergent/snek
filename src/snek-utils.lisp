@@ -47,6 +47,11 @@
 
 
 (defun add-vert! (snk xy)
+  "
+  adds a new vertex to snek
+
+  returns the id of the new vertex
+  "
   (declare (snek snk))
   (declare (vec:vec xy))
   (with-struct (snek- verts num-verts) snk
@@ -57,6 +62,11 @@
 
 
 (defun add-verts! (snk vv)
+  "
+  adds new vertices to snek
+
+  returns the ids of the new vertices
+  "
   (declare (snek snk))
   (declare (list vv))
   (loop for xy of-type vec:vec in vv collect
@@ -64,6 +74,9 @@
 
 
 (defun get-vert (snk v)
+  "
+  get the coordinate (vec) of vertex (id) v
+  "
   (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
@@ -72,6 +85,9 @@
 
 
 (defun get-verts (snk vv)
+  "
+  get the coordinates (vec) of vertices (ids) vv
+  "
   (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
@@ -80,6 +96,9 @@
 
 
 (defun get-all-verts (snk)
+  "
+  returns the coordinates (vec) of all vertices.
+  "
   (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
@@ -88,6 +107,9 @@
 
 
 (defun get-all-grps (snk)
+  "
+  returns all grps.
+  "
   (declare (snek snk))
   (loop for g being the hash-keys of (snek-grps snk)
     if g ; ignores nil (main) grp
@@ -95,12 +117,31 @@
 
 
 (defun get-grp-verts (snk &key g)
+  "
+  returns all vertices in a grp
+  "
   (declare (snek snk))
   (get-verts snk
     (get-vert-inds snk :g g)))
 
 
+(defun is-vert-in-grp (snk v &key g)
+  "
+  tests whether v is in grp g
+  "
+  (declare (snek snk))
+  (with-struct (snek- grps) snk
+    (multiple-value-bind (grp exists)
+      (gethash g grps)
+      (if exists
+        (graph:vmem (grp-grph grp) v)
+        (error "grp does not exist: ~a" grp)))))
+
+
 (defun get-vert-inds (snk &key g)
+  "
+  returns all vertex indices that belongs to a grp
+  "
   (declare (snek snk))
   (with-struct (snek- grps) snk
     (multiple-value-bind (grp exists)
@@ -130,17 +171,17 @@
   (declare (integer v))
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
-      (graph:get-incident-edges grph v)
-      (let ((edg (graph:get-incident-edges grph v)))
-        edg
-        #|(if edg|#
-          ;edg
-          #|(error "vert ~a does does not belong to an edge in grp ~a" v g))|#))))
+      (graph:get-incident-edges grph v))))
 
 ; TODO: get-all-incident-edges?
 
 
 (defun add-edge! (snk ee &key g)
+  "
+  adds a new edge to snek. provided the edge is valid. otherwise it returns nil.
+
+  note: returns nil if the edge exists already.
+  "
   (declare (snek snk))
   (with-grp (snk grp g)
     (with-struct (snek- num-verts) snk
@@ -156,6 +197,9 @@
 
 
 (defun add-edges! (snk ee)
+  "
+  adds multiple edges (see above). returns a list of the results.
+  "
   (declare (snek snk))
   (declare (list ee))
   (loop for e list in ee collect

@@ -1,33 +1,57 @@
 
 (in-package :snek)
 
-(defmacro with ((snk &key (zwidth nil)) &body body)
+(defmacro with ((snk &key zwidth collect r-alts) &body body)
   "
   creates a context for manipulating snek via alterations.
   all alterations created in this context will be flattened
   and applied to snk at the end of the context.
   "
-  (with-gensyms (sname zw aname recursive-do-alts x y)
-    `(let* ((,sname ,snk)
-            (,zw ,zwidth)
-            (,aname (snek-alt-names ,sname)))
+  (declare (type boolean collect))
+  (declare (type boolean r-alts))
+  (with-gensyms (sname zw aname rec x y resalts do-funcall finally)
+    (let* ((do-funcall `(funcall (gethash (type-of ,x) ,aname) ,sname ,x))
+           (wrap-funcall (cond ((and collect r-alts)
+                                  `(vpe (list ,do-funcall ,x) ,resalts))
+                               (collect `(vpe ,do-funcall ,resalts))
+                               (t do-funcall)))
+           (finally (if collect `(to-list ,resalts)
+                                nil)))
 
-      (incf (snek-wc ,sname))
+      `(let* ((,sname ,snk)
+              (,zw ,zwidth)
+              (,resalts (make-vec))
+              (,aname (snek-alt-names ,sname)))
 
-      (labels ((,recursive-do-alts (,x)
-                 (cond ((null ,x))
-                 ((atom ,x)
-                    (when (gethash (type-of ,x) ,aname)
-                      ; if atom is also alteration (else ignore):
-                      (funcall (gethash (type-of ,x) ,aname) ,sname ,x)))
-                 (t (,recursive-do-alts (car ,x))
-                    (,recursive-do-alts (cdr ,x))))))
+        (incf (snek-wc ,sname))
 
-        (zmap:with* (,zw (snek-verts ,sname) (snek-num-verts ,sname)
+        (labels ((,rec (,x)
+                  (cond ((null ,x))
+                  ((atom ,x)
+                     ; if atom is also alteration (else ignore):
+                     (when (gethash (type-of ,x) ,aname) ,wrap-funcall))
+                  (t (,rec (car ,x))
+                     (,rec (cdr ,x))))))
+
+          (zmap:with* (,zw (snek-verts ,sname) (snek-num-verts ,sname)
+                          (lambda (,y) (setf (snek-zmap ,sname) ,y)))
+            ; this lets @body be executed in the context of zmap:with;
+            ; useful if we want to have a parallel context inside zmap.
+            (,rec (list ,@body))))
+
+        ,finally))))
+
+
+(defmacro zwith ((snk zwidth) &body body)
+  "
+  creates a snek context. the zmap is constant inside this context.
+  "
+  (with-gensyms (sname zw y)
+    `(let ((,sname ,snk)
+           (,zw ,zwidth))
+      (zmap:with* (,zw (snek-verts ,sname) (snek-num-verts ,sname)
                         (lambda (,y) (setf (snek-zmap ,sname) ,y)))
-          ; this lets @body be executed in the context of zmap:with;
-          ; useful if we want to have a parallel context inside zmap.
-          (,recursive-do-alts (list ,@body)))))))
+          (progn ,@body)))))
 
 
 (defmacro with-dx ((snk vv dx d) &body body)
@@ -98,6 +122,7 @@
 
   if g is not provided, the main grp wil be used.
   "
+  (declare (type boolean collect))
   (with-gensyms (grp sname)
     `(let ((,sname ,snk))
       (with-grp (,sname ,grp ,g)
@@ -110,6 +135,7 @@
   "
   iterates over all verts in snk as i.
   "
+  (declare (type boolean collect))
   (with-gensyms (sname)
     `(let ((,sname ,snk))
       (loop for ,i integer from 0 below (snek-num-verts ,sname)
@@ -122,6 +148,7 @@
 
   if g is not provided, the main grp will be used.
   "
+  (declare (type boolean collect))
   (with-gensyms (grp grph)
     `(with-grp (,snk ,grp ,g)
       (let ((,grph (grp-grph ,grp)))
@@ -135,6 +162,7 @@
   "
   iterates over all grps of snk as g.
   "
+  (declare (type boolean collect))
   (with-gensyms (grps sname)
     `(let ((,sname ,snk))
       (let ((,grps (snek-grps ,sname)))
