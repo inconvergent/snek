@@ -5,6 +5,12 @@
       (vec:vec x y))))
 
 
+(defun get-grid* (sx sy numx numy)
+  (loop for x in (math:linspace numx (first sx) (second sx)) collect
+    (loop for y in (math:linspace numy (first sy) (second sy)) collect
+      (vec:vec x y))))
+
+
 (defun get-rnd-grid (size edge ngrid)
   (let ((a (- edge))
         (b (+ size edge)))

@@ -63,7 +63,7 @@
     res))
 
 
-(defun path (psvg pts &key stroke-width*)
+(defun path (psvg pts &key sw)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
@@ -75,7 +75,7 @@
                                      pth))))
       :fill "none"
       :stroke "black"
-      :stroke-width (if stroke-width* stroke-width* stroke-width))))
+      :stroke-width (if sw sw stroke-width))))
 
 
 (defun -move-to (res p)
@@ -89,41 +89,60 @@
       (vector-push-extend (format nil "Q~a,~a ~a,~a " ax ay bx by) res))))
 
 
-(defun bzspl (psvg pts &key stroke-width*)
+(defun -fl (a)
+  (first (last a)))
+
+
+(defun -roll-once (aa)
+  (append (subseq aa 1) (list (first aa))))
+
+
+(defun -do-open (pts pth)
+  (-move-to pth (first pts))
+  (if (= (length pts) 3)
+    ; 3 pts
+    (-quadratric pth (second pts) (third pts))
+    ; more than 3 pts
+    (let ((inner (subseq pts 1 (1- (length pts)))))
+      (loop for a in inner
+            and b in (cdr inner)
+            do
+        (-quadratric pth a (vec:mid a b)))
+      (-quadratric pth (-fl inner) (-fl pts)))))
+
+
+(defun -do-closed (pts pth)
+  (-move-to pth (vec:mid (-fl pts) (first pts)))
+  (loop for a in pts
+        and b in (-roll-once pts)
+        do
+    (-quadratric pth a (vec:mid a b))))
+
+
+(defun bzspl (psvg pts &key closed sw)
   (when (< (length pts) 3)
     (error "needs at least 3 pts."))
 
   (with-struct (plot-svg- scene stroke-width) psvg
     (let ((pth (make-vec)))
-      (-move-to pth (first pts))
-      (if (= (length pts) 3)
-        ; 3 pts
-        (-quadratric pth (second pts) (third pts))
-        ; more than 3 pts
-        (let ((inner (subseq pts 1 (1- (length pts)))))
-          (loop for a in inner
-                and b in (cdr inner)
-                do
-            (-quadratric pth a (vec:mid a b)))
-          (-quadratric pth (first (last inner)) (first (last pts)))))
-
+      (if closed (-do-closed pts pth) (-do-open pts pth))
       (cl-svg:draw scene
         (:path :d (cl-svg:path (finalize-path pth)))
          :fill "none"
          :stroke "black"
-         :stroke-width (if stroke-width* stroke-width* stroke-width)))))
+         :stroke-width (if sw sw stroke-width)))))
 
 
-(defun wbzspl (psvg pts offset width &key stroke-width*)
+(defun wbzspl (psvg pts offset width &key closed sw)
   (loop for s in (math:linspace
                    (math:int (* 1.5 width))
                    (- (/ width 2d0))
                    (/ width 2d0)) do
       (bzspl psvg (vec:lsub* pts (vec:scale offset s))
-             :stroke-width* stroke-width*)))
+             :closed closed :sw sw)))
 
 
-(defun wpath (psvg pts width &key stroke-width*)
+(defun wpath (psvg pts width &key sw)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
@@ -150,16 +169,16 @@
         (:path :d (cl-svg:path (finalize-path pth)))
         :fill "none"
         :stroke "black"
-        :stroke-width (if stroke-width* stroke-width* stroke-width)))))
+        :stroke-width (if sw sw stroke-width)))))
 
 
-(defun circ (psvg xy rad &key fill stroke-width*)
+(defun circ (psvg xy rad &key fill sw)
   (declare (plot-svg psvg))
   (with-struct (plot-svg- scene stroke-width) psvg
     (vec:with-xy-short (xy x y)
       (cl-svg:draw scene (:circle :cx x :cy y :r rad)
         :fill (if fill "black" "none")
-        :stroke "black" :stroke-width (if stroke-width* stroke-width* stroke-width)))))
+        :stroke "black" :stroke-width (if sw sw stroke-width)))))
 
 
 (defun wcirc (psvg xy rad &optional outer-rad)
