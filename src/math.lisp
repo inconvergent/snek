@@ -6,7 +6,7 @@
 
 (defun int (x)
   (the integer
-       (coerce (floor x) 'integer)))
+    (coerce (floor x) 'integer)))
 
 
 (defun int* (xx)
@@ -15,7 +15,7 @@
 
 (defun sfloat (x)
   (the float
-       (coerce x 'float)))
+    (coerce x 'float)))
 
 
 (defun sfloat* (xx)
@@ -24,7 +24,7 @@
 
 (defun dfloat (x)
   (the double-float
-       (coerce x 'double-float)))
+    (coerce x 'double-float)))
 
 
 (defun dfloat* (xx)
@@ -41,15 +41,15 @@
 (defmacro nrep (n &body body)
   (with-gensyms (i nname)
     `(let ((,nname ,n))
-      (loop for ,i integer from 1 to ,nname collect (progn ,@body)))))
+      (loop for ,i of-type integer from 1 to ,nname collect (progn ,@body)))))
 
 
 (defun range (a &optional (b nil))
   ; TODO
   ; (declare (integer a))
   (if (not b)
-    (loop for x integer from 0 below a collect x)
-    (loop for x integer from a below b collect x)))
+    (loop for x of-type integer from 0 below a collect x)
+    (loop for x of-type integer from a below b collect x)))
 
 
 (defun lget (l ii)

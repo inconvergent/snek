@@ -39,10 +39,10 @@
 
 (defun do-m (pts)
   (declare (list pts))
-  (loop for mrow list in *m* collect
+  (loop for mrow of-type list in *m* collect
     (let ((s (vec:vec 0d0 0d0)))
       (loop for p of-type vec:vec in pts
-            and mr double-float in mrow do
+            and mr of-type double-float in mrow do
         (setf s (vec:add s (vec:scale p mr))))
       s)))
 
@@ -52,7 +52,7 @@
   (declare (list pk))
   (let ((s (vec:vec 0d0 0d0)))
     (loop for p of-type vec:vec in pk
-          and xi double-float in (list 1d0 x (* x x)) do
+          and xi of-type double-float in (list 1d0 x (* x x)) do
       (setf s (vec:add s (vec:scale p xi))))
     s))
 
@@ -95,7 +95,7 @@
   (declare (bzspl b))
   (declare (list xx))
   (with-struct (bzspl- ns vpts) b
-    (loop for x double-float in xx collect
+    (loop for x of-type double-float in xx collect
       (-x-to-pt vpts ns x))))
 
 
@@ -103,7 +103,7 @@
   (declare (bzspl b))
   (let ((res 0d0))
     (with-struct (bzspl- ns vpts) b
-      (loop for seg integer from 0 below ns do
+      (loop for seg of-type integer from 0 below ns do
         (incf res (-get-segment-length vpts seg))))
     res))
 
@@ -111,10 +111,10 @@
 ; TODO: this is rather messy.
 (defun adaptive-pos (b &key (dens 1d0) (end t))
   (declare (bzspl b))
-  (let ((res (make-array 10 :fill-pointer 0 :element-type 'vec:vec)))
+  (let ((res (make-array 10 :fill-pointer 0 :element-type 'vec:vec :adjustable t)))
     (with-struct (bzspl- ns vpts) b
-      (loop for seg integer from 0 below ns collect
-        (loop for x-loc double-float in
+      (loop for seg of-type integer from 0 below ns collect
+        (loop for x-loc of-type double-float in
               (math:linspace (ceiling (* (-get-segment-length vpts seg) dens))
                              0d0 1d0 :end (and end (>= seg (1- ns)))) do
           (vector-push-extend  (do-t x-loc (do-m (-select-pts vpts seg))) res))))
@@ -154,13 +154,13 @@
 (defun -set-vpts-open (vpts pts n)
   (let ((opts (make-array n :element-type 'list :initial-contents pts))
         (n* (- (* 2 n) 3)))
-    (loop for i integer from 0 below 2
-          and k integer from (- n* 2)
-          and j integer from (- n 2) do
+    (loop for i of-type integer from 0 below 2
+          and k of-type integer from (- n* 2)
+          and j of-type integer from (- n 2) do
       (-set-v vpts opts i i)
       (-set-v vpts opts j k))
 
-    (loop for i integer from 1 below (- n 2) do
+    (loop for i of-type integer from 1 below (- n 2) do
       (let ((j (- (* 2 i) 1)))
         (-set-v vpts opts i j)
         (-set-v-mean vpts opts i (+ i 1) (+ j 1))))))
@@ -169,7 +169,7 @@
 (defun -set-vpts-closed (vpts pts n)
   (let ((opts (make-array n :element-type 'list :initial-contents pts))
         (n* (+ (* 2 n) 1)))
-    (loop for i integer from 0 below n do
+    (loop for i of-type integer from 0 below n do
       (let ((j (* 2 i)))
         (-set-v-mean vpts opts i (mod (+ i 1) n) j)
         (-set-v vpts opts (mod (+ i 1) n) (+ j 1))))
@@ -181,9 +181,9 @@
         (prev 0d0)
         (err 10d0))
     (block iterations
-      (loop for c integer from 3 do
+      (loop for c of-type integer from 3 do
         (setf curr
-              (let ((samples (loop for xi double-float in
+              (let ((samples (loop for xi of-type double-float in
                                      (math:linspace (expt 2 c) 0d0 1d0)
                                    collect
                                      (do-t xi (do-m (-select-pts vpts seg))))))

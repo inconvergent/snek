@@ -191,6 +191,13 @@
           aa))
 
 
+(defun lscale* (aa s)
+  (declare (list aa))
+  (declare (double-float s))
+  (mapcar (lambda (a) (scale a s))
+          aa))
+
+
 (defun mult (a b)
   (declare (vec a b))
   (vec (* (vec-x a) (vec-x b))
@@ -243,8 +250,8 @@
 
 (defun len2 (a)
   (declare (vec a))
-  (+ (expt (vec-x a) 2d0)
-     (expt (vec-y a) 2d0)))
+  (+ (expt (vec-x a) 2)
+     (expt (vec-y a) 2)))
 
 (defun len (a)
   (declare (vec a))

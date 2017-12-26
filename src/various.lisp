@@ -50,7 +50,7 @@
 
 
 (defun make-vec (&optional (s 100))
-  (make-array s :fill-pointer 0 :initial-element nil))
+  (make-array s :fill-pointer 0 :initial-element nil :adjustable t))
 
 
 (defun to-vec (init)
@@ -65,7 +65,7 @@
 
 
 (defun make-int-vec (&optional (s 100))
-  (make-array s :fill-pointer 0 :element-type 'integer))
+  (make-array s :fill-pointer 0 :element-type 'integer :adjustable t))
 
 
 (defun get-atup (a i)
@@ -128,8 +128,8 @@
 (defmacro square-loop ((x y s) &body body)
   (with-gensyms (sname)
     `(let ((,sname ,s))
-      (loop for ,x integer from 0 below ,sname do
-        (loop for ,y integer from 0 below ,sname do
+      (loop for ,x of-type integer from 0 below ,sname do
+        (loop for ,y of-type integer from 0 below ,sname do
           ,@body)))))
 
 

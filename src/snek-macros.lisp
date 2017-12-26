@@ -1,17 +1,17 @@
 
 (in-package :snek)
 
-(defmacro with ((snk &key zwidth collect r-alts) &body body)
+(defmacro with ((snk &key zwidth collect include-alts) &body body)
   "
   creates a context for manipulating snek via alterations.
   all alterations created in this context will be flattened
   and applied to snk at the end of the context.
   "
   (declare (type boolean collect))
-  (declare (type boolean r-alts))
+  (declare (type boolean include-alts))
   (with-gensyms (sname zw aname rec x y resalts do-funcall finally)
     (let* ((do-funcall `(funcall (gethash (type-of ,x) ,aname) ,sname ,x))
-           (wrap-funcall (cond ((and collect r-alts)
+           (wrap-funcall (cond ((and collect include-alts)
                                   `(vpe (list ,do-funcall ,x) ,resalts))
                                (collect `(vpe ,do-funcall ,resalts))
                                (t do-funcall)))
@@ -138,7 +138,7 @@
   (declare (type boolean collect))
   (with-gensyms (sname)
     `(let ((,sname ,snk))
-      (loop for ,i integer from 0 below (snek-num-verts ,sname)
+      (loop for ,i of-type integer from 0 below (snek-num-verts ,sname)
         ,(if collect 'collect 'do) (list ,@body)))))
 
 

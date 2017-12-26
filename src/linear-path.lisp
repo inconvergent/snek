@@ -62,38 +62,16 @@
   `(pos* ,path (rnd:rndspace 0.0d0 1.0d0 ,n)))
 
 
-(defun make (pts &key closed &aux (n (length pts)))
+(defun make (pts &key closed &aux
+              (n (if closed (+ (length pts) 1) (length pts))))
   (let ((p (make-dfloat-array n))
         (l (make-dfloat-array n :cols 1)))
     (loop for pt in pts and i from 0 do
       (vec:arr-set p i pt))
+
+    (if closed
+      (vec:arr-set p (1- n) (first pts)))
+
     (-set-path-lens p l n)
     (make-path :n n :pts p :lens l :closed closed)))
-
-
-(defun -move-rel (pts i xy)
-  (destructuring-bind (x y)
-    xy
-    (incf (aref pts i 0) x)
-    (incf (aref pts i 1) y)))
-
-
-(defun -move (pts i xy)
-  (destructuring-bind (x y)
-    xy
-    (setf (aref pts i 0) x
-          (aref pts i 1) y)))
-
-
-(defun move (path pos &key rel)
-  (let ((do-move (if rel #'-move-rel #'-move)))
-    (with-struct (path- pts lens n closed) path
-      (loop for xy in pos and i from 0 do
-        (funcall do-move pts i xy))
-
-      (if closed
-        (setf (aref pts (1- n) 0) (aref pts 0 0)
-              (aref pts (1- n) 1) (aref pts 0 1)))
-
-      (-set-path-lens pts lens n))))
 

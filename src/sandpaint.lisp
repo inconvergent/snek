@@ -192,7 +192,7 @@
   (declare (integer n))
   (with-struct (sandpaint- size vals rgba) sand
     (declare (type (array double-float) vals))
-    (loop for i integer from 0 below n do
+    (loop for i of-type integer from 0 below n do
       (vec:inside* (size (vec:arr-get vv i) x y)
         (-operator-over vals x y rgba)))))
 
@@ -221,7 +221,7 @@
   (declare (double-float rad))
   (with-struct (sandpaint- size vals rgba) sand
     (declare (type (array double-float) vals))
-    (loop for i integer from 0 below num do
+    (loop for i of-type integer from 0 below num do
       (-draw-circ vals size (vec:arr-get vv i)
                   rad grains rgba))))
 

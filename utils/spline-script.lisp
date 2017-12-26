@@ -12,15 +12,15 @@
 
 
 (defun test-centroids (counts nc ncn)
-  (loop for i from 0 below nc always
+  (loop for i of-type fixnum from 0 below nc always
         (multiple-value-bind (val exists)
           (gethash i counts)
           (and exists (>= val ncn)))))
 
 
 (defun get-dst (centroids cand)
-  (first (sort (loop for c in centroids
-                     and i from 0
+  (first (sort (loop for c of-type vec:vec in centroids
+                     and i of-type fixnum from 0
                      collect (list i (vec:dst cand c)))
                #'< :key #'second)))
 
@@ -28,7 +28,7 @@
 (defun get-centroids (bbox-fxn dst nc)
   (let ((hits 1)
         (centroids (funcall bbox-fxn 1)))
-    (loop for i from 0 do
+    (loop for i of-type fixnum from 0 do
       (let ((cand (first (funcall bbox-fxn 1))))
         (if (every (lambda (d) (> d dst))
                    (vec:ldst* centroids cand))
@@ -74,14 +74,14 @@
             (lambda ()
               (let ((counts (make-hash-table :test #'equal))
                     (centroid-pts (make-hash-table :test #'equal)) )
-                (loop for i from 0 do
+                (loop for i of-type fixnum from 0 do
                   (-do-test-cand gl
                                  centroid-pts
                                  counts
                                  (first (funcall (spline-glyph-bbox-fxn gl) 1)))
                   until (test-centroids counts nc ncn))
 
-                (apply #'append (loop for i from 0 below nc
+                (apply #'append (loop for i of-type fixnum from 0 below nc
                                     collect (gethash i centroid-pts))))))
       gl)))
 
@@ -91,7 +91,7 @@
                                   sort-fxn
                                   (min-dst 0d0))
   (let ((alphabet (make-hash-table :test #'equal)))
-    (loop for i from 0 and c across letters do
+    (loop for c across letters do
           (setf (gethash c alphabet)
                 (make-glyph c
                             (funcall get-bbox-fxn)

@@ -17,6 +17,7 @@
     :inside
     :inside*
     :iscale
+    :lscale*
     :isub
     :ladd
     :ladd*

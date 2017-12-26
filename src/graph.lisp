@@ -115,8 +115,8 @@ a simple (undirected) graph structure based on adjacency lists.
         (adj (graph-adj grph)))
     (declare (type (array list) res))
     (declare (hash-table adj))
-    (loop for a integer being the hash-keys of adj do
-      (loop for b integer in (hset:to-list (gethash a adj))
+    (loop for a of-type integer being the hash-keys of adj do
+      (loop for b of-type integer in (hset:to-list (gethash a adj))
         if (<= a b)
         do (vector-push-extend (list a b) res)))
     res))
@@ -128,7 +128,7 @@ a simple (undirected) graph structure based on adjacency lists.
   (with-struct (graph- adj) grph
     (let ((a (gethash v adj)))
       (if a
-        (loop for w integer being the hash-keys of a collect
+        (loop for w of-type integer being the hash-keys of a collect
               (sort (list v w) #'<))
         nil))))
 
@@ -147,8 +147,8 @@ a simple (undirected) graph structure based on adjacency lists.
 (defmacro with-graph-edges ((grph e) &body body)
   (with-gensyms (adj a b)
     `(let ((,adj (graph-adj ,grph)))
-      (loop for ,a integer being the hash-keys of ,adj collect
-        (loop for ,b integer in (hset:to-list (gethash ,a ,adj))
+      (loop for ,a of-type integer being the hash-keys of ,adj collect
+        (loop for ,b of-type integer in (hset:to-list (gethash ,a ,adj))
               do
                 (setf ,e (list ,a ,b))
               collect

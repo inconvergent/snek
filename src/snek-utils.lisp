@@ -39,7 +39,7 @@
 (defmacro -valid-verts ((num vv v) &body body)
   (with-gensyms (vv*)
     `(let ((,vv* ,vv))
-      (loop for ,v integer in ,vv*
+      (loop for ,v of-type integer in ,vv*
         if
           (and (> ,v -1) (< ,v ,num))
         collect
@@ -102,7 +102,7 @@
   (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
-    (loop for v integer from 0 below num-verts
+    (loop for v of-type integer from 0 below num-verts
       collect (vec:arr-get verts v))))
 
 
@@ -202,7 +202,7 @@
   "
   (declare (snek snk))
   (declare (list ee))
-  (loop for e list in ee collect
+  (loop for e of-type list in ee collect
     (add-edge! snk e)))
 
 

@@ -59,7 +59,7 @@
   (declare (integer num-verts))
   (declare (type (array double-float) verts))
   (let ((zone-to-verts (make-hash-table :test #'equal)))
-    (loop for v integer from 0 below num-verts do
+    (loop for v of-type integer from 0 below num-verts do
       (-add-v-to-zone verts zone-to-verts v zwidth))
     (-make-zmap
       :zwidth zwidth
@@ -69,7 +69,7 @@
 
 (defmacro with-verts-in-rad ((zm verts xy rad v) &body body)
   (with-gensyms (rad2 zm* zwidth zone-to-verts xy* za zb vals verts* exists z)
-    `(let* ((,rad2 (expt ,rad 2d0))
+    `(let* ((,rad2 (expt ,rad 2))
             (,verts* ,verts)
             (,zm* ,zm)
             (,xy* ,xy)
@@ -89,7 +89,7 @@
 
 
 (defun verts-in-rad (zm verts xy rad &aux
-                           (rad2 (expt (math:dfloat rad) 2.0d0)))
+                           (rad2 (expt (math:dfloat rad) 2)))
   (declare (type (array double-float) verts))
   (declare (zmap zm))
   (declare (vec:vec xy))
