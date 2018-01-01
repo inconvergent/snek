@@ -1,9 +1,3 @@
-tmp.png
-examples/res
-examples/*png
-examples/*.2obj
-examples/res/*.2obj
-gen-*/*png
-gen-*/res
-gen-*/*.2obj
+*.png
 *.svg
+*.2obj
