@@ -205,10 +205,25 @@
   (vec:add a (vec:scale (vec:sub b a) (random 1.0d0))))
 
 
+(defun on-line* (ab)
+  (declare (list ab))
+  (destructuring-bind (a b)
+    ab
+    (on-line a b)))
+
+
 (defun non-line (n a b)
   (declare (integer n))
   (declare (vec:vec a b))
   (loop repeat n collect (on-line a b)))
+
+
+(defun non-line* (n ab)
+  (declare (integer n))
+  (declare (list ab))
+  (destructuring-bind (a b)
+    ab
+    (non-line n a b)))
 
 
 ; WALKERS

@@ -92,7 +92,29 @@
         (setf a (append a (list v))))
       a)
    '(0.0d0 0.7d0 1.4d0 2.0999999999999996d0 2.8d0 3.5d0 4.199999999999999d0
-     4.8999999999999995d0 5.6d0 6.3d0)))
+     4.8999999999999995d0 5.6d0 6.3d0))
+
+  (do-test
+    (vec:segdst (list (vec:vec 0d0 0d0) (vec:vec 100d0 0d0)) (vec:vec 0d0 200d0))
+    200d0)
+
+  (do-test
+    (vec:segdst (list (vec:vec 0d0 0d0) (vec:vec 100d0 3d0)) (vec:vec 41d0 202d0))
+    200.67971443818558d0)
+
+  (do-test
+    (vec:segx (list (vec:vec 0d0 0d0) (vec:vec 100d0 0d0))
+              (list (vec:vec 0d0 1d0) (vec:vec 100d0 1d0)) :parallel :par)
+    :par)
+
+  (do-test
+    (vec:segx (list (vec:vec 0d0 0d0) (vec:vec 1d0 1d0))
+              (list (vec:vec 0d0 1d0) (vec:vec 1d0 0d0)) :parallel :par)
+    t)
+
+  (do-test
+    (vec:cross (vec:vec 1d0 2d0) (vec:vec 3d0 -7.1d0))
+    -13.1d0))
 
 
 (defun test-rnd ()

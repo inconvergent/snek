@@ -3,11 +3,12 @@
   (:use :common-lisp)
   (:export
     :add
+    :angle
     :arr-get
     :arr-set
-    :angle
     :copy
     :cos-sin
+    :cross
     :div
     :dot
     :dst
@@ -17,7 +18,6 @@
     :inside
     :inside*
     :iscale
-    :lscale*
     :isub
     :ladd
     :ladd*
@@ -32,6 +32,7 @@
     :lmult
     :lmult*
     :lround
+    :lscale*
     :lsub
     :lsub*
     :mid
@@ -40,6 +41,7 @@
     :nsub
     :on-circ
     :on-line
+    :on-line*
     :on-spiral
     :one
     :perp
@@ -47,6 +49,8 @@
     :rep
     :rot
     :scale
+    :segdst
+    :segx
     :sin-cos
     :sub
     :sum
@@ -112,6 +116,7 @@
     :nin-circ
     :non-circ
     :non-line
+    :non-line*
     :norm
     :nrnd
     :nrnd*
@@ -122,6 +127,7 @@
     :nrndi*
     :on-circ
     :on-line
+    :on-line*
     :prob
     :rcond
     :rnd
@@ -303,6 +309,21 @@
     :wpath)
   (:import-from :common-lisp-user
     :aif
+    :ensure-filename
+    :make-vec
+    :with-struct))
+
+
+(defpackage :obj
+  (:use :common-lisp)
+  (:export
+    :add-face
+    :add-verts-from-vec
+    :make
+    :save)
+  (:import-from :common-lisp-user
+    :aif
+    :vpe
     :ensure-filename
     :make-vec
     :with-struct))

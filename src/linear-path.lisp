@@ -58,8 +58,8 @@
       (math:dfloat* ff))))
 
 
-(defmacro rndpos (path n)
-  `(pos* ,path (rnd:rndspace 0.0d0 1.0d0 ,n)))
+(defun rndpos (path n)
+  (pos* path (rnd:rndspace n 0d0 1d0)))
 
 
 (defun make (pts &key closed &aux

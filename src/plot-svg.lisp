@@ -31,7 +31,7 @@
                                   'plot-svg:a4-landscape.")))))
 
 
-(defun make* (&key height width stroke-width)
+(defun make* (&key height width (stroke-width 1.1))
   (make-plot-svg
     :layout 'custom
     :stroke-width stroke-width
@@ -146,30 +146,35 @@
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
-    (let ((pth (make-vec))
-          (rep (math:int (* 1.5 width)))
-          (rup (/ width 2d0))
-          (rdown (- (/ width 2d0))))
+    (if (= width 1)
+      ; single path
+      (path psvg pts :sw sw)
+      ; multi path
+      (let ((pth (make-vec))
+            (rep (math:int (* 1.5 width)))
+            (rup (/ width 2d0))
+            (rdown (- (/ width 2d0))))
 
-      (loop for a in pts
-            and b in (cdr pts)
-            do
-        (accumulate-path pth a)
-        (loop for s in (math:linspace rep rdown rup)
-              and i from 0
+        (if (= 0 (mod rep 2)) (setf rep (1+ rep)))
+        (loop for a in pts
+              and b in (cdr pts)
               do
-          (accumulate-path
-              pth
-              (if (= (mod i 2) 0) a b)
-              (if (= (mod i 2) 0) b a)
-              (vec:scale (vec:norm (vec:perp (vec:sub b a))) s)))
-        (accumulate-path pth b))
+          (accumulate-path pth a)
+          (loop for s in (math:linspace rep rdown rup)
+                and i from 0
+                do
+            (accumulate-path
+                pth
+                (if (= (mod i 2) 0) a b)
+                (if (= (mod i 2) 0) b a)
+                (vec:scale (vec:norm (vec:perp (vec:sub b a))) s)))
+          (accumulate-path pth b))
 
-      (cl-svg:draw scene
-        (:path :d (cl-svg:path (finalize-path pth)))
-        :fill "none"
-        :stroke "black"
-        :stroke-width (if sw sw stroke-width)))))
+        (cl-svg:draw scene
+          (:path :d (cl-svg:path (finalize-path pth)))
+          :fill "none"
+          :stroke "black"
+          :stroke-width (if sw sw stroke-width))))))
 
 
 (defun circ (psvg xy rad &key fill sw)

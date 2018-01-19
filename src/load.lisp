@@ -13,7 +13,7 @@
 
 (asdf:defsystem "snek"
   :description "SNEK - A Generative System for Writing Generative Systems"
-  :version "2.9.2"
+  :version "2.9.4"
   :author "inconvergent"
   :licence "MIT"
   :serial t
@@ -32,6 +32,7 @@
                (:file "sandpaint")
                (:file "plot")
                (:file "plot-svg")
+               (:file "obj")
                (:file "zmap")
                (:file "snek-macros")
                (:file "snek")

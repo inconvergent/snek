@@ -97,6 +97,11 @@
   (mapcar #'+ a b))
 
 
+(defun dst (a b)
+  (declare (list a b))
+  (sqrt (loop for ai in a and bi in b sum (expt (- ai bi) 2d0))))
+
+
 (defun sub (a b)
   (declare (list a b))
   (mapcar #'- a b))

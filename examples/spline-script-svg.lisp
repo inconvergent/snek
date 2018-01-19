@@ -17,6 +17,7 @@
     (vec:vec 1.1d0 3.9d0)
     (vec:vec 1d0 1d0)))
 
+
 (defun swap (l)
   (let* ((ll (loop for k in l collect k))
          (n (length l))
@@ -32,42 +33,26 @@
   (vec:lmult* (rnd:nin-circ n 1d0) (vec:vec bx by)))
 
 
-(defun draw-pix (sand bzs grains)
-  (sandpaint:bzspl-stroke sand bzs (* grains (bzspl::bzspl-n bzs))))
-
-
-(defun draw-varying-pix (sand bzs grains)
-  (sandpaint:pix sand (bzspl:pos* bzs
-    (mapcar (lambda (x) (expt x 0.6d0))
-      (rnd:rndspace (* grains (bzspl::bzspl-n bzs)) 0d0 1d0)))))
-
-
-(defun draw (snk sand)
+(defun draw (snk psvg)
   (let ((state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*))))
-        (grains 15)
         (drift (vec:scale (vec:sin-cos -0.1d0) 0.009d0)))
-    (loop for p in (math:linspace 500 0 1)
+    (loop for p in (math:linspace 200 0 1)
           and i from 0 do
       (snek:with (snk)
         (snek:itr-all-verts (snk v)
-          (snek:move-vert? v drift)
-          (snek:move-vert? v (rnd:in-circ 0.1d0))
           ;(snek:move-vert? v (funcall state-gen v 0.000008d0))
-          ))
-      ;(sandpaint:set-fg-color sand (color:hsv 0.55 (- 1.0 i) (- 1.0 i) 0.009))
-      (snek:itr-grps (snk g :collect nil)
-        (aif (snek:get-grp-as-bzspl snk g)
-          ;(draw-pix sand it grains)
-          (draw-varying-pix sand it grains))))))
+          (snek:move-vert? v drift)
+          (snek:move-vert? v (rnd:in-circ 0.1d0)))))
+    (snek:itr-grps (snk g :collect nil)
+      (let ((pts (snek:get-grp-verts snk :g g)))
+        (when (> (length pts) 2)
+          (plot-svg:bzspl psvg pts))))))
 
 
 (defun main (size fn)
   (let ((trbl (list 70d0 950d0 950d0 55d0))
         (bbox (vec:vec 20d0 25d0))
-        (spacebox (vec:vec 10d0 25d0))
-        (sand (sandpaint:make size
-                :fg (color:black 0.009)
-                :bg (color:white))))
+        (spacebox (vec:vec 10d0 25d0)))
 
     (labels
       ((get-bbox-fxn ()
@@ -105,16 +90,13 @@
         (block draw-loop
           (loop for k from 0 do
             (let ((snk (snek:make))
+                  (psvg (plot-svg:make :layout 'plot-svg:a4-landscape))
                   (txt (subseq words wind)))
               (incf wind (aif (do-write snk alphabet spacebox trbl txt)
                               it
                               (return-from draw-loop)))
-              (draw snk sand))
-
-            (sandpaint:pixel-hack sand)
-            (sandpaint:save sand (append-postfix fn (format nil "-~3,'0d" k))
-                            :gamma 1.5)
-            (sandpaint:clear sand (color:white))))))))
+              (draw snk psvg)
+              (plot-svg:save psvg (append-postfix fn (format nil "-~3,'0d" k))))))))))
 
 
 (time (main 1000 (second (cmd-args))))

@@ -24,8 +24,8 @@
     fn*))
 
 
-(defmacro print-every (i n)
-  `(if (= 0 (mod ,i ,n)) (format t "~%itt: ~a~%" ,i)))
+(defun print-every (i n)
+  (when (= 0 (mod i n)) (format t "~%itt: ~a~%" i)))
 
 
 (defun dhalf (l)

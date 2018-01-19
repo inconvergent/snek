@@ -106,7 +106,7 @@
 (defun vec* (xy)
   (declare (list xy))
   (destructuring-bind (x y)
-    (coerce 'double-float xy)
+    (math:dfloat* xy)
     (declare (double-float x y))
     (vec x y)))
 
@@ -265,7 +265,7 @@
 
 (defun lmid (aa)
   (declare (list aa))
-  (let ((n 0))
+  (let ((n 1))
     (iscale
       (reduce (lambda (a b) (incf n) (add a b))
               aa)
@@ -319,7 +319,51 @@
       (vec (- (* x cosa) (* y sina))
            (+ (* x sina) (* y cosa))))))
 
-; TODO: cross
+
+(defun segdst (aa v)
+  (declare (list aa))
+  (declare (vec v))
+  (destructuring-bind (va vb)
+    aa
+    (let ((l2 (dst2 va vb)))
+      (if (<= l2 0d0)
+        ; line is a point
+        (dst va v)
+        ; else
+        (let ((tt (/ (+ (* (- (vec-x v) (vec-x va)) (- (vec-x vb) (vec-x va)))
+                        (* (- (vec-y v) (vec-y va)) (- (vec-y vb) (vec-y va))))
+                     l2)))
+          (if (> tt 1d0) (setf tt 1d0))
+          (if (< tt 0d0) (setf tt 0d0))
+          (dst v (scale (sub vb va) tt)))))))
+
+
+(defun segx (aa bb &key parallel)
+  (declare (list aa))
+  (declare (list bb))
+  (destructuring-bind (a1 a2 b1 b2)
+    (concatenate 'list aa bb)
+    (let* ((sa (sub a2 a1))
+           (sb (sub b2 b1))
+           (u (+ (* (- (vec-x sb)) (vec-y sa)) (* (vec-x sa) (vec-y sb)))))
+      (if (= u 0d0)
+        ; return parallel if the lines are parallel (default: nil)
+        parallel
+        ; otherwise check if they intersect
+        (let ((p (/ (+ (* (- (vec-y sa)) (- (vec-x a1) (vec-x b1)))
+                       (*    (vec-x sa)  (- (vec-y a1) (vec-y b1)))) u))
+
+              (q (/ (- (*    (vec-x sb)  (- (vec-y a1) (vec-y b1)))
+                       (*    (vec-y sb)  (- (vec-x a1) (vec-x b1)))) u)))
+          ; t if intersection
+          ; nil otherwise
+          (and (>= p 0d0) (<= p 1d0) (>= q 0d0) (<= q 1d0)))))))
+
+
+(defun cross (a b)
+  (declare (vec a))
+  (declare (vec b))
+  (- (* (vec-x a) (vec-y b)) (* (vec-y a) (vec-x b))))
 
 
 ; SHAPES
@@ -335,6 +379,14 @@
   (declare (double-float p))
   (declare (vec a b))
   (vec:add a (vec:scale (vec:sub b a) p)))
+
+
+(defun on-line* (p ab)
+  (declare (double-float p))
+  (declare (list ab))
+  (destructuring-bind (a b)
+    ab
+    (on-line p a b)))
 
 
 (defun on-spiral (p rad &key (xy (vec:zero)) (rot 0d0))

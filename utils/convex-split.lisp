@@ -1,0 +1,64 @@
+
+(defun get-splits (n)
+  (let ((a -1)
+        (b -1))
+  (loop until (not (= a b)) do
+    (setf a (rnd:rndi (1- n))
+          b (rnd:rndi (1- n))))
+  (sort (list a b) #'<)))
+
+
+(defun get-left (a b n)
+  (let ((res (make-vec)))
+    (loop for i from 0
+          while (<= i a)
+          do (vpe i res))
+    (vpe (list a (1+ a)) res)
+    (vpe (list b (1+ b)) res)
+    (loop for i from (1+ b)
+          while (< i n)
+          do (vpe (mod i (1- n)) res))
+    res))
+
+
+(defun get-right (a b n)
+  (let ((res (make-vec)))
+    (loop for i from (1+ a)
+          while (<= i b)
+          do (vpe i res))
+    (vpe (list b (1+ b)) res)
+    (vpe (list a (1+ a)) res)
+    (loop for i from (1+ a)
+          while (<= (mod i n) (1+ a))
+          do (vpe i res))
+    res))
+
+
+(defun do-mid (a b &optional (s 0.5d0))
+  (mapcar (lambda (l r) (+ l (* s (- r l)))) a b))
+
+
+(defun ind-to-pts (pts inds s)
+  (to-vec
+    (loop for i across inds collect
+      (if (eql (type-of i) 'cons)
+        (do-mid (aref pts (first i)) (aref pts (second i)) s)
+        (aref pts i)))))
+
+
+(defun split (pts &optional s (lim 0d0)
+                  &aux (s* (if (not s) (lambda () 0.5d0) s))
+                       (n (length pts)))
+    (if (> (loop for i from 0 below (1- n) minimizing
+             (math:dst (aref pts i) (aref pts (1+ i)))) lim)
+
+      ; do split
+      (destructuring-bind (a b)
+        (get-splits n)
+        (let ((sval (funcall s*)))
+          (list
+            t
+            (ind-to-pts pts (get-left a b n) sval)
+            (ind-to-pts pts (get-right a b n) sval))))
+      ; do not split
+      (list nil pts)))
