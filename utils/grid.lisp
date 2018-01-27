@@ -23,7 +23,7 @@
   (loop for i of-type double-float in (math:linspace n 0d0 1d0) collect
     (let* ((ivw (vec:on-line i v w))
            (p (vec:add ivw (vec:scale (vec:cos-sin angle) rad))))
-      (loop for of-type double-float ip in (math:linspace m 0d0 1d0) collect
+      (loop for ip of-type double-float in (math:linspace m 0d0 1d0) collect
         (vec:on-line ip ivw p)))))
 
 

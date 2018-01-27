@@ -2,18 +2,6 @@
 (in-package :vec)
 
 
-(defmacro cos-sin (a)
-  (with-gensyms (aname)
-    `(let ((,aname ,a))
-        (vec (cos ,aname) (sin ,aname)))))
-
-
-(defmacro sin-cos (a)
-  (with-gensyms (aname)
-    `(let ((,aname ,a))
-        (vec (sin ,aname) (cos ,aname)))))
-
-
 (defmacro inside* ((size xy x y) &body body)
   (with-gensyms (sname)
     `(let ((,sname ,size))
@@ -124,13 +112,24 @@
   (setf (aref a i 0) (vec::vec-x v)
         (aref a i 1) (vec::vec-y v)))
 
+
+; MATHS
+
+
+(defun cos-sin (a)
+  (declare (double-float a))
+  (vec (cos a) (sin a)))
+
+
+(defun sin-cos (a)
+  (declare (double-float a))
+  (vec (sin a) (cos a)))
+
+
 (defun angle (v)
   (declare (vec v))
   (with-xy ((norm v) x y)
     (atan y x)))
-
-
-; MATHS
 
 
 (defun scale (a s)
@@ -310,14 +309,14 @@
           aa))
 
 
-(defun rot (v a)
+(defun rot (v a &key (xy (zero)))
   (declare (vec v))
   (declare (double-float a))
   (let ((cosa (cos a))
         (sina (sin a)))
-    (with-xy (v x y)
-      (vec (- (* x cosa) (* y sina))
-           (+ (* x sina) (* y cosa))))))
+    (with-xy ((sub v xy) x y)
+      (add xy (vec (- (* x cosa) (* y sina))
+                   (+ (* x sina) (* y cosa)))))))
 
 
 (defun segdst (aa v)
@@ -328,14 +327,14 @@
     (let ((l2 (dst2 va vb)))
       (if (<= l2 0d0)
         ; line is a point
-        (dst va v)
+        (values (dst va v) 0d0)
         ; else
         (let ((tt (/ (+ (* (- (vec-x v) (vec-x va)) (- (vec-x vb) (vec-x va)))
                         (* (- (vec-y v) (vec-y va)) (- (vec-y vb) (vec-y va))))
                      l2)))
           (if (> tt 1d0) (setf tt 1d0))
           (if (< tt 0d0) (setf tt 0d0))
-          (dst v (scale (sub vb va) tt)))))))
+          (values (dst v (scale (sub vb va) tt)) tt))))))
 
 
 (defun segx (aa bb &key parallel)
@@ -348,7 +347,7 @@
            (u (+ (* (- (vec-x sb)) (vec-y sa)) (* (vec-x sa) (vec-y sb)))))
       (if (= u 0d0)
         ; return parallel if the lines are parallel (default: nil)
-        parallel
+        (values parallel nil nil)
         ; otherwise check if they intersect
         (let ((p (/ (+ (* (- (vec-y sa)) (- (vec-x a1) (vec-x b1)))
                        (*    (vec-x sa)  (- (vec-y a1) (vec-y b1)))) u))
@@ -357,7 +356,9 @@
                        (*    (vec-y sb)  (- (vec-x a1) (vec-x b1)))) u)))
           ; t if intersection
           ; nil otherwise
-          (and (>= p 0d0) (<= p 1d0) (>= q 0d0) (<= q 1d0)))))))
+          (values
+            (and (>= p 0d0) (<= p 1d0) (>= q 0d0) (<= q 1d0))
+            q p))))))
 
 
 (defun cross (a b)

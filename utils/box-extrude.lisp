@@ -14,17 +14,40 @@
     res))
 
 
+(defun normal-offset (av bv o)
+  (vec:ladd*
+    (list av bv)
+    (vec:scale
+      (vec:cos-sin
+        (- (vec:angle (vec:sub bv av))
+           (* PI 0.5d0)))
+      o)))
+
+
+(defun rot-offset (av bv o)
+  (let* ((m (vec:mid av bv))
+         (d (vec:sub bv av))
+         (pt (vec:add m
+                      (vec:scale
+                        (vec:cos-sin
+                          (- (vec:angle d)
+                             (* PI 0.5d0)))
+                        o)))
+         (rot (vec:scale (vec:rot d (rnd:rnd 0.5d0))
+                         0.5d0)))
+    (list
+      (vec:sub pt rot)
+      (vec:add pt rot))))
+
+
 (defun get-offsets (pts ab offset)
   (destructuring-bind (a b)
     ab
-    (let* ((av (aref pts a))
-           (bv (aref pts b))
-           (normal (vec:cos-sin (- (vec:angle (vec:sub bv av))
-                                   (+ 0d0 (* PI 0.5d0 )))))
-           (offset* (vec:scale normal offset)))
-      (list
-        (vec:add av offset*)
-        (vec:add bv offset*)))))
+    (let ((av (aref pts a))
+          (bv (aref pts b)))
+      (rnd:prob 0.2
+        (rot-offset av bv offset)
+        (normal-offset av bv (* offset 0.8d0))))))
 
 
 (defun -ind-to-pts (pts inds offset)
