@@ -3,14 +3,14 @@
   (rnd:rndi n))
 
 (defun do-extrude (n a)
-  (let ((res (make-vec)))
+  (let ((res (make-generic-array)))
     (loop for i from 0
           while (<= i a)
-          do (vpe i res))
-    (vpe (list a (mod (1+ a) n)) res)
+          do (array-push i res))
+    (array-push (list a (mod (1+ a) n)) res)
     (loop for i from (1+ a)
           while (<= i n)
-          do (vpe (mod i n) res))
+          do (array-push (mod i n) res))
     res))
 
 

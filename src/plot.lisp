@@ -25,9 +25,9 @@
 (defun make (&optional (size 1000))
   (make-plot
     :size size
-    :verts (make-vec)
-    :edges (make-vec)
-    :lines (make-vec)
+    :verts (make-generic-array)
+    :edges (make-generic-array)
+    :lines (make-generic-array)
     :coverage (make-coverage-array size)))
 
 
@@ -44,7 +44,7 @@
 (defun -ok-coverage (size coverage offset a b)
   (let ((itt (round (* 2.0d0 (vec:len offset))))
         (cov-count 0)
-        (cov (make-vec)))
+        (cov (make-generic-array)))
     (loop for s in (math:linspace itt 0.0 1.0) do
       (vec:inside* (size (vec:on-line s a b) x y)
         (incf cov-count (if (> (aref coverage x y) 0) 1 0))

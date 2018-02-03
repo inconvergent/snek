@@ -111,7 +111,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 (defun get-edges (grph)
   (declare (graph grph))
-  (let ((res (make-vec (graph-size grph)))
+  (let ((res (make-generic-array (graph-size grph)))
         (adj (graph-adj grph)))
     (declare (type (array list) res))
     (declare (hash-table adj))

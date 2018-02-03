@@ -9,28 +9,28 @@
 
 
 (defun get-left (a b n)
-  (let ((res (make-vec)))
+  (let ((res (make-generic-array)))
     (loop for i from 0
           while (<= i a)
-          do (vpe i res))
-    (vpe (list a (1+ a)) res)
-    (vpe (list b (1+ b)) res)
+          do (array-push i res))
+    (array-push (list a (1+ a)) res)
+    (array-push (list b (1+ b)) res)
     (loop for i from (1+ b)
           while (< i n)
-          do (vpe (mod i (1- n)) res))
+          do (array-push (mod i (1- n)) res))
     res))
 
 
 (defun get-right (a b n)
-  (let ((res (make-vec)))
+  (let ((res (make-generic-array)))
     (loop for i from (1+ a)
           while (<= i b)
-          do (vpe i res))
-    (vpe (list b (1+ b)) res)
-    (vpe (list a (1+ a)) res)
+          do (array-push i res))
+    (array-push (list b (1+ b)) res)
+    (array-push (list a (1+ a)) res)
     (loop for i from (1+ a)
           while (<= (mod i n) (1+ a))
-          do (vpe i res))
+          do (array-push i res))
     res))
 
 

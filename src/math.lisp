@@ -64,6 +64,21 @@
   (mod (+ x stp) 1d0))
 
 
+(defun mod- (i n)
+  (declare (integer i n))
+  (mod (+ n i -1) n))
+
+
+(defun mod+ (i n)
+  (declare (integer i n))
+  (mod (+ n i 1) n))
+
+
+(defun mod2 (i)
+  (declare (integer i))
+  (mod i 2))
+
+
 (defmacro with-linspace ((n a b rn &key (end t)) &body body)
   (with-gensyms (a* b* n* nn i ba)
   `(let* ((,n* (int ,n))

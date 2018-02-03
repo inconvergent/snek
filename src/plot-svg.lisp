@@ -3,17 +3,20 @@
 
 
 (defstruct plot-svg
-  (layout nil :type symbol :read-only nil)
-  (stroke-width nil :type float :read-only nil)
+  (layout nil :type symbol :read-only t)
+  (stroke-width nil :type double-float :read-only t)
+  (rep-scale nil :type double-float :read-only t)
   (scene nil :read-only nil))
 
 
 (defun make (&key
               (layout 'a4-landscape)
-              (stroke-width 1.1))
+              (stroke-width 1d0)
+              (rep-scale 1.5d0))
   (make-plot-svg
     :layout layout
     :stroke-width stroke-width
+    :rep-scale rep-scale
     :scene (case layout (a4-landscape
                           (cl-svg:make-svg-toplevel
                             'cl-svg:svg-1.1-toplevel
@@ -31,10 +34,11 @@
                                   'plot-svg:a4-landscape.")))))
 
 
-(defun make* (&key height width (stroke-width 1.1))
+(defun make* (&key height width (stroke-width 1.1) (rep-scale 1.3d0))
   (make-plot-svg
     :layout 'custom
     :stroke-width stroke-width
+    :rep-scale rep-scale
     :scene (cl-svg:make-svg-toplevel
               'cl-svg:svg-1.1-toplevel
               :height height
@@ -42,7 +46,7 @@
 
 
 (defun accumulate-path (pth a &optional b (offset (vec:zero)))
-  (vector-push-extend
+  (array-push
     (vec:with-xy-short ((vec:add a offset) x y)
       (if (> (length pth) 0)
         (cl-svg:line-to x y)
@@ -50,7 +54,7 @@
     pth)
 
   (when b
-    (vector-push-extend
+    (array-push
       (vec:with-xy-short ((vec:add b offset) x y)
         (cl-svg:line-to x y))
       pth)))
@@ -69,7 +73,7 @@
   (with-struct (plot-svg- scene stroke-width) psvg
     (cl-svg:draw scene
       (:path :d (cl-svg:path (finalize-path
-                               (let ((pth (make-vec)))
+                               (let ((pth (make-generic-array)))
                                      (loop for p in pts do
                                        (accumulate-path pth p))
                                      pth))))
@@ -80,14 +84,16 @@
 
 (defun -move-to (res p)
   (vec:with-xy-short (p x y)
-    (vector-push-extend (format nil "M~a,~a " x y) res)))
+    (array-push (format nil "M~a,~a " x y) res)))
 
 
 (defun -quadratric (res p q)
   (vec:with-xy-short (p ax ay)
     (vec:with-xy-short (q bx by)
-      (vector-push-extend (format nil "Q~a,~a ~a,~a " ax ay bx by) res))))
+      (array-push (format nil "Q~a,~a ~a,~a " ax ay bx by) res))))
 
+
+; ----- BZSPL HELPERS -----
 
 (defun -fl (a)
   (first (last a)))
@@ -118,13 +124,14 @@
         do
     (-quadratric pth a (vec:mid a b))))
 
+; -----
 
 (defun bzspl (psvg pts &key closed sw)
   (when (< (length pts) 3)
     (error "needs at least 3 pts."))
 
   (with-struct (plot-svg- scene stroke-width) psvg
-    (let ((pth (make-vec)))
+    (let ((pth (make-generic-array)))
       (if closed (-do-closed pts pth) (-do-open pts pth))
       (cl-svg:draw scene
         (:path :d (cl-svg:path (finalize-path pth)))
@@ -132,30 +139,35 @@
          :stroke "black"
          :stroke-width (if sw sw stroke-width)))))
 
+; -----
 
+; TODO width == 1?
 (defun wbzspl (psvg pts offset width &key closed sw)
-  (loop for s in (math:linspace
-                   (math:int (* 1.5 width))
-                   (- (/ width 2d0))
-                   (/ width 2d0)) do
+  (with-struct (plot-svg- rep-scale) psvg
+    (loop for s in (math:linspace
+                     (math:int (ceiling (* rep-scale width)))
+                     (- (/ width 2d0))
+                     (/ width 2d0)) do
       (bzspl psvg (vec:lsub* pts (vec:scale offset s))
-             :closed closed :sw sw)))
+             :closed closed :sw sw))))
+
+; ----- END BZSPL -----
 
 
-(defun wpath (psvg pts width &key sw)
+(defun wpath (psvg pts &key width sw)
   (declare (plot-svg psvg))
   (declare (list pts))
-  (with-struct (plot-svg- scene stroke-width) psvg
-    (if (= width 1)
+  (with-struct (plot-svg- scene stroke-width rep-scale) psvg
+    (if (not width)
       ; single path
       (path psvg pts :sw sw)
       ; multi path
-      (let ((pth (make-vec))
-            (rep (math:int (* 1.5 width)))
+      (let ((pth (make-generic-array))
+            (rep (math:int (ceiling (* rep-scale width))))
             (rup (/ width 2d0))
             (rdown (- (/ width 2d0))))
 
-        (if (= 0 (mod rep 2)) (setf rep (1+ rep)))
+        (if (= 0 (math:mod2 rep)) (setf rep (1+ rep)))
         (loop for a in pts
               and b in (cdr pts)
               do
@@ -165,8 +177,8 @@
                 do
             (accumulate-path
                 pth
-                (if (= (mod i 2) 0) a b)
-                (if (= (mod i 2) 0) b a)
+                (if (= (math:mod2 i) 0) a b)
+                (if (= (math:mod2 i) 0) b a)
                 (vec:scale (vec:norm (vec:perp (vec:sub b a))) s)))
           (accumulate-path pth b))
 
@@ -175,6 +187,125 @@
           :fill "none"
           :stroke "black"
           :stroke-width (if sw sw stroke-width))))))
+
+
+; ----- CPATH HELPER FXNS -----
+
+(defun -path-angles (pts)
+  (let ((res (make-generic-array)))
+    (loop for i from 0 below (1- (length pts))
+          do (array-push (vec:norm (vec:sub (aref pts (1+ i))
+                                     (aref pts i))) res))
+    (array-push (aref res (1- (length res))) res)
+    res))
+
+(defun -path-normals-open (angles)
+  (let ((res (make-generic-array)))
+    (array-push (vec:perp (aref angles 0)) res)
+    (loop for i from 0 below (1- (length angles)) do
+      (array-push (vec:perp (vec:norm (vec:add (aref angles i)
+                                        (aref angles (1+ i)))))
+           res))
+    res))
+
+(defun -path-normals-closed (angles)
+  (let ((ss (vec:perp (vec:norm (vec:add (aref angles 0)
+                                         (aref angles (1- (length angles)))))))
+        (res (make-generic-array)))
+
+    (array-push ss res)
+
+    (loop for i from 0 below (1- (length angles)) do
+      (array-push (vec:perp (vec:norm (vec:add
+                                 (aref angles i)
+                                 (aref angles (1+ i))))) res))
+    (setf (aref res (1- (length res))) ss)
+    res))
+
+(defun -scale-offset (w a b &key (fxn #'sin))
+  (abs (/ w (funcall fxn (abs (- (vec:angle a) (vec:angle b)))))))
+
+(defun -offset (v o)
+  (list (vec:add v o) (vec:sub v o)))
+
+(defun -make-chamfer-test-fxn (angles closed lim)
+  (let* ((n- (1- (length angles))))
+    (if closed
+      (lambda (i)
+        (and (> n- i -1)
+             (< (vec:dot (aref angles (if (< i 1) n- (1- i)))
+                         (aref angles i)) lim)))
+      (lambda (i)
+        (and (> n- i 0)
+             (< (vec:dot (aref angles (1- i))
+                         (aref angles i)) lim))))))
+
+(defun -chamfer (width diag pa na aa aa-)
+  (let* ((x (< (vec:cross aa aa-) 0d0))
+         (corner (if x (second diag) (first diag)))
+         (s (-scale-offset width aa- na :fxn #'cos)))
+    (loop for v in (-offset pa (vec:scale (vec:perp na) s))
+          collect (if x (list v corner) (list corner v)))))
+
+(defun -get-diagonals (pts width lim closed)
+  (let* ((res (make-generic-array))
+         (n (length pts))
+         (angles (-path-angles pts))
+         (chamfer-test (-make-chamfer-test-fxn angles closed lim))
+         (normals (if closed (-path-normals-closed angles)
+                             (-path-normals-open angles))))
+    (loop for pa across pts
+          and aa across angles
+          and na across normals
+          and i from 0
+          do
+      (let ((diag (-offset pa (vec:scale na (-scale-offset width aa na)))))
+        (mapcar (lambda (d) (array-push d res))
+                (if (funcall chamfer-test i)
+                    (-chamfer width diag pa na aa (aref angles (math:mod- i n)))
+                    (list diag)))))
+    (if closed
+      ; hack to handle closed path chamfering
+      (setf (aref res (1- (length res))) (aref res 0)))
+    res))
+
+(defun -accumulate-cpath-closed (diagonals rep)
+  (let ((res (make-generic-array)))
+    (loop for s in (math:linspace rep 0d0 1d0) do
+      (loop for d across diagonals do
+        (array-push (vec:on-line* s d) res)))
+    (to-list res)))
+
+(defun -accumulate-cpath-open (diagonals rep)
+  (let ((res (make-generic-array))
+        (n (length diagonals)))
+    (loop for s in (math:linspace rep 0d0 1d0)
+          and k from 0 do
+      (loop for i from 0 below n
+            and i- downfrom (1- (length diagonals)) do
+        (array-push (vec:on-line* (if (= (math:mod2 k) 0) s (- 1d0 s))
+                                  (aref diagonals (if (= (math:mod2 k) 0) i i-)))
+                    res)))
+    (to-list res)))
+
+; -----
+
+(defun cpath (psvg pts &key (width 1d0)
+                            closed
+                            (lim -0.5d0)
+                            sw
+                       &aux (pts* (to-vec (if closed (close-path pts) pts)))
+                            (width* (* width 0.5d0)))
+  (declare (plot-svg psvg))
+  (declare (list pts))
+  (with-struct (plot-svg- rep-scale) psvg
+    (let ((rep (math:int (ceiling (* rep-scale width))))
+          (diagonals (-get-diagonals pts* width* lim closed)))
+      (path psvg (if closed
+                   (-accumulate-cpath-closed diagonals rep)
+                   (-accumulate-cpath-open diagonals rep))))))
+
+; ----- END CPATH -----
 
 
 (defun circ (psvg xy rad &key fill sw)
@@ -187,12 +318,12 @@
 
 
 (defun wcirc (psvg xy rad &optional outer-rad)
-  (let* ((inner-rad (if outer-rad rad 1d0))
+  (with-struct (plot-svg- rep-scale) psvg
+    (let* ((inner-rad (if outer-rad rad 1d0))
          (outer-rad* (if outer-rad outer-rad rad))
-         (n (math:int (* (abs (- outer-rad* inner-rad))
-                               1.5d0))))
+         (n (math:int (* (ceiling (abs (- outer-rad* inner-rad))) rep-scale))))
     (loop for r in (math:linspace n inner-rad outer-rad*) do
-      (circ psvg xy r))))
+      (circ psvg xy r)))))
 
 
 (defun save (psvg fn)

@@ -49,7 +49,7 @@
   (make-array (list rows cols) :initial-element initial :element-type 'integer))
 
 
-(defun make-vec (&optional (s 100))
+(defun make-generic-array (&optional (s 100))
   (make-array s :fill-pointer 0 :initial-element nil :adjustable t))
 
 
@@ -133,5 +133,5 @@
           ,@body)))))
 
 
-(abbrev vpe vector-push-extend)
+(abbrev array-push vector-push-extend)
 

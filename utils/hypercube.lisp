@@ -17,20 +17,20 @@
 
 
 (defun hypercube-edges (cube)
-  (let ((edges (make-vec))
+  (let ((edges (make-generic-array))
         (n (length (aref cube 0))))
     (loop for a across cube do
       (loop for b across cube do
         (when (= (1- n)
                  (loop for ai in a and bi in b count (= ai bi)))
-          (vpe (list a b) edges))))
+          (array-push (list a b) edges))))
     edges))
 
 
 (defun hypercube (grid &optional init sel)
   (let ((n (length grid))
-        (respts (make-vec)))
-    (vpe
+        (respts (make-generic-array)))
+    (array-push
       (if init init
         (loop for g in grid collect
               (rnd:rndi 1 (1- g))))
@@ -44,7 +44,7 @@
           (let ((new (loop for p in x
                            and j from 0
                            collect (if (= j i) val p))))
-            (vpe new respts)))))
+            (array-push new respts)))))
     (values respts (hypercube-edges respts))))
 
 
@@ -57,17 +57,17 @@
 (defun surface-walk (n pts)
   ; this is a little inefficient since it wont always select viable pts.
   ; it is fast enough.
-  (let ((res (make-vec))
+  (let ((res (make-generic-array))
         (pts* (make-hash-table :test #'equal)))
 
     (loop for p across pts do (setf (gethash p pts*) t))
 
-    (vpe (first (rnd:nrnd-from 1 pts)) res)
+    (array-push (first (rnd:nrnd-from 1 pts)) res)
     (loop until (>= (length res) n) do
       (let ((new (-walk (aref res (1- (length res))))))
         (multiple-value-bind (val exists)
           (gethash new pts*)
-          (if exists (vpe new res)))))
+          (if exists (array-push new res)))))
     (to-list res)))
 
 

@@ -12,15 +12,15 @@
   (with-gensyms (sname zw aname rec x y resalts do-funcall finally)
     (let* ((do-funcall `(funcall (gethash (type-of ,x) ,aname) ,sname ,x))
            (wrap-funcall (cond ((and collect include-alts)
-                                  `(vpe (list ,do-funcall ,x) ,resalts))
-                               (collect `(vpe ,do-funcall ,resalts))
+                                  `(array-push (list ,do-funcall ,x) ,resalts))
+                               (collect `(array-push ,do-funcall ,resalts))
                                (t do-funcall)))
            (finally (if collect `(to-list ,resalts)
                                 nil)))
 
       `(let* ((,sname ,snk)
               (,zw ,zwidth)
-              (,resalts (make-vec))
+              (,resalts (make-generic-array))
               (,aname (snek-alt-names ,sname)))
 
         (incf (snek-wc ,sname))

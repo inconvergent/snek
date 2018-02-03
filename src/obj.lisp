@@ -11,8 +11,8 @@
 
 (defun make ()
   (make-obj
-    :verts (make-vec)
-    :faces (make-vec)))
+    :verts (make-generic-array)
+    :faces (make-generic-array)))
 
 
 (defun add-verts-from-vec (o new &optional (z 0d0))
@@ -20,14 +20,14 @@
     (setf (obj-num-verts o) (incf (obj-num-verts o) (length new)))
     (let ((n (length verts)))
       (loop for v in new and i from n do
-        (vpe (list (vec::vec-x v) (vec::vec-y v) z) verts)
+        (array-push (list (vec::vec-x v) (vec::vec-y v) z) verts)
         collect i))))
 
 
 (defun add-face (o new)
   (with-struct (obj- faces) o
     (setf (obj-num-faces o) (incf (obj-num-faces o)))
-    (vpe new faces)))
+    (array-push new faces)))
 
 
 (defun save (o fn &key (mesh-name "mesh"))

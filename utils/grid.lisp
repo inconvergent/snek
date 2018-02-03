@@ -28,9 +28,9 @@
 
 
 (defun get-v-grid (xy width height nums)
-  (let ((inside (make-vec))
-        (outside (make-vec))
-        (all (make-vec)))
+  (let ((inside (make-generic-array))
+        (outside (make-generic-array))
+        (all (make-generic-array)))
     (vec:with-xy (xy x y)
       (loop for b of-type double-float in (math:linspace (first nums) (- y height) (+ y height))
             and bi of-type integer from 0 do

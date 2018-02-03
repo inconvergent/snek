@@ -16,6 +16,7 @@
     :flip
     :idiv
     :inside
+    :ptinside
     :inside*
     :iscale
     :isub
@@ -59,10 +60,12 @@
     :vec
     :vec*
     :vec-coerce
-    :zero
     :with-xy
-    :with-xy-short)
+    :with-xy-short
+    :zero)
   (:import-from :common-lisp-user
+    :close-path
+    :array-push
     :PII
     :with-gensyms))
 
@@ -82,6 +85,9 @@
     :iscale*
     :lget
     :linspace
+    :mod2
+    :mod+
+    :mod-
     :mult
     :nrep
     :range
@@ -201,7 +207,7 @@
     :with-graph-edges)
   (:import-from :common-lisp-user
     :flatten
-    :make-vec
+    :make-generic-array
     :with-struct
     :with-gensyms))
 
@@ -288,7 +294,7 @@
     :aif
     :ensure-filename
     :half
-    :make-vec
+    :make-generic-array
     :square-loop
     :with-struct))
 
@@ -300,6 +306,7 @@
     :a4-portrait
     :bzspl
     :circ
+    :cpath
     :make
     :make*
     :path
@@ -310,7 +317,11 @@
   (:import-from :common-lisp-user
     :aif
     :ensure-filename
-    :make-vec
+    :make-generic-array
+    :array-push
+    :close-path
+    :to-vec
+    :to-list
     :with-struct))
 
 
@@ -323,9 +334,9 @@
     :save)
   (:import-from :common-lisp-user
     :aif
-    :vpe
+    :array-push
     :ensure-filename
-    :make-vec
+    :make-generic-array
     :with-struct))
 
 (defpackage :snek
@@ -384,9 +395,9 @@
     :flatten
     :get-dfloat-tup
     :make-dfloat-array
-    :make-vec
+    :make-generic-array
     :to-list
-    :vpe
+    :array-push
     :with-gensyms
     :with-struct))
 

@@ -367,6 +367,14 @@
   (- (* (vec-x a) (vec-y b)) (* (vec-y a) (vec-x b))))
 
 
+(defun ptinside (convex v)
+  (declare (list convex))
+  (declare (vec v))
+  (loop for a in (close-path convex)
+        and b in (cdr (close-path convex)) always
+    (>= (cross (sub b a) (sub v b)) 0d0)))
+
+
 ; SHAPES
 
 
