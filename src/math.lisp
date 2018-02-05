@@ -160,3 +160,73 @@
 
 ; TODO: expt, sqrt, ...
 
+
+; PATHS
+
+(defun path-angles (pts)
+  (let ((res (make-generic-array)))
+    (loop for i from 0 below (1- (length pts))
+          do (array-push (vec:norm (vec:sub (aref pts (1+ i))
+                                            (aref pts i))) res))
+    (array-push (aref res (1- (length res))) res)
+    res))
+
+
+(defun path-simplify (pts &optional (lim -0.989d0))
+  ;very naive paty simplification
+  (let* ((n (length pts))
+         (i 1)
+         (res (make-generic-array))
+         (pts* (if (equal (type-of pts) 'cons) (to-array pts) pts))
+         (angles (path-angles pts*)))
+
+    (array-push (aref pts* 0) res)
+
+    (loop while (< i (1- n)) do
+      (if (< (vec:dot (aref angles (1- i))
+                      (aref angles i)) lim)
+        (progn
+          (array-push (aref pts* (1+ i)) res)
+          (incf i 2))
+        (progn
+          (array-push (aref pts* i) res)
+          (incf i))))
+
+    (if (< i n)
+      (array-push (aref pts* i) res))
+
+    (if (< (length res) n)
+      (path-simplify res)
+      res)))
+
+
+(defun -perp (a b &optional (dir 0.5d0))
+(let ((df (vec:add a b)))
+  (if (<= (vec:len df) 1d-7)
+    (vec:perp a)
+    (vec:perp (vec:norm df)))))
+
+
+(defun path-normals-open (angles)
+  (let ((res (make-generic-array)))
+    (array-push (vec:perp (aref angles 0)) res)
+    (loop for i from 0 below (1- (length angles)) do
+      (array-push (-perp (aref angles i)
+                        (aref angles (1+ i)))
+                  res))
+    res))
+
+
+(defun path-normals-closed (angles)
+  (let ((ss (-perp (aref angles 0)
+                   (aref angles (1- (length angles)))))
+        (res (make-generic-array)))
+
+    (array-push ss res)
+
+    (loop for i from 0 below (1- (length angles)) do
+      (array-push (-perp (aref angles i)
+                         (aref angles (1+ i))) res))
+    (setf (aref res (1- (length res))) ss)
+    res))
+

@@ -53,7 +53,7 @@
   (make-array s :fill-pointer 0 :initial-element nil :adjustable t))
 
 
-(defun to-vec (init)
+(defun to-array (init)
   (declare (list init))
   (make-array
     (length init)

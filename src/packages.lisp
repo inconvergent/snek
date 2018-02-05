@@ -85,11 +85,15 @@
     :iscale*
     :lget
     :linspace
-    :mod2
     :mod+
     :mod-
+    :mod2
     :mult
     :nrep
+    :path-angles
+    :path-normals-closed
+    :path-normals-open
+    :path-simplify
     :range
     :rep
     :scale
@@ -100,6 +104,10 @@
     :sum
     :with-linspace)
   (:import-from :common-lisp-user
+    :array-push
+    :to-array
+    :to-list
+    :make-generic-array
     :with-gensyms))
 
 
@@ -149,7 +157,7 @@
     :with-rndspace)
   (:import-from :common-lisp-user
     :PII
-    :to-vec
+    :to-array
     :with-gensyms))
 
 
@@ -320,7 +328,7 @@
     :make-generic-array
     :array-push
     :close-path
-    :to-vec
+    :to-array
     :to-list
     :with-struct))
 

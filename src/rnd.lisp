@@ -11,7 +11,7 @@
 
 
 (defun nrnd-u-from (n a)
-  (let* ((a* (if (eql (type-of a) 'cons) (to-vec a) a))
+  (let* ((a* (if (eql (type-of a) 'cons) (to-array a) a))
          (resind nil)
          (anum (length a*)))
     (when (> n anum)

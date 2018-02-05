@@ -52,7 +52,7 @@
 
 (defun -ind-to-pts (pts inds offset)
   (let ((offset* nil))
-    (values (to-vec
+    (values (to-array
       (flatten (loop for i across inds collect
         (if (eql (type-of i) 'cons)
           (setf offset* (get-offsets pts i offset))

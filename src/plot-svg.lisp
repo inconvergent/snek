@@ -191,39 +191,12 @@
 
 ; ----- CPATH HELPER FXNS -----
 
-(defun -path-angles (pts)
-  (let ((res (make-generic-array)))
-    (loop for i from 0 below (1- (length pts))
-          do (array-push (vec:norm (vec:sub (aref pts (1+ i))
-                                     (aref pts i))) res))
-    (array-push (aref res (1- (length res))) res)
-    res))
-
-(defun -path-normals-open (angles)
-  (let ((res (make-generic-array)))
-    (array-push (vec:perp (aref angles 0)) res)
-    (loop for i from 0 below (1- (length angles)) do
-      (array-push (vec:perp (vec:norm (vec:add (aref angles i)
-                                        (aref angles (1+ i)))))
-           res))
-    res))
-
-(defun -path-normals-closed (angles)
-  (let ((ss (vec:perp (vec:norm (vec:add (aref angles 0)
-                                         (aref angles (1- (length angles)))))))
-        (res (make-generic-array)))
-
-    (array-push ss res)
-
-    (loop for i from 0 below (1- (length angles)) do
-      (array-push (vec:perp (vec:norm (vec:add
-                                 (aref angles i)
-                                 (aref angles (1+ i))))) res))
-    (setf (aref res (1- (length res))) ss)
-    res))
-
 (defun -scale-offset (w a b &key (fxn #'sin))
-  (abs (/ w (funcall fxn (abs (- (vec:angle a) (vec:angle b)))))))
+  (let ((dt (vec:dot a b))
+        (s (abs (funcall fxn (abs (- (vec:angle a) (vec:angle b)))))))
+    (if (or (< dt -0.98) (< s 0.01d0))
+        w
+        (/ w s))))
 
 (defun -offset (v o)
   (list (vec:add v o) (vec:sub v o)))
@@ -250,10 +223,10 @@
 (defun -get-diagonals (pts width lim closed)
   (let* ((res (make-generic-array))
          (n (length pts))
-         (angles (-path-angles pts))
+         (angles (math:path-angles pts))
          (chamfer-test (-make-chamfer-test-fxn angles closed lim))
-         (normals (if closed (-path-normals-closed angles)
-                             (-path-normals-open angles))))
+         (normals (if closed (math:path-normals-closed angles)
+                             (math:path-normals-open angles))))
     (loop for pa across pts
           and aa across angles
           and na across normals
@@ -269,22 +242,17 @@
       (setf (aref res (1- (length res))) (aref res 0)))
     res))
 
-(defun -accumulate-cpath-closed (diagonals rep)
-  (let ((res (make-generic-array)))
-    (loop for s in (math:linspace rep 0d0 1d0) do
-      (loop for d across diagonals do
-        (array-push (vec:on-line* s d) res)))
-    (to-list res)))
-
-(defun -accumulate-cpath-open (diagonals rep)
+(defun -accumulate-cpath (diagonals rep closed)
   (let ((res (make-generic-array))
         (n (length diagonals)))
     (loop for s in (math:linspace rep 0d0 1d0)
           and k from 0 do
       (loop for i from 0 below n
-            and i- downfrom (1- (length diagonals)) do
-        (array-push (vec:on-line* (if (= (math:mod2 k) 0) s (- 1d0 s))
-                                  (aref diagonals (if (= (math:mod2 k) 0) i i-)))
+            and i- downfrom (1- n) do
+        (array-push
+          (if closed
+            (vec:on-line* s (aref diagonals i))
+            (vec:on-line* s (aref diagonals (if (= (math:mod2 k) 0) i i-))))
                     res)))
     (to-list res)))
 
@@ -294,16 +262,14 @@
                             closed
                             (lim -0.5d0)
                             sw
-                       &aux (pts* (to-vec (if closed (close-path pts) pts)))
+                       &aux (pts* (to-array (if closed (close-path pts) pts)))
                             (width* (* width 0.5d0)))
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- rep-scale) psvg
     (let ((rep (math:int (ceiling (* rep-scale width))))
           (diagonals (-get-diagonals pts* width* lim closed)))
-      (path psvg (if closed
-                   (-accumulate-cpath-closed diagonals rep)
-                   (-accumulate-cpath-open diagonals rep))))))
+      (path psvg (-accumulate-cpath diagonals rep closed)))))
 
 ; ----- END CPATH -----
 

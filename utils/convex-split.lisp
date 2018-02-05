@@ -39,7 +39,7 @@
 
 
 (defun ind-to-pts (pts inds s)
-  (to-vec
+  (to-array
     (loop for i across inds collect
       (if (eql (type-of i) 'cons)
         (do-mid (aref pts (first i)) (aref pts (second i)) s)
