@@ -334,7 +334,6 @@
                      l2)))
           (if (> tt 1d0) (setf tt 1d0))
           (if (< tt 0d0) (setf tt 0d0))
-          (print tt)
           (values (dst v (on-line tt va vb)) tt))))))
 
 

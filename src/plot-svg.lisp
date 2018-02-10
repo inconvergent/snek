@@ -220,12 +220,18 @@
                        width* clim slim closed)))
       (path psvg (-accumulate-cpath diagonals rep closed)))))
 
+; draw circle with arc.
+(defun arccirc (x y r*)
+  (let* ((r (math:sfloat r*))
+         (r2 (* 2 r)))
+    (format nil "M~a,~a m -~a,0 a ~a,~a 0 1,0 ~a 0 a ~a,~a 0 1,0 -~a 0"
+            x y r r r r2 r r r2)))
 
 (defun circ (psvg xy rad &key fill sw)
   (declare (plot-svg psvg))
   (with-struct (plot-svg- scene stroke-width) psvg
     (vec:with-xy-short (xy x y)
-      (cl-svg:draw scene (:circle :cx x :cy y :r rad)
+      (cl-svg:draw scene   (:path :d (arccirc x y rad))  ;(:circle :cx x :cy y :r rad)
         :fill (if fill "black" "none")
         :stroke "black" :stroke-width (if sw sw stroke-width)))))
 
