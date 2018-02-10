@@ -1,6 +1,8 @@
 
 (in-package :math)
 
+(defvar dotlim 0.95d0)
+
 
 ; TYPES
 
@@ -172,8 +174,44 @@
     res))
 
 
-(defun path-simplify (pts &optional (lim -0.989d0))
-  ;very naive paty simplification
+(defun -path-simplify-rdp* (pts lim &optional left right)
+  (declare (double-float lim))
+  (let ((res (make-generic-array))
+        (dmax -1d0)
+        (index 0))
+
+    (let* ((l (if (not left) 0 left))
+           (r (if (not right) (1- (length pts)) right))
+           (seg (list (aref pts l) (aref pts r))))
+
+      (loop for i from (1+ l) below r do
+        (let ((d (vec:segdst seg (aref pts i))))
+          (if (> d dmax)
+            (setf dmax d
+                  index i))))
+
+      (if (> dmax lim)
+        (progn
+          (loop for i in (butlast (-path-simplify-rdp* pts lim l index))
+                do (array-push i res))
+          (loop for i in (-path-simplify-rdp* pts lim index r)
+                do (array-push i res)))
+        (progn
+          (array-push l res)
+          (array-push r res))))
+    (sort (to-list res) #'<)))
+
+
+(defun path-simplify-rdp (pts lim)
+  (let ((pts* (if (equal (type-of pts) 'cons) (to-array pts) pts)))
+    (loop for i in (-path-simplify-rdp* pts* lim)
+        collect (aref pts* i))))
+
+
+(defun path-simplify-par (pts len lim)
+  ; very naive paty simplification
+  ; it removes backtracking sections of the path.
+  ; a good default lim is -0.99d0
   (let* ((n (length pts))
          (i 1)
          (res (make-generic-array))
@@ -183,8 +221,11 @@
     (array-push (aref pts* 0) res)
 
     (loop while (< i (1- n)) do
-      (if (< (vec:dot (aref angles (1- i))
-                      (aref angles i)) lim)
+      (if (and
+            (< (vec:dst (aref pts* (1- i))
+                        (aref pts* i)) len)
+            (< (vec:dot (aref angles (1- i))
+                        (aref angles i)) lim))
         (progn
           (array-push (aref pts* (1+ i)) res)
           (incf i 2))
@@ -196,37 +237,89 @@
       (array-push (aref pts* i) res))
 
     (if (< (length res) n)
-      (path-simplify res)
+      (path-simplify-par res len lim)
       res)))
 
 
-(defun -perp (a b &optional (dir 0.5d0))
-(let ((df (vec:add a b)))
-  (if (<= (vec:len df) 1d-7)
-    (vec:perp a)
-    (vec:perp (vec:norm df)))))
+(defun -scale-offset (w a b &key (fxn #'sin))
+  (let ((dt (vec:dot a b))
+        (s (abs (funcall fxn (abs (- (vec:angle a)
+                                     (vec:angle b)))))))
+    (if (< s 0.05d0) w (/ w s))))
+
+(defun -offset (v o)
+  (list (vec:add v o) (vec:sub v o)))
 
 
-(defun path-normals-open (angles)
-  (let ((res (make-generic-array)))
-    (array-push (vec:perp (aref angles 0)) res)
-    (loop for i from 0 below (1- (length angles)) do
-      (array-push (-perp (aref angles i)
-                        (aref angles (1+ i)))
-                  res))
-    res))
+(defun -chamfer (width diag pa na aa aa-)
+  (let* ((x (< (vec:cross aa aa-) 0d0))
+         (corner (if x (second diag) (first diag)))
+         (s (-scale-offset width aa- na :fxn #'cos)))
+    (loop for v in (-offset pa (vec:scale (vec:perp na) s))
+          collect (if x (list v corner) (list corner v)))))
 
 
-(defun path-normals-closed (angles)
-  (let ((ss (-perp (aref angles 0)
-                   (aref angles (1- (length angles)))))
-        (res (make-generic-array)))
+(defun -regular-perp (a b)
+    (vec:perp (vec:norm (vec:add a b))))
 
-    (array-push ss res)
+(defun -sharp-perp (a)
+  (vec:perp a))
 
-    (loop for i from 0 below (1- (length angles)) do
-      (array-push (-perp (aref angles i)
-                         (aref angles (1+ i))) res))
-    (setf (aref res (1- (length res))) ss)
+(defun -fv (i n- sel)
+  (if (< i n-) sel :regular))
+
+(defun -make-test-fxn-closed (angles clim slim)
+  (let ((n- (1- (length angles))))
+    (lambda (i)
+      (let ((a (aref angles i))
+            (a- (aref angles (if (< i 1) n- (1- i)))))
+        (let ((dt (vec:dot a- a)))
+          (cond
+            ((<= dt slim) (list :sharp (-sharp-perp a-)))
+            ((<  dt clim) (list :chamfer (-regular-perp a- a)))
+            (t (list :regular (-regular-perp a- a)))))))))
+
+
+(defun -make-test-fxn-open (angles clim slim)
+  (let ((n- (1- (length angles))))
+    (lambda (i)
+      (let ((a (aref angles i)))
+        (if (> n- i 0)
+          (let ((dt (vec:dot (aref angles (1- i)) a)))
+            (cond
+              ((<= dt slim) (list :sharp (-sharp-perp (aref angles (1- i)))))
+              ((<  dt clim) (list :chamfer (-regular-perp
+                                             (aref angles (1- i)) a)))
+              (t (list :regular (-regular-perp (aref angles (1- i)) a)))))
+          (cond
+            ((< i 1) (list :regular (vec:perp a)))
+            (t (list :regular (vec:perp a)))))))))
+
+
+(defun -get-diagonals (pts width clim slim closed )
+  (let* ((res (make-generic-array))
+         (n (length pts))
+         (angles (math:path-angles pts))
+         (corner-test (if closed
+                        (-make-test-fxn-closed angles clim slim)
+                        (-make-test-fxn-open angles clim slim))))
+
+    (loop for i from 0 below (if closed (1- n) n) do
+      (destructuring-bind (corner na)
+        (funcall corner-test i)
+
+        (let ((diag (-offset (aref pts i) (vec:scale na (-scale-offset width (aref angles i) na)))))
+          (mapcar (lambda (d) (array-push d res))
+                  (case corner
+                    (:chamfer (-chamfer width diag (aref pts i) na (aref angles i)
+                                        (aref angles (math:mod- i n))))
+                    (:regular (list diag))
+                    (:sharp (list
+                              (progn diag)
+                              (reverse diag))))))))
+
+    (if closed
+      ; hack to handle closed path chamfering
+      (array-push (aref res 0) res))
     res))
 

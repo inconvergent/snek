@@ -74,6 +74,7 @@
   (:export
     :add
     :close-path
+    :cpath
     :dfloat
     :dfloat*
     :div
@@ -93,7 +94,8 @@
     :path-angles
     :path-normals-closed
     :path-normals-open
-    :path-simplify
+    :path-simplify-par
+    :path-simplify-rdp
     :range
     :rep
     :scale

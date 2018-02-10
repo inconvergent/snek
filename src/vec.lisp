@@ -334,7 +334,8 @@
                      l2)))
           (if (> tt 1d0) (setf tt 1d0))
           (if (< tt 0d0) (setf tt 0d0))
-          (values (dst v (scale (sub vb va) tt)) tt))))))
+          (print tt)
+          (values (dst v (on-line tt va vb)) tt))))))
 
 
 (defun segx (aa bb &key parallel)

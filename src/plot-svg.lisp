@@ -189,59 +189,6 @@
           :stroke-width (if sw sw stroke-width))))))
 
 
-; ----- CPATH HELPER FXNS -----
-
-(defun -scale-offset (w a b &key (fxn #'sin))
-  (let ((dt (vec:dot a b))
-        (s (abs (funcall fxn (abs (- (vec:angle a) (vec:angle b)))))))
-    (if (or (< dt -0.98) (< s 0.01d0))
-        w
-        (/ w s))))
-
-(defun -offset (v o)
-  (list (vec:add v o) (vec:sub v o)))
-
-(defun -make-chamfer-test-fxn (angles closed lim)
-  (let* ((n- (1- (length angles))))
-    (if closed
-      (lambda (i)
-        (and (> n- i -1)
-             (< (vec:dot (aref angles (if (< i 1) n- (1- i)))
-                         (aref angles i)) lim)))
-      (lambda (i)
-        (and (> n- i 0)
-             (< (vec:dot (aref angles (1- i))
-                         (aref angles i)) lim))))))
-
-(defun -chamfer (width diag pa na aa aa-)
-  (let* ((x (< (vec:cross aa aa-) 0d0))
-         (corner (if x (second diag) (first diag)))
-         (s (-scale-offset width aa- na :fxn #'cos)))
-    (loop for v in (-offset pa (vec:scale (vec:perp na) s))
-          collect (if x (list v corner) (list corner v)))))
-
-(defun -get-diagonals (pts width lim closed)
-  (let* ((res (make-generic-array))
-         (n (length pts))
-         (angles (math:path-angles pts))
-         (chamfer-test (-make-chamfer-test-fxn angles closed lim))
-         (normals (if closed (math:path-normals-closed angles)
-                             (math:path-normals-open angles))))
-    (loop for pa across pts
-          and aa across angles
-          and na across normals
-          and i from 0
-          do
-      (let ((diag (-offset pa (vec:scale na (-scale-offset width aa na)))))
-        (mapcar (lambda (d) (array-push d res))
-                (if (funcall chamfer-test i)
-                    (-chamfer width diag pa na aa (aref angles (math:mod- i n)))
-                    (list diag)))))
-    (if closed
-      ; hack to handle closed path chamfering
-      (setf (aref res (1- (length res))) (aref res 0)))
-    res))
-
 (defun -accumulate-cpath (diagonals rep closed)
   (let ((res (make-generic-array))
         (n (length diagonals)))
@@ -250,17 +197,17 @@
       (loop for i from 0 below n
             and i- downfrom (1- n) do
         (array-push
-          (if closed
-            (vec:on-line* s (aref diagonals i))
-            (vec:on-line* s (aref diagonals (if (= (math:mod2 k) 0) i i-))))
-                    res)))
+          (vec:on-line* s
+            (aref diagonals (if closed i (if (= (math:mod2 k) 0) i i-))))
+          res)))
     (to-list res)))
 
-; -----
 
 (defun cpath (psvg pts &key (width 1d0)
                             closed
-                            (lim -0.5d0)
+                            (clim -0.5d0)
+                            (slim -0.95d0)
+                            (simplify 1d0)
                             sw
                        &aux (pts* (to-array (if closed (close-path pts) pts)))
                             (width* (* width 0.5d0)))
@@ -268,10 +215,10 @@
   (declare (list pts))
   (with-struct (plot-svg- rep-scale) psvg
     (let ((rep (math:int (ceiling (* rep-scale width))))
-          (diagonals (-get-diagonals pts* width* lim closed)))
+          (diagonals (math::-get-diagonals
+                       (to-array (math:path-simplify-rdp pts* simplify))
+                       width* clim slim closed)))
       (path psvg (-accumulate-cpath diagonals rep closed)))))
-
-; ----- END CPATH -----
 
 
 (defun circ (psvg xy rad &key fill sw)
