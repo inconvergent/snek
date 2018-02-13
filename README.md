@@ -8,19 +8,22 @@ which I create art using various generative algorithms.
 
 ![head](img/cells.lisp.png?raw=true "ex")
 
-In short `snek` is three things:
+In short `snek` is four things:
 
 1. A simple (graph) data structure for working with vertices and edges The
    structure is named `snek`; the name is explained below. This structure is
    combined with a programming pattern for applying changes to the structure.
    The pattern relies on `alterations`, see below.
 
-2. A tool for drawing things called `sandpaint`. `sandpaint` uses random
+2. A series of useful data structures and tools. E.g. a 2D vector `vec` and a
+   package for generating different kinds of random numbers: `rnd`.
+
+
+3. A tool for drawing things called `sandpaint`. `sandpaint` uses random
    sampling to draw it's primitives. This creates a fairly distinct and gritty
    look in many cases.
 
-3. A series of useful data structures and tools. E.g. a 2D vector `vec` and a
-   package for generating different kinds of random numbers: `rnd`.
+4. A tool for drawing svg files.
 
 ![head](img/spline-script.lisp.png?raw=true "ex")
 
@@ -45,7 +48,8 @@ I have also written about things related to `snek` at
   - http://inconvergent.net/a-propensity-for-mistakes/ (indirectly about `snek`)
   - http://inconvergent.net/a-method-for-mistakes/
   - http://inconvergent.net/arbitrary-alterations/
-  - http://inconvergent.net/grains-of-sand/ (about "sandpainting", see `src/sandpaint.lisp`)
+  - http://inconvergent.net/grains-of-sand/ (about "sandpainting", see
+    `src/sandpaint.lisp`)
 
 Here is and example of manipulating a `snek` instance called `snk` using
 `alterations`. Alteration constructors are postfixed with `?`.
@@ -86,23 +90,20 @@ argument, the resulting file will be named `./tmp.png`.
 
 ## Usage
 
-Among other places, `snek` is used in
-
-  - http://moment.inconvergent.net/
-  - https://twitter.com/sandpaintbot
-  - https://twitter.com/scratchpaintbot
-  - https://twitter.com/cronianrings
-  - https://twitter.com/rndshep
+I use snek for most of the work that I post on twitter
+(https://twitter.com/inconvergent). Both for generating raster images as well
+as vector images for plotting.
 
 ![lines](img/lines.lisp.png?raw=true "ex")
 
 ![lines](img/grid-bz-walk.lisp.png?raw=true "ex")
 
-I also use it to create mechanical plotter drawings:
+Here are some plotted examples:
 
+ - http://inconvergent.net/spline-script/plots/
  - http://inconvergent.net/mechanical-plotter-drawings/
  - http://inconvergent.net/mechanical-plotter-drawings/3/
- - http://inconvergent.net/spline-script/plots/
+ - http://inconvergent.net/mechanical-plotter-drawings/5/
 
 
 ## Dependencies

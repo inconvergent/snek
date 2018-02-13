@@ -94,6 +94,7 @@
     :path-angles
     :path-normals-closed
     :path-normals-open
+    :path-offset
     :path-simplify-par
     :path-simplify-rdp
     :range

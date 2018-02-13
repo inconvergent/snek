@@ -323,3 +323,10 @@
       (array-push (aref res 0) res))
     res))
 
+(defun path-offset (pts width &key (s 1d0) closed
+                                   (clim -0.5) (slim -0.95)
+                                   (simplify 1d0))
+  (let ((diag (-get-diagonals (to-array (path-simplify-rdp pts simplify))
+                width clim slim closed)))
+    (loop for d across diag collect (vec:on-line* s d))))
+

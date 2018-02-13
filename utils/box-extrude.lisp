@@ -45,7 +45,7 @@
     ab
     (let ((av (aref pts a))
           (bv (aref pts b)))
-      (rnd:prob 0.2
+      (rnd:prob 0.4
         (rot-offset av bv offset)
         (normal-offset av bv (* offset 0.8d0))))))
 
