@@ -67,7 +67,7 @@
     res))
 
 
-(defun path (psvg pts &key sw)
+(defun path (psvg pts &key sw (fill "none") closed)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
@@ -76,8 +76,9 @@
                                (let ((pth (make-generic-array)))
                                      (loop for p in pts do
                                        (accumulate-path pth p))
+                                     (if closed (array-push "Z" pth))
                                      pth))))
-      :fill "none"
+      :fill fill
       :stroke "black"
       :stroke-width (if sw sw stroke-width))))
 
