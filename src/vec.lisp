@@ -138,6 +138,10 @@
   (vec (* (vec-x a) s)
        (* (vec-y a) s)))
 
+(defun neg (a)
+  (declare (vec a))
+  (scale a -1d0))
+
 
 (defun iscale (a s)
   (declare (vec a))

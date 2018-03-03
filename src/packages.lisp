@@ -38,6 +38,7 @@
     :lsub*
     :mid
     :mult
+    :neg
     :norm
     :nsub
     :on-circ

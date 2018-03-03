@@ -12,7 +12,7 @@
 (defun make (&key
               (layout 'a4-landscape)
               (stroke-width 1d0)
-              (rep-scale 1.5d0))
+              (rep-scale 1.3d0))
   (make-plot-svg
     :layout layout
     :stroke-width stroke-width
@@ -142,10 +142,10 @@
 ; -----
 
 ; TODO width == 1?
-(defun wbzspl (psvg pts offset width &key closed sw)
+(defun wbzspl (psvg pts offset width &key closed sw rs)
   (with-struct (plot-svg- rep-scale) psvg
     (loop for s in (math:linspace
-                     (math:int (ceiling (* rep-scale width)))
+                     (math:int (ceiling (* (if rs rs rep-scale) width)))
                      (- (/ width 2d0))
                      (/ width 2d0)) do
       (bzspl psvg (vec:lsub* pts (vec:scale offset s))
@@ -154,7 +154,7 @@
 ; ----- END BZSPL -----
 
 
-(defun wpath (psvg pts &key width sw)
+(defun wpath (psvg pts &key width sw rs)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width rep-scale) psvg
@@ -163,7 +163,7 @@
       (path psvg pts :sw sw)
       ; multi path
       (let ((pth (make-generic-array))
-            (rep (math:int (ceiling (* rep-scale width))))
+            (rep (math:int (ceiling (* (if rs rs rep-scale) width))))
             (rup (/ width 2d0))
             (rdown (- (/ width 2d0))))
 
@@ -209,12 +209,13 @@
                             (slim -0.95d0)
                             (simplify 1d0)
                             sw
+                            rs
                        &aux (pts* (to-array (if closed (close-path pts) pts)))
                             (width* (* width 0.5d0)))
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- rep-scale) psvg
-    (let ((rep (math:int (ceiling (* rep-scale width))))
+    (let ((rep (math:int (ceiling (* (if rs rs rep-scale) width))))
           (diagonals (math::-get-diagonals
                        (to-array (math:path-simplify-rdp pts* simplify))
                        width* clim slim closed)))
@@ -236,11 +237,12 @@
         :stroke "black" :stroke-width (if sw sw stroke-width)))))
 
 
-(defun wcirc (psvg xy rad &optional outer-rad)
+(defun wcirc (psvg xy rad &key outer-rad rs)
   (with-struct (plot-svg- rep-scale) psvg
     (let* ((inner-rad (if outer-rad rad 1d0))
          (outer-rad* (if outer-rad outer-rad rad))
-         (n (math:int (* (ceiling (abs (- outer-rad* inner-rad))) rep-scale))))
+         (n (math:int (* (ceiling (abs (- outer-rad* inner-rad)))
+                         (if rs rs rep-scale)))))
     (loop for r in (math:linspace n inner-rad outer-rad*) do
       (circ psvg xy r)))))
 
