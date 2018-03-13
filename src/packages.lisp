@@ -16,7 +16,6 @@
     :flip
     :idiv
     :inside
-    :ptinside
     :inside*
     :iscale
     :isub
@@ -48,6 +47,7 @@
     :one
     :perp
     :polygon
+    :ptinside
     :rep
     :rot
     :scale
@@ -119,6 +119,7 @@
   (:use :common-lisp)
   (:export
     :aget
+    :array-split
     :bernoulli
     :either
     :get-acc-circ-stp*
@@ -162,6 +163,8 @@
   (:import-from :common-lisp-user
     :PII
     :to-array
+    :array-push
+    :make-generic-array
     :with-gensyms))
 
 
@@ -319,6 +322,7 @@
     :bzspl
     :circ
     :cpath
+    :hatch
     :make
     :make*
     :path

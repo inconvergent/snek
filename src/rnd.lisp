@@ -1,6 +1,40 @@
 
 (in-package :rnd)
 
+; MACROS
+
+
+(defmacro with-prob (p &body body)
+  "
+  executes body with probability p.
+  "
+  (with-gensyms (pname)
+    `(let ((,pname ,p))
+       (when (< (random 1d0) ,p)
+         (list ,@body)))))
+
+
+(defmacro prob (p a &optional b)
+  `(if (< (rnd) ,p)
+     ,a ,b))
+
+
+(defmacro either (a b)
+  `(prob 0.5d0 ,a ,b))
+
+
+(defmacro rcond (&rest clauses)
+  (with-gensyms (val)
+    (let* ((tot 0d0)
+           (clauses* (loop for (prob . body) in clauses
+                           do (incf tot (math:dfloat prob))
+                           collect `((< ,val ,tot) ,@body))))
+    `(let ((,val (rnd ,tot)))
+      (cond ,@clauses*)))))
+
+
+; GENERIC
+
 
 (defun lget (l)
   (nth (random (length l)) l))
@@ -23,6 +57,23 @@
 
 (defun nrnd-from (n a)
   (loop for i in (nrndi n 0 (length a)) collect (aref a i)))
+
+
+(defun -init-gen-array (v)
+  (let ((res (make-generic-array)))
+    (array-push v res)
+    res))
+
+(defun array-split (arr p)
+  (let ((res (make-generic-array)))
+
+    (array-push (-init-gen-array (aref arr 0)) res)
+
+    (loop for i from 1 below (length arr) do
+      (prob p
+        (array-push (-init-gen-array (aref arr i)) res)
+        (array-push (aref arr i) (aref res (1- (length res))))))
+    res))
 
 
 ; NUMBERS AND RANGES
@@ -278,36 +329,4 @@
         (xy (vec:copy init)))
     (lambda (stp)
       (setf xy (vec:add xy (setf a (vec:add a (in-circ stp))))))))
-
-
-; MACROS
-
-
-(defmacro with-prob (p &body body)
-  "
-  executes body with probability p.
-  "
-  (with-gensyms (pname)
-    `(let ((,pname ,p))
-       (when (< (random 1d0) ,p)
-         (list ,@body)))))
-
-
-(defmacro prob (p a &optional b)
-  `(if (< (rnd) ,p)
-     ,a ,b))
-
-
-(defmacro either (a b)
-  `(prob 0.5d0 ,a ,b))
-
-
-(defmacro rcond (&rest clauses)
-  (with-gensyms (val)
-    (let* ((tot 0d0)
-           (clauses* (loop for (prob . body) in clauses
-                           do (incf tot (math:dfloat prob))
-                           collect `((< ,val ,tot) ,@body))))
-    `(let ((,val (rnd ,tot)))
-      (cond ,@clauses*)))))
 

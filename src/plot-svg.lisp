@@ -94,6 +94,81 @@
       (array-push (format nil "Q~a,~a ~a,~a " ax ay bx by) res))))
 
 
+; ----- HATCH HELPERS -----
+
+(defun -rad (pts)
+  (let ((mid (vec:lmid (to-list pts))))
+    (list mid (* 1.2d0 (loop for p across pts maximize
+                         (vec:dst mid p))))))
+
+
+(defun -get-lines (n mid dst angle steps rnd)
+  (let ((lines (make-generic-array))
+        (slide (vec:scale (vec:cos-sin (- angle (* 0.5 PI))) dst))
+        (offset (vec:scale (vec:cos-sin angle) dst)))
+    (loop for s in (funcall steps n) do
+      (let ((xy (vec:on-line s (vec:add mid offset)
+                               (vec:sub mid offset))))
+        (array-push (list
+                        (vec:sub (funcall rnd xy) slide)
+                        (vec:add (funcall rnd xy) slide))
+                      lines)))
+    lines))
+
+
+(defun -get-hatches (line pts)
+  (let ((ixs (make-generic-array))
+        (res (make-generic-array)))
+
+    (loop for i from 0 below (1- (length pts)) do
+      (multiple-value-bind (x s)
+        (vec:segx line (list (aref pts i) (aref pts (1+ i))))
+        (if x (array-push (vec:on-line* s line) ixs))))
+
+    (loop for i from 0 below (/ (length ixs) 2) by 2 do
+      (array-push (list (aref ixs i) (aref ixs (1+ i))) res))
+
+    res))
+
+
+(defun -get-pts (pts closed)
+  (let ((res (make-generic-array))
+        (is-cons (equal (type-of pts) 'cons)))
+    (if is-cons
+      (loop for p in pts do (array-push p res))
+      (loop for p across pts do (array-push p res)))
+    (if closed (array-push (if is-cons (first pts) (aref pts 0)) res))
+    res))
+
+
+(defun -reline (line)
+  (list (rnd:either (first line) (second line))
+        (rnd:on-line* line)))
+
+
+; ----- HATCH -----
+
+
+(defun hatch (psvg pts &key (angles (list 0d0 (* 0.5d0 PI)))
+                            (rnd (lambda (xy) xy))
+                            (steps (lambda (n) (math:linspace n 0d0 1d0)))
+                            (post (lambda (h) h))
+                            closed rs
+                       &aux (pts* (-get-pts pts closed)))
+  (with-struct (plot-svg- rep-scale) psvg
+    (destructuring-bind (mid dst)
+      (-rad pts*)
+      (loop for a in angles do
+        (loop for line across
+              (-get-lines (math:int (ceiling (* 2d0 (if rs rs rep-scale) dst)))
+                mid dst a steps rnd) do
+          (let ((hatches (-get-hatches line pts*)))
+            (if (> (length hatches) 0)
+              (loop for h across hatches do
+                (if (every #'identity h)
+                  (plot-svg:path psvg (funcall post h)))))))))))
+
+
 ; ----- BZSPL HELPERS -----
 
 (defun -fl (a)
