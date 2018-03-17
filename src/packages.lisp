@@ -32,6 +32,7 @@
     :lmult
     :lmult*
     :lround
+    :lrot
     :lscale*
     :lsub
     :lsub*
@@ -80,6 +81,7 @@
     :dfloat*
     :div
     :dst
+    :hatch
     :inc
     :int
     :int*
@@ -104,6 +106,7 @@
     :scale*
     :sfloat
     :sfloat*
+    :stitch
     :sub
     :sum
     :with-linspace)
@@ -325,6 +328,7 @@
     :hatch
     :make
     :make*
+    :mhatch
     :path
     :save
     :wbzspl

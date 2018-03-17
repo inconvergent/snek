@@ -323,6 +323,13 @@
                    (+ (* x sina) (* y cosa)))))))
 
 
+(defun lrot (pts a &key (xy (zero)))
+  (declare (list pts))
+  (declare (double-float a))
+  (mapcar (lambda (p) (declare (vec p))
+            (rot p a :xy xy)) pts))
+
+
 (defun segdst (aa v)
   (declare (list aa))
   (declare (vec v))

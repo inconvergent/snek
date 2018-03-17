@@ -330,3 +330,85 @@
                 width clim slim closed)))
     (loop for d across diag collect (vec:on-line* s d))))
 
+
+; ----- STITCH -----
+
+
+(defun stitch (lines)
+  (let ((res (make-generic-array)))
+    (loop for i from 0 below (length lines) do
+      (let ((ss (make-generic-array))
+            (curr (aref lines i)))
+
+        (array-push 0d0 ss)
+        (array-push 1d0 ss)
+
+        (loop for j from 0 below (length lines) do
+          (multiple-value-bind (x s)
+            (vec:segx curr (aref lines j))
+            (if x (array-push s ss))))
+
+        (setf ss (sort ss (if (< (random 1d0) 0.5d0) #'< #'>)))
+
+        (loop for k from (random 2) below (1- (length ss)) by 2 do
+          (array-push (list (vec:on-line* (aref ss k) curr)
+                            (vec:on-line* (aref ss (1+ k)) curr))
+                      res))))
+    res))
+
+
+; ----- HATCH -----
+
+(defun -get-mid-rad (pts)
+  (let ((mid (vec:lmid (to-list pts))))
+    (list mid (* 1.2d0 (loop for p across pts maximize (vec:dst mid p))))))
+
+
+(defun -get-lines (n mid dst angle steps rnd)
+  (let ((lines (make-generic-array))
+        (slide (vec:scale (vec:cos-sin (- angle (* 0.5 PI))) dst))
+        (offset (vec:scale (vec:cos-sin angle) dst)))
+    (loop for s in (funcall steps n) do
+      (let ((xy (vec:on-line s (vec:add mid offset)
+                               (vec:sub mid offset))))
+        (array-push (funcall rnd (list (vec:add xy slide)
+                                       (vec:sub xy slide)))
+                      lines)))
+    lines))
+
+
+(defun -line-hatch (line pts)
+  (let ((ixs (make-generic-array))
+        (res (make-generic-array)))
+
+    (loop for i from 0 below (1- (length pts)) do
+      (multiple-value-bind (x s)
+        (vec:segx line (list (aref pts i) (aref pts (1+ i))))
+        (if x (array-push s ixs))))
+
+    (setf ixs (sort ixs #'<))
+
+    (loop for i from 0 below (1- (length ixs)) by 2 do
+      (array-push (list (vec:on-line* (aref ixs i) line)
+                        (vec:on-line* (aref ixs (1+ i)) line)) res))
+
+    res))
+
+(defun hatch (pts &key (angles (list 0d0 (* 0.5d0 PI)))
+                       (steps (lambda (n) (math:linspace n 0d0 1d0)))
+                       (rs 0.25d0)
+                       (rnd #'identity))
+  (destructuring-bind (mid dst)
+    (-get-mid-rad pts)
+    (let ((res (make-generic-array)))
+      (loop for a in angles do
+        (loop for line across
+              (-get-lines (math:int (ceiling (* 2d0 rs dst)))
+                          mid dst a steps rnd) do
+          (let ((hh (-line-hatch line pts)))
+            (if (> (length hh) 0)
+              (loop for h across (remove-if-not (lambda (h) (every #'identity h))
+                                                hh)
+                do (array-push h res))))))
+      res)))
+
