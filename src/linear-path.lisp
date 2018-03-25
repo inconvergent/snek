@@ -26,16 +26,21 @@
             (/ (aref lens i 0) total)))))
 
 
-; TODO: binary search
 (defun -find-seg-ind (lens f n)
-  (loop
-    for ind from 0 below n
-    until (< f (aref lens ind 0))
-    finally (return ind)))
+  (let ((l 0)
+        (r (- n 1))
+        (mid 0))
+    (loop until (< (aref lens mid 0) f (aref lens (1+ mid) 0)) do
+      (setf mid (floor (+ l r) 2))
+      (cond ((> f (aref lens mid 0))
+              (setf l (progn mid)))
+            ((< f (aref lens mid 0))
+              (setf r (1+ mid)))))
+    (progn (1+ mid))))
 
 
 (defun -calc-pos (pts lens n f)
-  (let ((ind (-find-seg-ind lens f n)))
+  (let ((ind (progn (-find-seg-ind lens f n))))
         (let ((pb (vec:arr-get pts ind))
               (pa (vec:arr-get pts (1- ind)))
               (s (-diff-scale

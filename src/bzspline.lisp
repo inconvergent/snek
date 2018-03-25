@@ -111,14 +111,14 @@
 ; TODO: this is rather messy.
 (defun adaptive-pos (b &key (dens 1d0) (end t))
   (declare (bzspl b))
-  (let ((res (make-array 10 :fill-pointer 0 :element-type 'vec:vec :adjustable t)))
+  (let ((res (make-generic-array :type 'vec:vec)))
     (with-struct (bzspl- ns vpts) b
       (loop for seg of-type integer from 0 below ns collect
         (loop for x-loc of-type double-float in
               (math:linspace (ceiling (* (-get-segment-length vpts seg) dens))
                              0d0 1d0 :end (and end (>= seg (1- ns)))) do
-          (vector-push-extend  (do-t x-loc (do-m (-select-pts vpts seg))) res))))
-       (coerce res 'list)))
+          (array-push  (do-t x-loc (do-m (-select-pts vpts seg))) res))))
+       (to-list res)))
 
 
 (defmacro with-rndpos ((b n rn) &body body)

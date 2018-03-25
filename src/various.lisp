@@ -49,8 +49,22 @@
   (make-array (list rows cols) :initial-element initial :element-type 'integer))
 
 
-(defun make-generic-array (&optional (s 100))
-  (make-array s :fill-pointer 0 :initial-element nil :adjustable t))
+(defun array-add (a vv)
+  (if (eql (type-of vv) 'cons)
+    (loop for v in vv do (array-push v a))
+    (loop for v across vv do (array-push v a))))
+
+
+(defun make-generic-array (&key init (type t) (size 100))
+  (let ((res (if init (make-array size :fill-pointer 0
+                                       :initial-contents init
+                                       :element-type type
+                                       :adjustable t)
+                      (make-array size :fill-pointer 0
+                                       :element-type type
+                                       :adjustable t))))
+    (if init (array-add res init))
+    res))
 
 
 (defun to-array (init)
@@ -58,6 +72,14 @@
   (make-array
     (length init)
     :initial-contents init))
+
+
+(defun to-generic-array (init &key (type t))
+  (make-array (* (length init))
+              :fill-pointer 0
+              :initial-contents init
+              :element-type type
+              :adjustable t))
 
 
 (defun to-list (a)

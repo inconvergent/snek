@@ -134,6 +134,7 @@
               &aux (draw (if drop
                            (lambda (p) (rnd:prob drop nil (plot-svg:path psvg p :sw sw)))
                            (lambda (p) (plot-svg:path psvg p :sw sw)))))
+  (declare (plot-svg psvg))
   (with-struct (plot-svg- rep-scale) psvg
     (let ((res (make-generic-array)))
 
@@ -184,6 +185,7 @@
 ; -----
 
 (defun bzspl (psvg pts &key closed sw)
+  (declare (plot-svg psvg))
   (when (< (length pts) 3)
     (error "needs at least 3 pts."))
 
@@ -200,6 +202,7 @@
 
 ; TODO width == 1?
 (defun wbzspl (psvg pts offset width &key closed sw rs)
+  (declare (plot-svg psvg))
   (with-struct (plot-svg- rep-scale) psvg
     (loop for s in (math:linspace
                      (math:int (ceiling (* (if rs rs rep-scale) width)))
@@ -295,6 +298,7 @@
 
 
 (defun wcirc (psvg xy rad &key outer-rad rs)
+  (declare (plot-svg psvg))
   (with-struct (plot-svg- rep-scale) psvg
     (let* ((inner-rad (if outer-rad rad 1d0))
          (outer-rad* (if outer-rad outer-rad rad))

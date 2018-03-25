@@ -241,6 +241,9 @@
     :rndpos
     :with-rndpos)
   (:import-from :common-lisp-user
+    :array-push
+    :to-list
+    :make-generic-array
     :with-gensyms
     :make-dfloat-array
     :with-struct))
