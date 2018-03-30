@@ -140,10 +140,10 @@
 
       (loop for pts across mpts do
         (loop for h across (math:hatch (-get-pts pts closed)
-                         :angles angles
-                         :steps steps
-                         :rs (if rs rs rep-scale)
-                         :rnd rnd)
+                             :angles angles
+                             :steps steps
+                             :rs (if rs rs rep-scale)
+                             :rnd rnd)
             do (array-push h res)))
 
       (loop for h across (if stitch (math:stitch res) res) do
@@ -170,8 +170,7 @@
     (let ((inner (subseq pts 1 (1- (length pts)))))
       (loop for a in inner
             and b in (cdr inner)
-            do
-        (-quadratric pth a (vec:mid a b)))
+            do (-quadratric pth a (vec:mid a b)))
       (-quadratric pth (-fl inner) (-fl pts)))))
 
 
@@ -179,8 +178,7 @@
   (-move-to pth (vec:mid (-fl pts) (first pts)))
   (loop for a in pts
         and b in (-roll-once pts)
-        do
-    (-quadratric pth a (vec:mid a b))))
+        do (-quadratric pth a (vec:mid a b))))
 
 ; -----
 

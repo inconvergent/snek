@@ -35,6 +35,23 @@
     (progn ,@body)))
 
 
+(defmacro with-loop-grid ((grid xy) &body body)
+  (with-gensyms (grid* x y)
+    `(let ((,grid* ,grid))
+      (loop for ,x in ,grid* do
+        (loop for ,y in ,grid* do
+          (let ((,xy (vec ,x ,y)))
+            (progn ,@body)))))))
+
+
+(defmacro with-loop-grid* ((grid xy) &body body)
+  (with-gensyms (x y)
+    `(loop for ,x in ,grid do
+      (loop for ,y in ,grid do
+        (let ((,xy (vec ,x ,y)))
+          (progn ,@body))))))
+
+
 (defmacro rep (&body body)
   `(vec
      (progn ,@body)
@@ -175,10 +192,16 @@
       (- (vec-y b) (vec-y a))))
 
 
+(defun op (fx a b)
+  (declare (vec a b))
+  (vec (funcall fx (vec-x a) (vec-x b))
+       (funcall fx (vec-y a) (vec-y b))))
+
+
 (defun add (a b)
   (declare (vec a b))
   (vec (+ (vec-x a) (vec-x b))
-      (+ (vec-y a) (vec-y b))))
+       (+ (vec-y a) (vec-y b))))
 
 
 (defun ladd (aa bb)
@@ -388,7 +411,6 @@
 
 ; SHAPES
 
-
 (defun on-circ (p rad &key (xy (vec:zero)))
   (declare (double-float p rad))
   (declare (vec xy))
@@ -416,12 +438,28 @@
                          (* p rad))))
 
 
+(defun rect (w h &key (xy (vec:zero)))
+  (declare (double-float w h))
+  (declare (vec xy))
+  (list
+    (vec:add xy (vec:vec w (- h)))
+    (vec:add xy (vec:vec w h))
+    (vec:add xy (vec:vec (- w) h))
+    (vec:sub xy (vec:vec w h))))
+
+
+(defun square (bs &key xy)
+  (declare (double-float bs))
+  (declare (vec xy))
+  (rect bs bs :xy xy))
+
+
 (defun polygon (n rad &key (xy (vec:zero)) (rot 0d0))
   (declare (integer n))
   (declare (double-float rad rot))
   (declare (vec xy))
-  (loop for i from 0 below n collect (vec:add xy
-    (vec:scale
-      (vec:cos-sin (+ rot (* (/ i n) PII)))
-      rad))))
+  (loop
+    for i from 0 below n
+    collect (vec:add (vec:scale (vec:cos-sin (+ rot (* (/ i n) PII))) rad)
+                     xy)))
 

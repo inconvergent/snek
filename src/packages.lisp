@@ -46,15 +46,18 @@
     :on-line*
     :on-spiral
     :one
+    :op
     :perp
     :polygon
     :ptinside
     :rep
     :rot
+    :rect
     :scale
     :segdst
     :segx
     :sin-cos
+    :square
     :sub
     :sum
     :tolist
@@ -62,6 +65,8 @@
     :vec
     :vec*
     :vec-coerce
+    :with-loop-grid
+    :with-loop-grid*
     :with-xy
     :with-xy-short
     :zero)

@@ -1,4 +1,7 @@
 
+(abbrev array-push vector-push-extend)
+
+
 (defvar PII (* PI 2d0))
 
 
@@ -37,6 +40,14 @@
   (/ l 2))
 
 
+(defun length-1 (a)
+  (1- (length a)))
+
+
+(defun array-last (a)
+  (aref a (length-1 a)))
+
+
 (defun make-dfloat-array (rows &key (cols 2) (initial 0.0d0))
   (make-array (list rows cols) :initial-element initial :element-type 'double-float))
 
@@ -56,7 +67,7 @@
 
 
 (defun make-generic-array (&key init (type t) (size 100))
-  (let ((res (if init (make-array size :fill-pointer 0
+  (let ((res (if init (make-array (length init) :fill-pointer 0
                                        :initial-contents init
                                        :element-type type
                                        :adjustable t)
@@ -76,7 +87,7 @@
 
 (defun to-generic-array (init &key (type t))
   (make-array (* (length init))
-              :fill-pointer 0
+              :fill-pointer (length init)
               :initial-contents init
               :element-type type
               :adjustable t))
@@ -155,5 +166,4 @@
           ,@body)))))
 
 
-(abbrev array-push vector-push-extend)
 
