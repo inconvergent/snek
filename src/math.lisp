@@ -357,12 +357,12 @@
     res))
 
 
+(defun mid-rad (pts &aux (pts* (to-list pts)))
+  (let ((mid (vec:lmid pts*)))
+    (values mid (loop for p in pts* maximize (vec:dst mid p)))))
+
+
 ; ----- HATCH -----
-
-(defun -get-mid-rad (pts)
-  (let ((mid (vec:lmid (to-list pts))))
-    (list mid (* 1.2d0 (loop for p across pts maximize (vec:dst mid p))))))
-
 
 (defun -get-lines (n mid dst angle steps rnd)
   (let ((lines (make-generic-array))
@@ -398,17 +398,81 @@
                        (steps (lambda (n) (math:linspace n 0d0 1d0)))
                        (rs 0.25d0)
                        (rnd #'identity))
-  (destructuring-bind (mid dst)
-    (-get-mid-rad pts)
+  (multiple-value-bind (mid dst)
+    (mid-rad pts)
     (let ((res (make-generic-array)))
       (loop for a in angles do
         (loop for line across
-              (-get-lines (math:int (ceiling (* 2d0 rs dst)))
-                          mid dst a steps rnd) do
+              (-get-lines (math:int (ceiling (* 2.40 rs dst)))
+                          mid (* 1.2d0 dst) a steps rnd) do
           (let ((hh (-line-hatch line pts)))
             (if (> (length hh) 0)
               (loop for h across (remove-if-not (lambda (h) (every #'identity h))
                                                 hh)
                 do (array-push h res))))))
       res)))
+
+
+; ----- CONVEX SPLIT -----
+
+(defun -get-splits (n pts &aux (n- (1- n)))
+  (let ((len (loop for i from 0 below (1- n) and ii from 1
+                   summing (vec:dst (aref pts i) (aref pts ii)))))
+    (flet ((lenok (i) (< (rnd:rnd) (/ (vec:dst (aref pts i) (aref pts (1+ i)))
+                                      len))))
+      (loop with a with b
+            do (setf a (rnd:rndi n-)
+                     b (rnd:rndi n-))
+            until (and (not (= a b))
+                       (funcall #'lenok a)
+                       (funcall #'lenok b))
+            finally (return (sort (list a b) #'<))))))
+
+
+(defun -split-get-left (a b n)
+  (let ((res (make-generic-array)))
+    (loop for i from 0
+          while (<= i a)
+          do (array-push i res))
+    (array-push (list a (1+ a)) res)
+    (array-push (list b (1+ b)) res)
+    (loop for i from (1+ b)
+          while (< i n)
+          do (array-push (mod i (1- n)) res))
+    res))
+
+
+(defun -split-get-right (a b n)
+  (let ((res (make-generic-array)))
+    (loop for i from (1+ a)
+          while (<= i b)
+          do (array-push i res))
+    (array-push (list b (1+ b)) res)
+    (array-push (list a (1+ a)) res)
+    (loop for i from (1+ a)
+          while (<= (mod i n) (1+ a))
+          do (array-push i res))
+    res))
+
+
+(defun -split-ind-to-pts (pts inds s)
+  (to-array
+    (loop for i across inds collect
+      (if (eql (type-of i) 'cons)
+        (destructuring-bind (a b)
+          (mapcar (lambda (i*) (aref pts i*)) i)
+          (vec:add a (vec:scale (vec:sub b a) s)))
+        (aref pts i)))))
+
+
+(defun convex-split (pts &key (s 0.5d0) (lim 0d0)
+                         &aux (n (length pts)))
+  (if (< (loop for i from 0 below (1- n) minimizing
+           (vec:dst (aref pts i) (aref pts (1+ i)))) lim)
+    (return-from convex-split (list pts nil)))
+
+  (destructuring-bind (a b)
+    (-get-splits n pts)
+    (list (-split-ind-to-pts pts (-split-get-left a b n) s)
+          (-split-ind-to-pts pts (-split-get-right a b n) s))))
 

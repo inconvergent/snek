@@ -56,6 +56,7 @@
     :scale
     :segdst
     :segx
+    :segx*
     :sin-cos
     :square
     :sub
@@ -81,6 +82,7 @@
   (:export
     :add
     :close-path
+    :convex-split
     :cpath
     :dfloat
     :dfloat*
@@ -94,6 +96,7 @@
     :iscale*
     :lget
     :linspace
+    :mid-rad
     :mod+
     :mod-
     :mod2
@@ -331,6 +334,7 @@
     :a4-landscape
     :a4-portrait
     :bzspl
+    :bzx
     :circ
     :cpath
     :hatch

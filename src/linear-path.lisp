@@ -30,7 +30,7 @@
   (let ((l 0)
         (r (- n 1))
         (mid 0))
-    (loop until (< (aref lens mid 0) f (aref lens (1+ mid) 0)) do
+    (loop until (<= (aref lens mid 0) f (aref lens (1+ mid) 0)) do
       (setf mid (floor (+ l r) 2))
       (cond ((> f (aref lens mid 0))
               (setf l (progn mid)))
@@ -40,7 +40,7 @@
 
 
 (defun -calc-pos (pts lens n f)
-  (let ((ind (progn (-find-seg-ind lens f n))))
+  (let ((ind (-find-seg-ind lens f n)))
         (let ((pb (vec:arr-get pts ind))
               (pa (vec:arr-get pts (1- ind)))
               (s (-diff-scale

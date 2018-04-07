@@ -111,6 +111,8 @@
 ; TODO: this is rather messy.
 (defun adaptive-pos (b &key (dens 1d0) (end t))
   (declare (bzspl b))
+  (declare (double-float dens))
+  (declare (boolean end))
   (let ((res (make-generic-array :type 'vec:vec)))
     (with-struct (bzspl- ns vpts) b
       (loop for seg of-type integer from 0 below ns collect
@@ -198,7 +200,6 @@
     curr))
 
 
-
 (defun make (pts &key closed &aux (n (length pts)))
   (declare (list pts))
   (declare (boolean closed))
@@ -212,6 +213,14 @@
     (if closed
       (-set-vpts-closed vpts pts n)
       (-set-vpts-open vpts pts n))
-
     (make-bzspl :n n :ns ns :vpts vpts :closed closed)))
+
+
+; TODO: estimate intersection pt.
+(defun bzx (aa bb &key (dens 1d0))
+  (declare (bzspl aa bb))
+  (declare (double-float dens))
+  (let ((ptsa (adaptive-pos aa :dens dens))
+        (ptsb (adaptive-pos bb :dens dens)))
+    (vec:segx aa bb)))
 

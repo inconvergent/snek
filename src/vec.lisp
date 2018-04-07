@@ -38,16 +38,16 @@
 (defmacro with-loop-grid ((grid xy) &body body)
   (with-gensyms (grid* x y)
     `(let ((,grid* ,grid))
-      (loop for ,x in ,grid* do
-        (loop for ,y in ,grid* do
+      (loop for ,y in ,grid* do
+        (loop for ,x in ,grid* do
           (let ((,xy (vec ,x ,y)))
             (progn ,@body)))))))
 
 
 (defmacro with-loop-grid* ((grid xy) &body body)
   (with-gensyms (x y)
-    `(loop for ,x in ,grid do
-      (loop for ,y in ,grid do
+    `(loop for ,y in ,grid do
+      (loop for ,x in ,grid do
         (let ((,xy (vec ,x ,y)))
           (progn ,@body))))))
 
@@ -395,6 +395,13 @@
             q p))))))
 
 
+(defun segx* (l &key parallel)
+  (declare (list l))
+  (destructuring-bind (a b)
+    l
+    (vec:segx a b :parallel parallel)))
+
+
 (defun cross (a b)
   (declare (vec a))
   (declare (vec b))
@@ -458,8 +465,6 @@
   (declare (integer n))
   (declare (double-float rad rot))
   (declare (vec xy))
-  (loop
-    for i from 0 below n
-    collect (vec:add (vec:scale (vec:cos-sin (+ rot (* (/ i n) PII))) rad)
-                     xy)))
+  (loop for i from 0 below n
+    collect (vec:add (vec:scale (vec:cos-sin (+ rot (* (/ i n) PII))) rad) xy)))
 
