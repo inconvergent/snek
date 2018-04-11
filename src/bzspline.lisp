@@ -62,12 +62,10 @@
   (declare (double-float x))
   (let ((s (/ 1d0 (math:dfloat ns))))
     (if (>= x 1d0)
-      (values
-        1d0
-        (- (floor (/ x s)) 1))
-      (values
-        (/ (mod x s) s)
-        (floor (/ x s))))))
+      (values 1d0
+              (- (floor (/ x s)) 1))
+      (values (/ (mod x s) s)
+              (floor (/ x s))))))
 
 
 (defun -select-pts (vpts seg)

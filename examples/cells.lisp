@@ -1,6 +1,7 @@
 #!/usr/bin/sbcl --script
 
 (load "../src/load")
+(load "../utils/force")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
@@ -33,7 +34,7 @@
 
       (snek:with (snk :zwidth 60.0d0)
         (snek:itr-all-verts (snk v)
-          (map 'list (lambda (w) (snek:force? snk v w -0.05))
+          (map 'list (lambda (w) (force? snk v w -0.05))
                      (snek:verts-in-rad snk (snek:get-vert snk v) 60.0d0))
           ;(snek:with-verts-in-rad (snk (snek:get-vert snk v) 60d0 w)
           ;  (cons)
@@ -43,7 +44,7 @@
           )
         (snek:itr-grps (snk g)
           (snek:itr-edges (snk e :g g)
-            (snek:force? snk (first e) (second e) 0.1))))
+            (force? snk (first e) (second e) 0.1))))
       (snek:itr-grps (snk g :collect nil)
         (sandpaint:bzspl-stroke sand
           (bzspl:make (snek:get-grp-verts snk :g g) :closed t)

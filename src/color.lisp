@@ -43,20 +43,18 @@ Colors are stored internally with premultiplied alpha.
 (defun to-list (c)
   (declare (rgba c))
   (let ((a (rgba-a c)))
-    (list
-      (/ (rgba-r c) a)
-      (/ (rgba-g c) a)
-      (/ (rgba-b c) a)
-      a)))
+    (list (/ (rgba-r c) a)
+          (/ (rgba-g c) a)
+          (/ (rgba-b c) a)
+          a)))
 
 
 (defun to-list* (c)
   (declare (rgba c))
-  (list
-    (rgba-r c)
-    (rgba-g c)
-    (rgba-b c)
-    (rgba-a c)))
+  (list (rgba-r c)
+        (rgba-g c)
+        (rgba-b c)
+        (rgba-a c)))
 
 
 (defun white (&optional (a 1d0))
@@ -93,11 +91,10 @@ Colors are stored internally with premultiplied alpha.
 
 (defun cmyk (c m y k &optional (a 1d0))
   (let ((ik (- 1d0 (math:dfloat k))))
-    (make-rgba
-      (* (- 1d0 (math:dfloat c)) ik)
-      (* (- 1d0 (math:dfloat m)) ik)
-      (* (- 1d0 (math:dfloat y)) ik)
-      a)))
+    (make-rgba (* (- 1d0 (math:dfloat c)) ik)
+               (* (- 1d0 (math:dfloat m)) ik)
+               (* (- 1d0 (math:dfloat y)) ik)
+               a)))
 
 
 (defun hsv (h s v &optional (a 1d0))

@@ -3,6 +3,7 @@
 
 
 (defvar PII (* PI 2d0))
+(defvar PI5 (* PI 0.5d0))
 
 
 ;http://cl-cookbook.sourceforge.net/os.html
@@ -52,7 +53,7 @@
   (make-array (list rows cols) :initial-element initial :element-type 'double-float))
 
 
-(defun make-symb-array (rows &key (initial nil))
+(defun make-symb-array (rows &key initial)
   (make-array rows :initial-element initial :element-type 'symbol))
 
 
@@ -80,9 +81,7 @@
 
 (defun to-array (init)
   (declare (list init))
-  (make-array
-    (length init)
-    :initial-contents init))
+  (make-array (length init) :initial-contents init))
 
 
 (defun to-generic-array (init &key (type t))
@@ -91,6 +90,13 @@
               :initial-contents init
               :element-type type
               :adjustable t))
+
+
+(defun make-hash-table-init (init &key (test #'equal))
+  (loop with res = (make-hash-table :test test)
+        for (k v) in init
+        do (setf (gethash k res) v)
+        finally (return res)))
 
 
 (defun to-list (a)
@@ -121,8 +127,7 @@
 (defun set-atup (a i vv)
   (declare (integer i))
   (declare (list vv))
-  (destructuring-bind (v1 v2)
-    vv
+  (destructuring-bind (v1 v2) vv
     (setf (aref a i 0) v1
           (aref a i 1) v2)))
 
@@ -131,8 +136,7 @@
   (declare (integer i))
   (declare (type (array integer) a))
   (declare (list vv))
-  (destructuring-bind (v1 v2)
-    vv
+  (destructuring-bind (v1 v2) vv
     (declare (integer v1 v2))
     (setf (aref a i 0) v1
           (aref a i 1) v2)))
@@ -142,8 +146,7 @@
   (declare (integer i))
   (declare (type (array double-float) a))
   (declare (list vv))
-  (destructuring-bind (v1 v2)
-    vv
+  (destructuring-bind (v1 v2) vv
     (declare (double-float v1 v2))
     (setf (aref a i 0) v1
           (aref a i 1) v2)))
@@ -158,12 +161,10 @@
   (append p (list (nth 0 p))))
 
 
-(defmacro square-loop ((x y s) &body body)
-  (with-gensyms (sname)
-    `(let ((,sname ,s))
-      (loop for ,x of-type integer from 0 below ,sname do
-        (loop for ,y of-type integer from 0 below ,sname do
+(defmacro square-loop ((x y n) &body body)
+  (with-gensyms (n*)
+    `(let ((,n* ,n))
+      (loop for ,x of-type integer from 0 below ,n* do
+        (loop for ,y of-type integer from 0 below ,n* do
           ,@body)))))
-
-
 

@@ -131,6 +131,18 @@
           (graph:get-verts (grp-grph ,grp)))))))
 
 
+(defmacro itr-prm-verts ((snk i &key p (collect t)) &body body)
+  "
+  iterates over all verts in prm p as i.
+  "
+  (declare (type boolean collect))
+  (with-gensyms (prm pr sname)
+    `(let* ((,sname ,snk))
+      (map ',(if collect 'list 'nil)
+          (lambda (,i) (declare (integer ,i)) (list ,@body))
+          (get-prm-vert-inds ,sname :p ,p)))))
+
+
 (defmacro itr-all-verts ((snk i &key (collect t)) &body body)
   "
   iterates over all verts in snk as i.
@@ -157,16 +169,28 @@
              (graph:get-edges ,grph))))))
 
 
-; TODO add flag to include nil grp
-(defmacro itr-grps ((snk g &key (collect t)) &body body)
+(defmacro itr-grps ((snk g &key (collect t) main) &body body)
   "
   iterates over all grps of snk as g.
   "
   (declare (type boolean collect))
-  (with-gensyms (grps sname)
-    `(let ((,sname ,snk))
+  (with-gensyms (grps sname main*)
+    `(let ((,sname ,snk)
+           (,main* ,main))
       (let ((,grps (snek-grps ,sname)))
         (loop for ,g being the hash-keys of ,grps
-          if ,g ; ignores nil (main) grp
+          if (or ,main* ,g)
+          ,(if collect 'collect 'do) (list ,@body))))))
+
+
+(defmacro itr-prms ((snk p &key (collect t)) &body body)
+  "
+  iterates over all prms of snk as p.
+  "
+  (declare (type boolean collect))
+  (with-gensyms (prms sname)
+    `(let ((,sname ,snk))
+      (let ((,prms (snek-prms ,sname)))
+        (loop for ,p being the hash-keys of ,prms
           ,(if collect 'collect 'do) (list ,@body))))))
 

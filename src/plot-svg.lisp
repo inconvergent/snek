@@ -53,11 +53,10 @@
         (cl-svg:move-to x y)))
     pth)
 
-  (when b
-    (array-push
-      (vec:with-xy-short ((vec:add b offset) x y)
-        (cl-svg:line-to x y))
-      pth)))
+  (when b (array-push
+            (vec:with-xy-short ((vec:add b offset) x y)
+              (cl-svg:line-to x y))
+            pth)))
 
 
 (defun finalize-path (pth)
@@ -140,10 +139,10 @@
 
       (loop for pts across mpts do
         (loop for h across (math:hatch (-get-pts pts closed)
-                             :angles angles
-                             :steps steps
-                             :rs (if rs rs rep-scale)
-                             :rnd rnd)
+                                       :angles angles
+                                       :steps steps
+                                       :rs (if rs rs rep-scale)
+                                       :rnd rnd)
             do (array-push h res)))
 
       (loop for h across (if stitch (math:stitch res) res) do
@@ -247,18 +246,17 @@
           :stroke-width (if sw sw stroke-width))))))
 
 
-(defun -accumulate-cpath (diagonals rep closed)
-  (let ((res (make-generic-array))
-        (n (length diagonals)))
-    (loop for s in (math:linspace rep 0d0 1d0)
+(defun -accumulate-cpath (diagonals rep closed &aux (n (length diagonals)))
+  (loop with res = (make-generic-array)
+          for s in (math:linspace rep 0d0 1d0)
           and k from 0 do
       (loop for i from 0 below n
-            and i- downfrom (1- n) do
-        (array-push
-          (vec:on-line* s
-            (aref diagonals (if closed i (if (= (math:mod2 k) 0) i i-))))
-          res)))
-    (to-list res)))
+            and i- downfrom (1- n)
+            do (array-push (vec:on-line* s
+                             (aref diagonals
+                                   (if closed i (if (= (math:mod2 k) 0) i i-))))
+                           res))
+    finally (return (to-list res))))
 
 
 (defun cpath (psvg pts &key (width 1d0)
@@ -266,8 +264,7 @@
                             (clim -0.5d0)
                             (slim -0.95d0)
                             (simplify 1d0)
-                            sw
-                            rs
+                            sw rs
                        &aux (pts* (to-array (if closed (close-path pts) pts)))
                             (width* (* width 0.5d0)))
   (declare (plot-svg psvg))
@@ -279,31 +276,49 @@
                        width* clim slim closed)))
       (path psvg (-accumulate-cpath diagonals rep closed)))))
 
+
 ; draw circle with arc.
-(defun arccirc (x y r*)
+(defun -arccirc (x y r*)
   (let* ((r (math:sfloat r*))
          (r2 (* 2 r)))
     (format nil "M~a,~a m -~a,0 a ~a,~a 0 1,0 ~a 0 a ~a,~a 0 1,0 -~a 0"
             x y r r r r2 r r r2)))
 
-(defun circ (psvg xy rad &key fill sw)
+
+(defun circ (psvg xy rad &key (fill "none") sw aspath)
   (declare (plot-svg psvg))
+  (declare (vec:vec xy))
+  (declare (double-float rad))
   (with-struct (plot-svg- scene stroke-width) psvg
     (vec:with-xy-short (xy x y)
-      (cl-svg:draw scene   (:path :d (arccirc x y rad))  ;(:circle :cx x :cy y :r rad)
-        :fill (if fill "black" "none")
-        :stroke "black" :stroke-width (if sw sw stroke-width)))))
+      ; this seems unnecessary?
+      (let ((sw* (if sw sw stroke-width)))
+        (if aspath
+          (cl-svg:draw scene (:path :d (-arccirc x y rad))
+                       :fill fill :stroke "black" :stroke-width sw*)
+          (cl-svg:draw scene (:circle :cx x :cy y :r rad)
+                       :fill fill :stroke "black" :stroke-width sw*))))))
 
 
-(defun wcirc (psvg xy rad &key outer-rad rs)
+; TODO: create path with multiple circs
+; TODO: multiple rads
+(defun circs (psvg vv rad &key (fill "none") sw aspath)
+  (declare (plot-svg psvg))
+  (declare (list vv))
+  (declare (double-float rad))
+  (loop for xy of-type vec:vec in vv
+        do (circ psvg xy rad :fill fill :sw sw :aspath aspath)))
+
+
+(defun wcirc (psvg xy rad &key outer-rad rs aspath)
   (declare (plot-svg psvg))
   (with-struct (plot-svg- rep-scale) psvg
     (let* ((inner-rad (if outer-rad rad 1d0))
-         (outer-rad* (if outer-rad outer-rad rad))
-         (n (math:int (* (ceiling (abs (- outer-rad* inner-rad)))
-                         (if rs rs rep-scale)))))
-    (loop for r in (math:linspace n inner-rad outer-rad*) do
-      (circ psvg xy r)))))
+           (outer-rad* (if outer-rad outer-rad rad))
+           (n (math:int (* (ceiling (abs (- outer-rad* inner-rad)))
+                           (if rs rs rep-scale)))))
+    (loop for r in (math:linspace n inner-rad outer-rad*)
+          do (circ psvg xy r :aspath aspath)))))
 
 
 (defun save (psvg fn)

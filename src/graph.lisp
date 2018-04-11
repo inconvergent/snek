@@ -16,13 +16,12 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun make (&key (size 1000) (inc 1.5))
-  (-make-graph
-    :size size
-    :inc inc
-    :num-edges 0
-    :adj (make-hash-table :test #'eql :size size :rehash-size inc)
-    :verts (hset:make :size size :inc inc)
-    :make-hset (lambda (x) (hset:make :init x :size size :inc inc))))
+  (-make-graph :size size
+               :inc inc
+               :num-edges 0
+               :adj (make-hash-table :test #'eql :size size :rehash-size inc)
+               :verts (hset:make :size size :inc inc)
+               :make-hset (lambda (x) (hset:make :init x :size size :inc inc))))
 
 
 (defun -add (make adj a b)
@@ -30,10 +29,9 @@ a simple (undirected) graph structure based on adjacency lists.
   (multiple-value-bind (val exists)
     (gethash a adj)
     (if (not exists)
-      (progn
-        (setf val (funcall make (list b))
-              (gethash a adj) val)
-        t)
+      (progn (setf val (funcall make (list b))
+                       (gethash a adj) val)
+             t)
       (hset:add val b))))
 
 
@@ -42,23 +40,19 @@ a simple (undirected) graph structure based on adjacency lists.
   (declare (integer a b))
   (with-struct (graph- adj make-hset verts) grph
     (if
-      (progn
-        (hset:add* verts (list a b))
-        (reduce (lambda (x y) (or x y))
-                (list
-                  (-add make-hset adj a b)
-                  (-add make-hset adj b a))))
-      (progn
-        (incf (graph-num-edges grph) 2)
-        t))))
+      (progn (hset:add* verts (list a b))
+             (reduce (lambda (x y) (or x y))
+                     (list (-add make-hset adj a b)
+                           (-add make-hset adj b a))))
+      (progn (incf (graph-num-edges grph) 2)
+             t))))
 
 
 (defun -del (adj a b)
   (declare (integer a b))
   (multiple-value-bind (val exists)
     (gethash a adj)
-    (if exists
-      (hset:del val b))))
+    (when exists (hset:del val b))))
 
 
 (defun -prune (adj verts a)
@@ -67,10 +61,9 @@ a simple (undirected) graph structure based on adjacency lists.
     (gethash a adj)
     (if (not exists)
         (hset:del verts a)
-          (if (< (hset:num val) 1)
-            (progn
-              (remhash a adj)
-              (hset:del verts a))))))
+          (when (< (hset:num val) 1)
+            (progn (remhash a adj)
+                   (hset:del verts a))))))
 
 
 (defun del (grph a b)
@@ -79,14 +72,12 @@ a simple (undirected) graph structure based on adjacency lists.
   (with-struct (graph- adj verts) grph
     (if
       (reduce (lambda (x y) (or x y))
-              (list
-                (-del adj a b)
-                (-del adj b a)))
-      (progn
-        (-prune adj verts a)
-        (-prune adj verts b)
-        (incf (graph-num-edges grph) -2)
-        t))))
+              (list (-del adj a b)
+                    (-del adj b a)))
+      (progn (-prune adj verts a)
+             (-prune adj verts b)
+             (incf (graph-num-edges grph) -2)
+             t))))
 
 
 (defun get-num-edges (grph)
@@ -105,8 +96,7 @@ a simple (undirected) graph structure based on adjacency lists.
   (with-struct (graph- adj) grph
     (multiple-value-bind (val exists)
       (gethash a adj)
-      (if exists
-        (hset:mem val b)))))
+      (when exists (hset:mem val b)))))
 
 
 (defun get-edges (grph)
@@ -127,10 +117,8 @@ a simple (undirected) graph structure based on adjacency lists.
   (declare (integer v))
   (with-struct (graph- adj) grph
     (let ((a (gethash v adj)))
-      (if a
-        (loop for w of-type integer being the hash-keys of a collect
-              (sort (list v w) #'<))
-        nil))))
+      (when a (loop for w of-type integer being the hash-keys of a
+                    collect (sort (list v w) #'<))))))
 
 
 (defun get-verts (grph)
@@ -149,8 +137,6 @@ a simple (undirected) graph structure based on adjacency lists.
     `(let ((,adj (graph-adj ,grph)))
       (loop for ,a of-type integer being the hash-keys of ,adj collect
         (loop for ,b of-type integer in (hset:to-list (gethash ,a ,adj))
-              do
-                (setf ,e (list ,a ,b))
-              collect
-                (list ,@body))))))
+              do (setf ,e (list ,a ,b))
+              collect (list ,@body))))))
 

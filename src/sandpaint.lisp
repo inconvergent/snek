@@ -3,11 +3,10 @@
 
 
 (defun make-rgba-array (size)
-  (make-array
-    (list size size 4)
-    :adjustable nil
-    :initial-element 0d0
-    :element-type 'double-float))
+  (make-array (list size size 4)
+              :adjustable nil
+              :initial-element 0d0
+              :element-type 'double-float))
 
 
 (defun -scale-convert (v &key (s 1d0) (gamma 1d0))
@@ -17,10 +16,9 @@
 
 (defun -unsigned-256 (v)
   (declare (double-float v))
-  (cond
-    ((> v 1d0) 255)
-    ((< v 0d0) 0)
-    (t (round (* 255 v)))))
+  (cond ((> v 1d0) 255)
+        ((< v 0d0) 0)
+        (t (round (* 255 v)))))
 
 
 (defun -setf-operator-over (vals x y i a color)
@@ -93,8 +91,8 @@
         (ry (round (vec::vec-y nxy))))
     (if (and (>= rx 0) (< rx size)
              (>= ry 0) (< ry size))
-      (setf (aref new-vals rx ry i)
-            (aref old-vals x y i)))))
+        (setf (aref new-vals rx ry i)
+              (aref old-vals x y i)))))
 
 
 (defun chromatic-aberration (sand center &key (s 1d0) (noise 1d0))
@@ -240,8 +238,7 @@
   (declare (list line))
   (with-struct (sandpaint- size vals rgba) sand
     (declare (type (array double-float) vals))
-    (destructuring-bind (u v)
-      line
+    (destructuring-bind (u v) line
       (-draw-stroke vals size grains u v rgba))))
 
 
@@ -250,8 +247,7 @@
   (declare (list line))
   (with-struct (sandpaint- size vals rgba) sand
     (declare (type (array double-float) vals))
-    (destructuring-bind (u v)
-      line
+    (destructuring-bind (u v) line
       (-draw-dens-stroke vals size dens u v rgba))))
 
 

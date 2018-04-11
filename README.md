@@ -135,12 +135,6 @@ collaboration/Open Source project. As such I am unlikely to accept PRs, reply
 to issues, or take requests.
 
 
-## Planned Changes
-
- - Randomized order of alteration apply
- - test parallel zmap implementation
-
-
 ## Bugs
 
  - bzspl has lower sample density near the edges in some cases.

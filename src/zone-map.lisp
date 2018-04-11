@@ -32,9 +32,8 @@
   (declare (vec:vec xy))
   (declare (double-float zwidth))
   (vec:with-xy (xy x y)
-    (values
-      (floor x zwidth)
-      (floor y zwidth))))
+    (values (floor x zwidth)
+            (floor y zwidth))))
 
 
 (defstruct (zmap (:constructor -make-zmap))
@@ -61,10 +60,9 @@
   (let ((zone-to-verts (make-hash-table :test #'equal)))
     (loop for v of-type integer from 0 below num-verts do
       (-add-v-to-zone verts zone-to-verts v zwidth))
-    (-make-zmap
-      :zwidth zwidth
-      :num-verts num-verts
-      :zone-to-verts zone-to-verts)))
+    (-make-zmap :zwidth zwidth
+                :num-verts num-verts
+                :zone-to-verts zone-to-verts)))
 
 
 (defmacro with-verts-in-rad ((zm verts xy rad v) &body body)

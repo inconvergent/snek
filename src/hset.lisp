@@ -21,8 +21,7 @@ this is a naive wrapper around hash-map. not sure how efficient it will be?
 
 (defun del (s e)
   (declare (integer e))
-  (the boolean
-       (remhash e s)))
+  (the boolean (remhash e s)))
 
 
 (defun del* (s ee)

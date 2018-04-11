@@ -205,7 +205,7 @@
 (defun path-simplify-rdp (pts lim)
   (let ((pts* (if (equal (type-of pts) 'cons) (to-array pts) pts)))
     (loop for i in (-path-simplify-rdp* pts* lim)
-        collect (aref pts* i))))
+          collect (aref pts* i))))
 
 
 (defun path-simplify-par (pts len lim)
@@ -226,12 +226,10 @@
                         (aref pts* i)) len)
             (< (vec:dot (aref angles (1- i))
                         (aref angles i)) lim))
-        (progn
-          (array-push (aref pts* (1+ i)) res)
-          (incf i 2))
-        (progn
-          (array-push (aref pts* i) res)
-          (incf i))))
+        (progn (array-push (aref pts* (1+ i)) res)
+               (incf i 2))
+        (progn (array-push (aref pts* i) res)
+               (incf i))))
 
     (if (< i n)
       (array-push (aref pts* i) res))
@@ -409,7 +407,7 @@
             (if (> (length hh) 0)
               (loop for h across (remove-if-not (lambda (h) (every #'identity h))
                                                 hh)
-                do (array-push h res))))))
+                    do (array-push h res))))))
       res)))
 
 

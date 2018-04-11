@@ -15,8 +15,7 @@
 
 
 (defmacro prob (p a &optional b)
-  `(if (< (rnd) ,p)
-     ,a ,b))
+  `(if (< (rnd) ,p) ,a ,b))
 
 
 (defmacro either (a b)
@@ -59,19 +58,14 @@
   (loop for i in (nrndi n 0 (length a)) collect (aref a i)))
 
 
-(defun -init-gen-array (v)
-  (let ((res (make-generic-array)))
-    (array-push v res)
-    res))
-
 (defun array-split (arr p)
   (let ((res (make-generic-array)))
 
-    (array-push (-init-gen-array (aref arr 0)) res)
+    (array-push (make-generic-array :init (list (aref arr 0))) res)
 
     (loop for i from 1 below (length arr) do
       (prob p
-        (array-push (-init-gen-array (aref arr i)) res)
+        (array-push (make-generic-array :init (list (aref arr i))) res)
         (array-push (aref arr i) (aref res (1- (length res))))))
     res))
 
@@ -122,9 +116,8 @@
   (declare (double-float mu sigma))
   (let ((s (* sigma (sqrt (* -2d0 (log (rnd))))))
         (u (* 2d0 pi (rnd))))
-    (values
-      (+ mu (* s (cos u)))
-      (+ mu (* s (sin u))))))
+    (values (+ mu (* s (cos u)))
+            (+ mu (* s (sin u))))))
 
 
 (defun rndbtwn (a b)
@@ -164,27 +157,27 @@
   (declare (double-float a b))
   (destructuring-bind (a b)
     (sort (list a b) #'<)
-      (let ((d (- b a)))
-        (let ((res (math:nrep n (+ a (random d)))))
-          (if order (sort res #'<) res)))))
+    (declare (double-float a b))
+    (let ((d (- b a)))
+      (let ((res (math:nrep n (+ a (random d)))))
+        (if order (sort res #'<) res)))))
 
 
 (defun rndspacei (n a b &key order)
   (declare (integer n a b))
   (destructuring-bind (a b)
     (sort (list a b) #'<)
-      (let ((d (- b a)))
-        (let ((res (math:nrep n (+ a (random d)))))
-          (if order (sort res #'<) res)))))
+    (declare (integer a b))
+    (let ((d (- b a)))
+      (let ((res (math:nrep n (+ a (random d)))))
+        (if order (sort res #'<) res)))))
 
 
 (defun bernoulli (n p)
   (declare (integer n))
   (declare (double-float p))
   (loop repeat n collect
-    (if (< (rnd:rnd) p)
-      1d0
-      0d0)))
+    (if (< (rnd:rnd) p) 1d0 0d0)))
 
 
 ; SHAPES
@@ -219,9 +212,8 @@
     (let ((a (random 1.0d0))
           (b (random 1.0d0)))
       (declare (double-float a b))
-      (if (< a b)
-        (vec:scale (vec:cos-sin (* PII (/ a b))) (* b rad))
-        (vec:scale (vec:cos-sin (* PII (/ b a))) (* a rad))))
+      (if (< a b) (vec:scale (vec:cos-sin (* PII (/ a b))) (* b rad))
+                  (vec:scale (vec:cos-sin (* PII (/ b a))) (* a rad))))
     xy))
 
 
@@ -260,6 +252,7 @@
   (declare (list ab))
   (destructuring-bind (a b)
     ab
+    (declare (vec:vec a b))
     (on-line a b)))
 
 
@@ -274,6 +267,7 @@
   (declare (list ab))
   (destructuring-bind (a b)
     ab
+    (declare (vec:vec a b))
     (non-line n a b)))
 
 

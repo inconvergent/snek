@@ -7,231 +7,180 @@
 ;(setf *random-state* (make-random-state t))
 
 
-
 (defun test-snek (snk)
-  (do-test
-    (snek:add-vert! snk (vec:vec 0d0 0d0))
-    0)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 10d0 0d0))
-    1)
+  (do-test (snek:add-vert! snk (vec:vec 0d0 0d0))
+           0)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 3d0 3d0))
-    2)
+  (do-test (snek:add-vert! snk (vec:vec 10d0 0d0))
+           1)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 4d0 3d0))
-    3)
+  (do-test (snek:add-vert! snk (vec:vec 3d0 3d0))
+           2)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 7d0 200d0))
-    4)
+  (do-test (snek:add-vert! snk (vec:vec 4d0 3d0))
+           3)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 2d0 10d0))
-    5)
+  (do-test (snek:add-vert! snk (vec:vec 7d0 200d0))
+           4)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 4d0 11d0))
-    6)
+  (do-test (snek:add-vert! snk (vec:vec 2d0 10d0))
+           5)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 3d0 10d0))
-    7)
+  (do-test (snek:add-vert! snk (vec:vec 4d0 11d0))
+           6)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 0d0 0.5d0))
-    8)
+  (do-test (snek:add-vert! snk (vec:vec 3d0 10d0))
+           7)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 2d0 1.0d0))
-    9)
+  (do-test (snek:add-vert! snk (vec:vec 0d0 0.5d0))
+           8)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 3.0d0 10d0))
-    10)
+  (do-test (snek:add-vert! snk (vec:vec 2d0 1.0d0))
+           9)
 
-  (do-test
-    (snek:add-edge! snk '(0 0))
-    nil)
+  (do-test (snek:add-vert! snk (vec:vec 3.0d0 10d0))
+           10)
 
-  (do-test
-    (snek:add-edge! snk '(0 2))
-    '(0 2))
+  (do-test (snek:add-edge! snk '(0 0))
+           nil)
 
-  (do-test
-    (snek:add-edge! snk '(0 1))
-    '(0 1))
+  (do-test (snek:add-edge! snk '(0 2))
+           '(0 2))
 
-  (do-test
-    (snek:add-edge! snk '(5 0))
-    '(0 5))
+  (do-test (snek:add-edge! snk '(0 1))
+           '(0 1))
 
-  (do-test
-    (snek:add-edge! snk '(1 0))
-    nil)
+  (do-test (snek:add-edge! snk '(5 0))
+           '(0 5))
 
-  (do-test
-    (snek:add-edge! snk '(5 0))
-    nil)
+  (do-test (snek:add-edge! snk '(1 0))
+           nil)
 
-  (do-test
-    (snek:add-edge! snk '(0 2))
-    nil)
+  (do-test (snek:add-edge! snk '(5 0))
+           nil)
 
-  (do-test
-    (snek:add-edge! snk '(5 2))
-    '(2 5))
+  (do-test (snek:add-edge! snk '(0 2))
+           nil)
 
-  (do-test
-    (snek:add-edge! snk '(4 1))
-    '(1 4))
+  (do-test (snek:add-edge! snk '(5 2))
+           '(2 5))
 
-  (do-test
-    (snek:add-edge! snk '(4 0))
-    '(0 4))
+  (do-test (snek:add-edge! snk '(4 1))
+           '(1 4))
 
-  (do-test
-    (snek:add-edge! snk '(5 1))
-    '(1 5))
+  (do-test (snek:add-edge! snk '(4 0))
+           '(0 4))
 
-  (do-test
-    (snek:add-edge! snk '(9 9))
-    nil)
+  (do-test (snek:add-edge! snk '(5 1))
+           '(1 5))
 
-  (do-test
-    (snek:add-edge! snk '(3 9))
-    '(3 9))
+  (do-test (snek:add-edge! snk '(9 9))
+           nil)
 
-  (do-test
-    (snek:add-edge! snk '(0 1))
-    nil)
+  (do-test (snek:add-edge! snk '(3 9))
+           '(3 9))
 
-  (do-test
-    (snek:add-edge! snk '(0 4))
-    nil)
+  (do-test (snek:add-edge! snk '(0 1))
+           nil)
 
-  (do-test
-    (snek:add-edge! snk '(10 9))
-    '(9 10))
+  (do-test (snek:add-edge! snk '(0 4))
+           nil)
 
-  (do-test
-    (snek:get-vert snk 2)
-    (vec:vec 3.0d0 3.0d0))
+  (do-test (snek:add-edge! snk '(10 9))
+           '(9 10))
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 0d0 1d0))
-    11)
+  (do-test (snek:get-vert snk 2)
+           (vec:vec 3.0d0 3.0d0))
 
-  (do-test
-    (snek:add-edge! snk '(0 1))
-    nil)
+  (do-test (snek:add-vert! snk (vec:vec 0d0 1d0))
+           11)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 0d0 7d0))
-    12)
+  (do-test (snek:add-edge! snk '(0 1))
+           nil)
 
-  (do-test
-    (snek:edge-length snk '(0 4))
-    200.12246250733574d0)
+  (do-test (snek:add-vert! snk (vec:vec 0d0 7d0))
+           12)
 
-  (do-test
-    (snek:edge-length snk '(2 5))
-    7.0710678118654755d0)
+  (do-test (snek:edge-length snk '(0 4))
+           200.12246250733574d0)
 
-  (do-test
-    (snek:edge-length snk '(1 2))
-    7.615773105863909d0))
+  (do-test (snek:edge-length snk '(2 5))
+           7.0710678118654755d0)
 
+  (do-test (snek:edge-length snk '(1 2))
+           7.615773105863909d0))
 
 (defun test-snek-2 (snk)
-  (do-test
-    (snek:add-vert! snk (vec:vec 0d0 0d0))
-    0)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 20d0 20d0))
-    1)
+  (do-test (snek:add-vert! snk (vec:vec 0d0 0d0))
+           0)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 30d0 30d0))
-    2)
+  (do-test (snek:add-vert! snk (vec:vec 20d0 20d0))
+           1)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 40d0 40d0))
-    3)
+  (do-test (snek:add-vert! snk (vec:vec 30d0 30d0))
+           2)
 
-  (do-test
-    (snek:add-edge! snk '(0 1))
-    '(0 1))
+  (do-test (snek:add-vert! snk (vec:vec 40d0 40d0))
+           3)
 
-  (do-test
-    (snek:add-edge! snk '(1 2))
-    '(1 2))
+  (do-test (snek:add-edge! snk '(0 1))
+           '(0 1))
 
-  (do-test
-    (snek:add-edge! snk '(2 3))
-    '(2 3))
+  (do-test (snek:add-edge! snk '(1 2))
+           '(1 2))
 
-  (do-test
-    (snek:get-edges snk)
-    '#((0 1) (1 2) (2 3)))
+  (do-test (snek:add-edge! snk '(2 3))
+           '(2 3))
 
-  (do-test
-    (snek:del-edge! snk '(0 1))
-    t)
+  (do-test (snek:get-edges snk)
+           '#((0 1) (1 2) (2 3)))
 
-  (do-test
-    (snek:del-edge! snk '(0 1))
-    nil)
+  (do-test (snek:del-edge! snk '(0 1))
+           t)
 
-  (do-test
-    (snek:del-edge! snk '(3 2))
-    t)
+  (do-test (snek:del-edge! snk '(0 1))
+           nil)
 
-  (do-test
-    (snek:del-edge! snk '(1 2))
-    t)
+  (do-test (snek:del-edge! snk '(3 2))
+           t)
 
-  (do-test
-    (snek:get-num-edges snk)
-    0)
+  (do-test (snek:del-edge! snk '(1 2))
+           t)
 
-  (do-test
-    (snek::snek-num-verts snk)
-    4))
+  (do-test (snek:get-num-edges snk)
+           0)
+
+  (do-test (snek::snek-num-verts snk)
+           4))
 
 
 (defun test-snek-3 (snk)
-  (do-test
-    (snek:add-vert! snk (vec:vec 10d0 10d0))
-    0)
-  (do-test
-    (snek:add-vert! snk (vec:vec 20d0 10d0))
-    1)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 30d0 10d0))
-    2)
+  (do-test (snek:add-vert! snk (vec:vec 10d0 10d0))
+           0)
 
-  (do-test
-    (snek:add-vert! snk (vec:vec 40d0 10d0))
-    3)
+  (do-test (snek:add-vert! snk (vec:vec 20d0 10d0))
+           1)
 
-  (do-test
-    (snek:add-edge! snk '(0 1))
-    '(0 1))
-  (do-test
-    (snek:add-edge! snk '(1 2))
-    '(1 2))
-  (do-test
-    (snek:add-edge! snk '(2 3))
-    '(2 3))
-  (do-test
-    (snek:add-edge! snk '(2 3))
-    nil))
+  (do-test (snek:add-vert! snk (vec:vec 30d0 10d0))
+           2)
+
+  (do-test (snek:add-vert! snk (vec:vec 40d0 10d0))
+           3)
+
+  (do-test (snek:add-edge! snk '(0 1))
+           '(0 1))
+
+  (do-test (snek:add-edge! snk '(1 2))
+           '(1 2))
+
+  (do-test (snek:add-edge! snk '(2 3))
+           '(2 3))
+
+  (do-test (snek:add-edge! snk '(2 3))
+           nil))
 
 
 (defun init-snek ()
@@ -262,9 +211,8 @@
       (snek:get-incident-edges snk 1)
       '((1 2) (0 1) (1 3)))
 
-    (do-test
-      (snek:get-incident-edges snk 100)
-      nil)))
+    (do-test (snek:get-incident-edges snk 100)
+             nil)))
 
 
 (defun test-snek-with ()
@@ -282,9 +230,8 @@
             (list nil)
             (list (list))))
 
-    (do-test
-      (sort (snek:get-vert-inds snk) #'<)
-      (list 0 1 2 3 5 6 7))))
+    (do-test (sort (snek:get-vert-inds snk) #'<)
+             (list 0 1 2 3 5 6 7))))
 
 
 (defun test-snek-add ()
@@ -292,9 +239,8 @@
     (snek:with (snk)
       (snek:add-vert? (vec:vec 10d0 3d0)))
 
-    (do-test
-      (snek:get-vert snk 11)
-      (vec:vec 10d0 3d0))
+    (do-test (snek:get-vert snk 11)
+             (vec:vec 10d0 3d0))
 
     (do-test
       (snek:with (snk :collect t)
@@ -302,16 +248,14 @@
         (snek:add-vert? (vec:vec 70d0 3d0)))
       '(12 13))
 
-    (do-test
-      (snek::snek-num-verts snk)
-      14)
+    (do-test (snek::snek-num-verts snk)
+             14)
 
     (snek:with (snk)
       (snek:add-edge*? (vec:vec 7d0 3d0) (vec:vec 100d0 0.99d0)))
 
-    (do-test
-      (snek:get-edges snk)
-      '#((1 2) (1 3) (0 1) (3 7) (5 6) (14 15)))))
+    (do-test (snek:get-edges snk)
+             '#((1 2) (1 3) (0 1) (3 7) (5 6) (14 15)))))
 
 (defun test-snek-move ()
   (let ((snk (init-snek)))
@@ -326,21 +270,17 @@
             (VEC:VEC 2.0d0 3.0d0)
             (VEC:VEC 6.0d0 8.0d0)))
 
-    (do-test
-      (snek:get-vert snk 0)
-      (vec:vec 3d0 5d0))
+    (do-test (snek:get-vert snk 0)
+             (vec:vec 3d0 5d0))
 
-    (do-test
-      (snek:get-vert snk 1)
-      (vec:vec 3d0 6d0))
+    (do-test (snek:get-vert snk 1)
+             (vec:vec 3d0 6d0))
 
-    (do-test
-      (snek:get-vert snk 3)
-      (vec:vec 2d0 3d0))
+    (do-test (snek:get-vert snk 3)
+             (vec:vec 2d0 3d0))
 
-    (do-test
-      (snek:get-vert snk 2)
-      (vec:vec 6d0 8d0))))
+    (do-test (snek:get-vert snk 2)
+             (vec:vec 6d0 8d0))))
 
 (defun test-snek-join ()
   (let ((snk (init-snek)))
@@ -350,9 +290,8 @@
       (snek:join-verts? 3 6)
       (snek:join-verts? 7 1))
 
-  (do-test
-    (snek:get-num-edges snk)
-    14)
+  (do-test (snek:get-num-edges snk)
+           14)
 
 
   (do-test
@@ -366,9 +305,8 @@
 (defun test-snek-append ()
   (let ((snk (init-snek)))
 
-    (do-test
-      (snek::snek-num-verts snk)
-      11)
+    (do-test (snek::snek-num-verts snk)
+             11)
 
     (do-test
       (snek:with (snk :collect t)
@@ -377,13 +315,11 @@
         (snek:append-edge? 7 (vec:vec 1d0 2d0)))
       '(11 12 13))
 
-    (do-test
-      (snek:get-num-edges snk)
-      16)
+    (do-test (snek:get-num-edges snk)
+             16)
 
-    (do-test
-      (snek::snek-num-verts snk)
-      14)
+    (do-test (snek::snek-num-verts snk)
+             14)
 
     (do-test
       (snek::snek-verts snk)
@@ -402,13 +338,11 @@
         (snek:split-edge? '(5 6)))
       '((2 11) nil (6 12)))
 
-  (do-test
-    (snek:get-num-edges snk)
-    14)
+  (do-test (snek:get-num-edges snk)
+           14)
 
-  (do-test
-    (snek::snek-num-verts snk)
-    13)
+  (do-test (snek::snek-num-verts snk)
+           13)
 
   (do-test
     (snek::snek-verts snk)
@@ -425,17 +359,14 @@
         (snek:append-edge? v (vec:vec 3d0 2d0))
         (snek:move-vert? v (vec:vec 2d0 2d0))))
 
-    (do-test
-      (snek:get-num-edges snk)
-      12)
+    (do-test (snek:get-num-edges snk)
+             12)
 
-    (do-test
-      (snek::snek-num-verts snk)
-      12)
+    (do-test (snek::snek-num-verts snk)
+             12)
 
-    (do-test
-      (snek::snek-wc snk)
-      1)
+    (do-test (snek::snek-wc snk)
+             1)
 
     (snek:with (snk)
       (snek:itr-all-verts (snk v)
@@ -463,21 +394,18 @@
       '(1.0d0 1.4142135623730951d0 2.23606797749979d0 3.1622776601683795d0
         4.123105625617661d0 4.47213595499958d0))
 
-    (do-test
-      (snek::snek-wc snk)
-      2)
+    (do-test (snek::snek-wc snk)
+             2)
 
     (snek:with (snk)
       (snek:with-rnd-edge (snk e)
         (snek:split-edge? e)))
 
-    (do-test
-      (snek:get-num-edges snk)
-      14)
+    (do-test (snek:get-num-edges snk)
+             14)
 
-    (do-test
-      (snek::snek-num-verts snk)
-      13)))
+    (do-test (snek::snek-num-verts snk)
+             13)))
 
 (defun test-snek-zmap ()
   (let ((snk (snek:make)))
@@ -541,9 +469,9 @@
 (defun test-snek-grp ()
   (let ((snk (snek:make :max-verts 22 :grp-size 30)))
 
-    (let ((g1 (snek:add-grp! snk :type 'path :closed t))
+    (let ((g1 (snek:add-grp! snk :type 'path))
           (g2 (snek:add-grp! snk))
-          (g3 (snek:add-grp! snk :type 'path :closed t)))
+          (g3 (snek:add-grp! snk :type 'path)))
       (snek:add-vert! snk (vec:vec 100d0 200d0))
       (snek:add-vert! snk (vec:vec 200d0 300d0))
       (snek:add-vert! snk (vec:vec 300d0 400d0))
@@ -560,33 +488,65 @@
       (snek:add-edge! snk '(3 2) :g g2)
       (snek:add-edge! snk '(1 5) :g g3)
 
-      (do-test
-        (sort (flatten (snek:itr-verts (snk i :g g2) i)) #'<)
-        '(1 2 3))
+      (do-test (sort (flatten (snek:itr-verts (snk i :g g2) i)) #'<)
+               '(1 2 3))
+
+      (do-test (sort (flatten (snek:itr-verts (snk i :g nil) i)) #'<)
+               '(1 2))
+
+      (do-test (sort (flatten (snek:itr-edges (snk e :g g1) e)) #'<)
+               '(1 2))
+
+      (do-test (sort (snek:get-vert-inds snk :g g1) #'<)
+               '(1 2))
+
+      (do-test (sort (snek:get-vert-inds snk :g g3) #'<)
+               '(1 5))
+
+      (do-test (length (snek:get-vert-inds snk))
+               2)
+
+      (do-test (length (snek:itr-grps (snk g) g))
+               3))))
+
+(defun test-snek-prm ()
+  (let ((snk (snek:make :max-verts 22 :grp-size 30
+                        :prms (list
+                                (list 'snek::path
+                                      (lambda (snk p &optional extra-args)
+                                        (snek:get-prm-vert-inds snk :p p)))))))
+    (let ((p1 (snek:add-prm! snk :type 'snek::path))
+          (p2 (snek:add-prm! snk))
+          (p3 (snek:add-prm! snk :type 'path)))
+      (snek:add-vert! snk (vec:vec 100d0 200d0) :p p1)
+      (snek:add-vert! snk (vec:vec 200d0 300d0) :p p2)
+      (snek:add-vert! snk (vec:vec 300d0 400d0) :p p3)
+      (snek:add-vert! snk (vec:vec 400d0 500d0) :p p1)
+      (snek:add-vert! snk (vec:vec 600d0 700d0) :p p1)
+      (snek:add-vert! snk (vec:vec 700d0 800d0) :p p2)
 
       (do-test
-        (sort (flatten (snek:itr-verts (snk i :g nil) i)) #'<)
-        '(1 2))
-
-      (do-test
-        (sort (flatten (snek:itr-edges (snk e :g g1) e)) #'<)
-        '(1 2))
-
-      (do-test
-        (sort (snek:get-vert-inds snk :g g1) #'<)
-        '(1 2))
-
-      (do-test
-        (sort (snek:get-vert-inds snk :g g3) #'<)
+        (flatten (snek:itr-prm-verts (snk i :p p2) i))
         '(1 5))
 
       (do-test
-        (length (snek:get-vert-inds snk))
-        2)
+        (flatten (snek:itr-prm-verts (snk i :p p1) i))
+        '(0 3 4))
 
       (do-test
-        (length (snek:itr-grps (snk g) g))
-        3))))
+        (snek:get-prm-verts snk :p p1)
+        (list (vec:vec 100.0d0 200.0d0)
+              (vec:vec 400.0d0 500.0d0)
+              (vec:vec 600.0d0 700.0d0)))
+
+      (do-test (to-list (snek:prmr snk :p p1))
+               '(0 3 4))
+
+      (do-test (to-list (snek:prmr snk :p p2))
+               '(1 5))
+
+      (do-test (length (snek:itr-prms (snk p) p))
+               3))))
 
 
 (defun main ()
@@ -603,9 +563,8 @@
   (test-title (test-snek-itrs))
   (test-title (test-snek-zmap))
   (test-title (test-snek-grp))
-  (test-title (test-summary))
-
-  )
+  (test-title (test-snek-prm))
+  (test-title (test-summary)))
 
 (main)
 

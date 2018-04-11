@@ -4,16 +4,17 @@
 ; ADD VERT
 
 (defstruct (add-vert-alt
-    (:constructor add-vert? (xy)))
-  (xy nil :type vec:vec :read-only t))
+    (:constructor add-vert? (xy &key p)))
+  (xy nil :type vec:vec :read-only t)
+  (p nil :type symbol :read-only t))
 
 
 (defun do-add-vert-alt (snk a)
   "
   add vert at xy.
   "
-  (with-struct (add-vert-alt- xy) a
-    (add-vert! snk xy)))
+  (with-struct (add-vert-alt- xy p) a
+    (add-vert! snk xy :p p)))
 
 
 ; ADD EDGE
@@ -77,9 +78,8 @@
   (with-struct (snek- num-verts) snk
     (with-struct (append-edge-alt- v xy rel g) a
       (-valid-vert (num-verts v :err nil)
-        (let ((w (if rel
-                   (add-vert! snk (vec:add (get-vert snk v) xy))
-                   (add-vert! snk xy))))
+        (let ((w (if rel (add-vert! snk (vec:add (get-vert snk v) xy))
+                         (add-vert! snk xy))))
           (declare (integer w))
           (add-edge! snk (list v w) :g g)
           w)))))
@@ -122,8 +122,7 @@
     (let ((res (del-edge! snk e :g g))
           (verts (snek-verts snk)))
       (declare (type (array double-float) verts))
-      (destructuring-bind (a b)
-        e
+      (destructuring-bind (a b) e
         (declare (integer a b))
         (if res
           (let ((c (add-vert! snk
@@ -131,30 +130,4 @@
                                (vec:arr-get verts b)))))
             (add-edge! snk (list a c) :g g)
             (add-edge! snk (list c b) :g g)))))))
-
-
-(defun -get-force-alterations (u v f)
-  (list (move-vert? v f) (move-vert? u (vec:scale f -1.0d0))))
-
-
-(defmacro force? (snk v1 v2 r)
-  "
-  creates relative movement (move-vert alteration) between verts
-  v1 and v2.
-  "
-  (with-gensyms (vname v1name v2name rname)
-    `(let ((,vname (snek-verts ,snk))
-           (,v1name ,v1)
-           (,v2name ,v2)
-           (,rname (math:dfloat ,r)))
-      (declare (double-float ,rname))
-      (declare (integer ,v1name))
-      (declare (integer ,v2name))
-      (-get-force-alterations
-        ,v1name ,v2name
-        (vec:scale
-          (vec:nsub
-            (vec:arr-get ,vname ,v1name)
-            (vec:arr-get ,vname ,v2name))
-          ,rname)))))
 

@@ -336,6 +336,7 @@
     :bzspl
     :bzx
     :circ
+    :circs
     :cpath
     :hatch
     :make
@@ -381,6 +382,7 @@
     :add-path!
     :add-path*!
     :add-polygon!
+    :add-prm!
     :add-vert!
     :add-vert?
     :add-verts!
@@ -391,15 +393,20 @@
     :draw-verts
     :edge-length
     :export-2obj
-    :force?
     :get-all-grps
+    :get-all-prms
     :get-all-verts
     :get-edges
+    :get-grp
     :get-grp-as-bzspl
     :get-grp-verts
     :get-incident-edges
     :get-num-edges
     :get-num-verts
+    :get-prm
+    :get-prm-vert-inds
+    :get-prm-verts
+    :get-props
     :get-vert
     :get-vert-inds
     :get-verts
@@ -407,12 +414,17 @@
     :itr-all-verts
     :itr-edges
     :itr-grps
+    :itr-prms
     :itr-verts
+    :itr-prm-verts
     :join-verts?
     :make
     :make-mutate
     :move-vert?
     :mutate
+    :prmf
+    :prmr
+    :psvg-get-prm-types
     :split-edge?
     :verts-in-rad
     :with
@@ -424,10 +436,12 @@
     :with-verts-in-rad)
   (:import-from :common-lisp-user
     :append-postfix
+    :close-path
     :flatten
     :get-dfloat-tup
     :make-dfloat-array
     :make-generic-array
+    :make-hash-table-init
     :to-list
     :array-push
     :with-gensyms
