@@ -13,18 +13,16 @@
       (loop
         for char-pos-x in (rnd:rndspace line-chars sx (+ sx width) :order t)
         for char-pos-y in (rnd:rndspace line-chars (- sy 10d0) (+ sy 10d0))
-        for char-height in (math:add
-                             (rnd:rndspace line-chars 0.4d0 1d0)
-                             (math:scale*
-                               (rnd:bernoulli line-chars 0.05d0)
-                               2d0))
+        for char-height in (math:add (rnd:rndspace line-chars 0.4d0 1d0)
+                                     (math:scale*
+                                       (rnd:bernoulli line-chars 0.05d0)
+                                       2d0))
         collect
           (snek:add-verts! snk
             (mapcar
               (lambda (v)
-                (vec:add
-                  (vec:mult v (vec:vec 2.0d0 char-height))
-                  (vec:vec char-pos-x char-pos-y)))
+                (vec:add (vec:mult v (vec:vec 2.0d0 char-height))
+                         (vec:vec char-pos-x char-pos-y)))
               (rnd:nin-circ (rnd:rndi* char-num) (rnd:rnd char-rad))))))
     snk))
 
@@ -39,8 +37,8 @@
         ;       :prob 0.001d0
         ;       :noise 10.d0))
         (sand (sandpaint:make size
-                :fg (color:black 0.009)
-                :bg (color:white))))
+                              :fg (color:black 0.009)
+                              :bg (color:white))))
 
     (loop for y in (math:linspace line-num border (- size border)) do
       (format t "~a ~%" y)

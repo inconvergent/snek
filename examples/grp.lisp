@@ -22,8 +22,8 @@
         (rad 25d0)
         (snk (snek:make :max-verts 10000))
         (sand (sandpaint:make size
-                :fg (color:white 0.005)
-                :bg (color:gray 0.1d0))))
+                              :fg (color:white 0.005)
+                              :bg (color:gray 0.1d0))))
 
     (init snk rep rad)
 
@@ -39,8 +39,7 @@
             (let ((ns (funcall (gethash g grp-states) noise)))
               (snek:itr-verts (snk v :g g)
                 (snek:move-vert? v
-                  (vec:add ns
-                    (rnd:in-circ 0.05d0)))))))
+                  (vec:add ns (rnd:in-circ 0.05d0)))))))
 
         (snek:itr-grps (snk g :collect nil)
           (snek:draw-edges snk sand grains :g g))))

@@ -61,6 +61,7 @@
             (lambda (n)
               (mapcar (lambda (v) (vec:rot v (* PI 0.2d0)))
                       (shape n bx by))))))
+
        (estimate-nc-ncn-fxn (bbox-fxn)
          (let* ((samples (funcall bbox-fxn 1000))
                 (mid (vec:lmid samples))
@@ -68,6 +69,7 @@
            (if (< area 30d0)
              (list area 4 1)
              (list area 7 1))))
+
        (sort-centroids-fxn ()
          (let ((f (if (< (rnd:rnd)) #'< #'>))
                (rot (rnd:rnd PII)))
@@ -78,6 +80,7 @@
                (if (< (rnd:rnd) 0.6)
                  (swap res)
                  res))))))
+
       (let ((alphabet (show-alphabet (get-alphabet *alphabet*
                         :get-bbox-fxn #'get-bbox-fxn
                         :nc-ncn-fxn #'estimate-nc-ncn-fxn

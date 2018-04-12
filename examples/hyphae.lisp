@@ -44,8 +44,8 @@
                  (gethash v curr)
                  (if exists
                    (if (> c 20)
-                     (print (remhash v curr))
-                     (incf (gethash v curr))))))
+                       (print (remhash v curr))
+                       (incf (gethash v curr))))))
 
              (do-append-edge-alt* (snk a)
                (let ((v (snek::append-edge-alt-v a)))
@@ -53,14 +53,12 @@
                  (inside-border (size (snek::append-edge-alt-xy a) 10)
                    (if (<= (length (snek:verts-in-rad snk (snek::append-edge-alt-xy a) rad)) 1)
                      (aif (snek::do-append-edge-alt snk a)
-                       (progn
-                         (incf hits)
-                         (setf (gethash it curr) 0)
-                         (draw snk a it))))))))
+                       (progn (incf hits)
+                              (setf (gethash it curr) 0)
+                              (draw snk a it))))))))
 
-      (let ((snk (snek:make
-                   :max-verts itt
-                   :alts `((snek::append-edge-alt ,#'do-append-edge-alt*)))))
+      (let ((snk (snek:make :max-verts itt
+                            :alts `((snek::append-edge-alt ,#'do-append-edge-alt*)))))
 
         (init snk 20)
 
@@ -76,8 +74,8 @@
 
 (defun main (size fn)
   (let ((sand (sandpaint:make size
-                :fg (color:black 0.01)
-                :bg (color:white))))
+                              :fg (color:black 0.01)
+                              :bg (color:white))))
 
     (hyphae sand size fn 1000 10.0d0 (vec:vec 250d0 250d0))))
 

@@ -19,8 +19,8 @@
                         (append-edge-alt-xy a)
                         (snek:get-vert snk (append-edge-alt-v a)))
                       200d0)
-                 (aif (do-append-edge-alt snk a)
-                    (setf curr it)))))
+                   (aif (do-append-edge-alt snk a)
+                      (setf curr it)))))
 
       (let ((snk (snek:make
                    :alts `((append-edge-alt ,#'do-append-edge-alt*)))))

@@ -12,8 +12,8 @@
   (let ((w (* 0.5d0 (- right left)))
         (mid (* 0.5d0 (+ right left))))
     (to-array
-      (loop for i from 0 below n collect
-        (list (rnd:in-box w w :xy (vec:v mid)) (rnd:on-circ 1d0))))))
+      (loop for i from 0 below n
+            collect (list (rnd:in-box w w :xy (vec:v mid)) (rnd:on-circ 1d0))))))
 
 
 (defun make-lines (left right len noise dims &key xspace)
@@ -41,13 +41,11 @@
   (loop for u across lu
         and ui from 0 do
     (loop for w across lw
-          and wi from 0 do
-      (multiple-value-bind (int us ws)
-        (vec:segx u w)
-        (if int
-          (array-push
-             (list ui wi us ws)
-             res))))))
+          and wi from 0
+          do (multiple-value-bind (int us ws)
+               (vec:segx u w)
+               (when int
+                     (array-push (list ui wi us ws) res))))))
 
 
 (defun get-intersects (lines)

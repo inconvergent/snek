@@ -280,6 +280,17 @@
     (do-test (length (bzspl:adaptive-pos (bzspl:make pts-a)))
              226)
 
+    (do-test (bzspl:adaptive-pos (bzspl:make (list (vec:vec 0d0 0d0)
+                                                   (vec:vec 1d0 2d0)
+                                                   (vec:vec -3d0 5d0))))
+             (list (vec:vec 0.0d0 0.0d0)
+                   (vec:vec 0.19444444444444442d0 0.6944444444444444d0)
+                   (vec:vec 0.11111111111111105d0 1.4444444444444444d0)
+                   (vec:vec -0.25d0 2.25d0)
+                   (vec:vec -0.8888888888888891d0 3.1111111111111107d0)
+                   (vec:vec -1.805555555555555d0 4.027777777777778d0)
+                   (vec:vec -3.0d0 5.0d0)))
+
     (do-test (bzspl:len (bzspl:make pts-a))
              225.14997459916276d0)
 

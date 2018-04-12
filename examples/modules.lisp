@@ -23,15 +23,15 @@
         (rep 7)
         (snk (snek:make :max-verts 100000))
         (sand (sandpaint:make size
-                :fg (color:black 0.01)
-                :bg (color:white))))
+                              :fg (color:black 0.01)
+                              :bg (color:white))))
 
     (snek:add-verts! snk (rnd:nin-box 100 450d0 450d0 :xy (vec:vec 500d0 500d0)))
 
     (let ((fns (list 'run-join 'run-move)))
-      (loop for i from 0 to itt do
-        (print-every i 1000)
-        (funcall (rnd:lget fns) snk)))
+      (loop for i from 0 to itt
+            do (print-every i 1000)
+               (funcall (rnd:lget fns) snk)))
 
     ;(snek-export-2obj snk (append-postfix fn ".2obj"))
     (snek:draw-edges snk sand 1000)

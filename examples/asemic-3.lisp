@@ -53,12 +53,11 @@
 
 (defun make-glyph (xy bbox nc ncn)
   (vec:with-xy ((vec:scale bbox 0.5d0) bx by)
-    (-glyph-generate-pts
-      xy
-      bbox
-      (rnd:nin-box nc bx by :xy xy)
-      nc
-      ncn)))
+    (-glyph-generate-pts xy
+                         bbox
+                         (rnd:nin-box nc bx by :xy xy)
+                         nc
+                         ncn)))
 
 
 (defun init-line (width line-chars sxy bbox)
@@ -93,12 +92,11 @@
         (line-chars 20)
         (line-num 10)
         (grains 95)
-        (r (rep-list (list
-                       (color:hsv 0.51 1 1 0.01)
-                       (color:hsv 0.91 1 1 0.01))))
+        (r (rep-list (list (color:hsv 0.51 1 1 0.01)
+                           (color:hsv 0.91 1 1 0.01))))
         (sand (sandpaint:make size
-                :fg (color:white 0.009)
-                :bg (color:white))))
+                              :fg (color:white 0.009)
+                              :bg (color:white))))
 
     (sandpaint:set-fg-color sand (color:vdark 0.009))
     (draw-block-grid size border line-chars line-num 19d0 34d0 600000 sand)

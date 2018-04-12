@@ -8,18 +8,15 @@
 
 
 (defun mpath (lines p)
-  (mapcar
-    (lambda (l)
-      (lin-path:pos (lin-path:make l) p))
-    lines))
+  (mapcar (lambda (l)
+            (lin-path:pos (lin-path:make l) p))
+          lines))
 
 
 (defun get-lines (a b n)
   (loop for x in (rnd:rndspace n a b :order t)
-    collect
-      (loop for y in (rnd:rndspace n a b)
-            collect
-          (vec:vec x y))))
+    collect (loop for y in (rnd:rndspace n a b)
+                  collect (vec:vec x y))))
 
 
 
@@ -29,8 +26,8 @@
         (nsteps 1000)
         (grains 50)
         (sand (sandpaint:make size
-                :fg (color:white 0.05)
-                :bg (color:dark))))
+                              :fg (color:white 0.05)
+                              :bg (color:dark))))
           (let ((lines (get-lines -500d0 1500d0 40)))
 
             (loop

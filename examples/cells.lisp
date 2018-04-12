@@ -12,10 +12,10 @@
     (mapcar
       (lambda (g) (let ((mid (rnd:in-circ (* 0.5d0 (- size 200d0)) :xy xy)))
                     (snek:add-path! snk
-                      (math:rep (p (math:linspace n 0 1 :end nil))
-                        (vec:on-circ p 20d0 :xy mid))
-                      :g g
-                      :closed t)))
+                                    (math:rep (p (math:linspace n 0 1 :end nil))
+                                      (vec:on-circ p 20d0 :xy mid))
+                                    :g g
+                                    :closed t)))
       (math:nrep m (snek:add-grp! snk)))
   snk))
 
@@ -26,8 +26,8 @@
         (grains 30)
         (snk (init-snek 5 800 size (vec:rep (* 0.5d0 size))))
         (sand (sandpaint:make size
-                :fg (color:white 0.05)
-                :bg (color:dark))))
+                              :fg (color:white 0.05)
+                              :bg (color:dark))))
 
     (loop for i from 0 below itt do
       (print-every i 100)

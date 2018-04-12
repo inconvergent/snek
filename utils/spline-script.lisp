@@ -59,17 +59,16 @@
   (destructuring-bind (area nc ncn)
     (funcall nc-ncn-fxn bbox-fxn)
 
-    (let ((gl (make-spline-glyph
-                :name name
-                :area area
-                :nc nc
-                :ncn ncn
-                :min-dst min-dst
-                :centroids (mapcar #'second
-                                   (funcall sort-fxn
-                                     (get-centroids bbox-fxn min-dst nc)))
-                :bbox-fxn bbox-fxn
-                :sort-fxn sort-fxn)))
+    (let ((gl (make-spline-glyph :name name
+                                 :area area
+                                 :nc nc
+                                 :ncn ncn
+                                 :min-dst min-dst
+                                 :centroids (mapcar #'second
+                                                    (funcall sort-fxn
+                                                      (get-centroids bbox-fxn min-dst nc)))
+                                 :bbox-fxn bbox-fxn
+                                 :sort-fxn sort-fxn)))
       (setf (spline-glyph-fxn gl)
             (lambda ()
               (let ((counts (make-hash-table :test #'equal))

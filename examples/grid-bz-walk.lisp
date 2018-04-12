@@ -14,11 +14,10 @@
 
 (defun rnd-dir ()
   (nth (rnd:rndi 4)
-       (list
-         (list 0 -1)
-         (list 0 1)
-         (list -1 0)
-         (list 1 0))))
+       (list (list 0 -1)
+             (list 0 1)
+             (list -1 0)
+             (list 1 0))))
 
 (defmacro -swap (n m n* m*)
   (with-gensyms (h w)
@@ -41,10 +40,10 @@
 
         (lambda (noise)
           (incf x (mixed noise 0.2d0))
-          (if (> x 1.0d0)
-            (-swap n m n* m*))
-          (if (< x 0.0d0)
-            (-swap n* m* n m))
+          (when (> x 1.0d0)
+                (-swap n m n* m*))
+          (when (< x 0.0d0)
+                (-swap n* m* n m))
           (setf x (mod x 1.0d0))
           (vec:on-line x
             (nth (mod m ngrid) (nth (mod n ngrid) grid))
@@ -59,8 +58,8 @@
         (grains 10)
         (edge 60)
         (sand (sandpaint:make size
-                :fg (color:white 0.05)
-                :bg (color:dark))))
+                              :fg (color:white 0.05)
+                              :bg (color:dark))))
 
 
     (let* ((grid (get-grid size edge 5))

@@ -41,11 +41,11 @@
         (noise 0.000000000007d0)
         (grains 10)
         (snk (init-snek 40 1
-               (half size)
-               (vec:rep (* 0.5d0 size))))
+                        (half size)
+                        (vec:rep (* 0.5d0 size))))
         (sand (sandpaint:make size
-                :fg (color:white 0.05)
-                :bg (color:dark)))
+                              :fg (color:white 0.05)
+                              :bg (color:dark)))
         (mut (snek:make-mutate :noise 100 :prob 0.000005)))
 
       (let ((state-gen (get-walkers-state-gen snk)))

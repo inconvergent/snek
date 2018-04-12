@@ -12,7 +12,7 @@
 
     (snek:add-path! snk
                     (math:rep (p (math:linspace n 0 1 :end nil))
-                         (vec:on-circ p 20d0 :xy xy))
+                              (vec:on-circ p 20d0 :xy xy))
                     :closed t)
     snk))
 
@@ -25,8 +25,8 @@
         (farl 100d0)
         (stp 0.004d0)
         (sand (sandpaint:make size
-                :fg (color:white 0.05)
-                :bg (color:dark))))
+                              :fg (color:white 0.05)
+                              :bg (color:dark))))
 
     (start-timer "total")
     (loop for i from 0 below itt do

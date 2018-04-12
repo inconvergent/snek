@@ -55,8 +55,8 @@
         (h-state-gen (get-state-gen
                      (lambda () (rnd:get-acc-lin-stp (rnd:rnd)))))
         (sand (sandpaint:make size
-                :fg (color:white 0.01)
-                :bg (color:black))))
+                              :fg (color:white 0.01)
+                              :bg (color:black))))
 
     (snek:with (snk)
       (snek:itr-all-verts (snk v)

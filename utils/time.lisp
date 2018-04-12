@@ -22,8 +22,8 @@
 
 (defun show-timers ()
   (format t "~%timers: ~%")
-  (loop for ti being the hash-keys of *tsum* do
-    (format t "  ~a:  ~a ~%" ti (gethash ti *tsum*))))
+  (loop for ti being the hash-keys of *tsum*
+        do (format t "  ~a:  ~a ~%" ti (gethash ti *tsum*))))
 
 
 (defmacro with-timer ((name) &body body)

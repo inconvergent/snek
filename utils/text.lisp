@@ -13,7 +13,7 @@
 
 
 (defun show-sections (words)
-  (loop for section in words do
-        (print "---------------------------------------------------------")
-        (print section)))
+  (loop for section in words
+        do (print "---------------------------------------------------------")
+           (print section)))
 

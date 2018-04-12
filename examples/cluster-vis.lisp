@@ -10,7 +10,7 @@
   (first (sort (loop for c in centroids
                      and i from 0
                      collect (list i (vec:dst cand c)))
-            #'< :key #'second)))
+               #'< :key #'second)))
 
 (defun get-pt (w size)
   (rnd:in-box w w :xy (vec:rep (* 0.5d0 size))))
@@ -41,8 +41,8 @@
         (colors (math:nrep 20 (color:hsv (rnd:rnd) 0.7 0.8 0.09))))
 
     (let ((sand (sandpaint:make size
-                :fg (color:black 0.08)
-                :bg (color:white))))
+                                :fg (color:black 0.08)
+                                :bg (color:white))))
       (sandpaint:set-fg-color sand (color:black 0.009))
       (loop for pt in (get-distributed-pts centroids size 450d0 300000) do
         (destructuring-bind (i dst)
@@ -66,9 +66,7 @@
       (draw-circ sand colors centroids)
 
       (sandpaint:pixel-hack sand)
-      (sandpaint:save sand fn :gamma 1.5))
-
-    ))
+      (sandpaint:save sand fn :gamma 1.5))))
 
 
 (time (main 1000 (second (cmd-args))))

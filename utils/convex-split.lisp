@@ -56,10 +56,9 @@
       (destructuring-bind (a b)
         (get-splits n)
         (let ((sval (funcall s*)))
-          (list
-            t
-            (ind-to-pts pts (get-left a b n) sval)
-            (ind-to-pts pts (get-right a b n) sval))))
+          (list t
+                (ind-to-pts pts (get-left a b n) sval)
+                (ind-to-pts pts (get-right a b n) sval))))
       ; do not split
       (list nil pts)))
 

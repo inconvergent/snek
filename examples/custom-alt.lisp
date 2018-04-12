@@ -42,8 +42,8 @@
 
 (defun main (size fn)
   (let ((sand (sandpaint:make size
-                :fg (color:black 0.01)
-                :bg (color:white))))
+                              :fg (color:black 0.01)
+                              :bg (color:white))))
 
     (draw-path sand fn 5000 10.0d0 (vec:vec 250d0 250d0))))
 

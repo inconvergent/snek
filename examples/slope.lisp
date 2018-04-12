@@ -31,14 +31,13 @@
             (setf va (vec:add va (rnd:in-circ noise :xy (vec:zero))))
 
             (loop for k from 1 to itt
-              do
-                (snek:with (snk)
-                  (snek:add-vert? (rnd:on-line p1 p2))
-                  (snek:with-rnd-vert (snk v)
-                    (snek:append-edge? v va))
-                  (snek:with-rnd-vert (snk v)
-                    (snek:with-rnd-vert (snk w)
-                      (snek:join-verts? w v)))))
+              do (snek:with (snk)
+                   (snek:add-vert? (rnd:on-line p1 p2))
+                   (snek:with-rnd-vert (snk v)
+                     (snek:append-edge? v va))
+                   (snek:with-rnd-vert (snk v)
+                     (snek:with-rnd-vert (snk w)
+                       (snek:join-verts? w v)))))
               (snek:draw-edges snk sand grains)))
 
 

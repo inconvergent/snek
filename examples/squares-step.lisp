@@ -13,8 +13,8 @@
         (rad 98d0)
         (snk (snek:make))
         (sand (sandpaint:make size
-                :fg (color:white 0.005)
-                :bg (color:gray 0.1d0))))
+                              :fg (color:white 0.005)
+                              :bg (color:gray 0.1d0))))
 
     (loop for x in (math:linspace rep 200d0 800d0) for i from 0 do
       (loop for y in (math:linspace rep 200d0 800d0) for j from 0 do
@@ -28,11 +28,10 @@
       (snek:itr-grps (snk g)
         (incf c)
         (setf (gethash g grp-states)
-              (list
-                (lin-path:make (snek:get-grp-verts snk :g g))
-                (rnd:get-acc-lin-stp* (rnd:rnd))
-                (rnd:get-acc-lin-stp* (rnd:rnd))
-                noise)))
+              (list (lin-path:make (snek:get-grp-verts snk :g g))
+                    (rnd:get-acc-lin-stp* (rnd:rnd))
+                    (rnd:get-acc-lin-stp* (rnd:rnd))
+                    noise)))
 
       (loop for i from 0 to itt do
         (print-every i 1000)

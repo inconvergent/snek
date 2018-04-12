@@ -13,8 +13,8 @@
         (grains 3)
         (itt 1000)
         (sand (sandpaint:make size
-                :fg (color:black 0.01)
-                :bg (color:white))))
+                              :fg (color:black 0.01)
+                              :bg (color:white))))
 
     (loop for i in (math:linspace repeat 100 900)
           for j from 1 to repeat do

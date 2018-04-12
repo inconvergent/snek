@@ -7,8 +7,8 @@
 
 (defun get-grid* (sx sy numx numy)
   (loop for x of-type double-float in (math:linspace numx (first sx) (second sx)) collect
-    (loop for y in (math:linspace numy (first sy) (second sy)) collect
-      (vec:vec x y))))
+    (loop for y in (math:linspace numy (first sy) (second sy))
+          collect (vec:vec x y))))
 
 
 (defun get-rnd-grid (size edge ngrid)

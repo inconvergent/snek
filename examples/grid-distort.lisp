@@ -19,8 +19,8 @@
          (grid (get-grid size 50d0 ngrid))
          (state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*))))
          (sand (sandpaint:make size
-                 :fg (color:white 0.05)
-                 :bg (color:dark))))
+                               :fg (color:white 0.05)
+                               :bg (color:dark))))
 
     (snek:add-verts! snk (flatten grid))
 
@@ -43,7 +43,6 @@
         (snek:itr-all-verts (snk v)
           (snek:move-vert? v (funcall state-gen v 0.000009d0))
           ;(snek:move-vert? v (rnd:in-circ 0.4d0))
-
           ))
 
       (snek:itr-grps (snk g :collect nil)

@@ -2,17 +2,16 @@
 (defun get-projection-fxn (proj mid s)
   (lambda (x)
     (vec:add mid
-      (vec:mult
-        (vec:sum (loop for px in proj and ix in x collect
+      (vec:mult (vec:sum (loop for px in proj and ix in x collect
                    (vec:scale px (math:dfloat ix))))
-        s))))
+                s))))
 
 
 (defun do-count (state ind &optional (c 1))
   (multiple-value-bind (val exists)
     (gethash ind state)
-    (if (not exists)
-      (setf val 0))
+    (when (not exists)
+          (setf val 0))
     (setf (gethash ind state) (+ val c))))
 
 
@@ -23,7 +22,7 @@
       (loop for b across cube do
         (when (= (1- n)
                  (loop for ai in a and bi in b count (= ai bi)))
-          (array-push (list a b) edges))))
+              (array-push (list a b) edges))))
     edges))
 
 
@@ -80,20 +79,16 @@
 
 
 (defun tris (psvg proj n abc)
-  (destructuring-bind (a b c)
-    abc
+  (destructuring-bind (a b c) abc
     (loop for s in (math:linspace n 0 1) do
-      (plot-svg:path psvg (list
-                            (vec:on-line s (funcall proj a)  (funcall proj b))
-                            (vec:on-line s (funcall proj a)  (funcall proj c)))))))
+      (plot-svg:path psvg (list (vec:on-line s (funcall proj a)  (funcall proj b))
+                                (vec:on-line s (funcall proj a)  (funcall proj c)))))))
 
 (defun quads (psvg proj n abcd)
-  (destructuring-bind (a b c d)
-    abcd
+  (destructuring-bind (a b c d) abcd
     (loop for s in (math:linspace n 0 1) do
-      (plot-svg:path psvg (list
-                            (vec:on-line s (funcall proj a)  (funcall proj b))
-                            (vec:on-line s (funcall proj c)  (funcall proj d)))))))
+      (plot-svg:path psvg (list (vec:on-line s (funcall proj a)  (funcall proj b))
+                                (vec:on-line s (funcall proj c)  (funcall proj d)))))))
 
 
 (defun path (visited state pts selected)

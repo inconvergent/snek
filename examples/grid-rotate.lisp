@@ -22,14 +22,13 @@
 (defun main (size fn)
   (let* ((ngrid 100)
          (snk (snek:make :max-verts 100000))
-         (grid )
          (state-gen (get-state-gen (lambda () (rnd:get-circ-stp*))))
          (sand (sandpaint:make size
                  :fg (color:black 0.05)
                  :bg (color:white))))
 
-    (loop for i from 0 below 10 do
-      (place-grid snk 0 size (vec:vec 500d0 500d0)))
+    (loop for i from 0 below 10
+          do (place-grid snk 0 size (vec:vec 500d0 500d0)))
 
     (loop for i from 0 below 50 do
       (print-every i 100)
@@ -40,7 +39,6 @@
       ;(snek:itr-grps (snk g)
       ;  (sandpaint:pix sand
       ;    (bzspl:rndpos (snek:get-grp-as-bzspl snk g) 500)))
-
       )
 
       (snek:itr-grps (snk g)
