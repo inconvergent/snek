@@ -117,14 +117,24 @@
         collect (add-vert! snk xy :p p)))
 
 
-(defun get-props (snk &key g p)
+(defun get-prm-props (snk &key p)
   (declare (snek snk))
-  (when (and g p) (error "you must get props of either a grp or a prm."))
-  ; if p is provided, return props of p.
-  ; if g is provided, return props of g.
-  ; otherwise return props of default grp (nil)
-  (if p (prm-props (get-prm snk :p p))
-        (grp-props (get-grp snk :g g))))
+  (prm-props (get-prm snk :p p)))
+
+
+(defun get-grp-props (snk &key g)
+  (declare (snek snk))
+  (grp-props (get-grp snk :g g)))
+
+
+(defun set-prm-props (snk v &key p)
+  (declare (snek snk))
+  (setf (prm-props (get-prm snk :p p)) v))
+
+
+(defun set-grp-props (snk v &key g)
+  (declare (snek snk))
+  (setf (grp-props (get-grp snk :g g)) v))
 
 
 (defun get-args (snk &key p)
@@ -220,6 +230,10 @@
   (get-verts snk (get-prm-vert-inds snk :p p)))
 
 
+(defun sel-args (snk p ea)
+  (if ea ea (get-args snk :p p)))
+
+
 (defun prmr (snk &key p type args)
   (declare (snek snk))
   (when (not p) (error "must provide a prm name."))
@@ -227,9 +241,9 @@
          (type* (if type type (prm-type pr))))
     (when pr
       (multiple-value-bind (fxn exists)
-        (gethash type* (snek-prm-names snk) )
+        (gethash type* (snek-prm-names snk))
         (when (not exists) (error "trying to use undefined prm type: ~a" type*))
-        (funcall fxn snk p args)))))
+        (funcall fxn snk p  (snek:sel-args snk p args))))))
 
 
 ;(defmacro prmf (snk fx &key p args)

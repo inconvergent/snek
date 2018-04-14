@@ -305,10 +305,11 @@
   (loop for a in aa collect (dst a b)))
 
 
-(defun norm (a)
+(defun norm (a &optional (s 1d0))
   (declare (vec a))
+  (declare (double-float s))
   (let ((l (len a)))
-    (if (> l 0d0) (iscale a l) a)))
+    (if (> l 0d0) (scale a (/ s l)) 0d0)))
 
 
 (defun nsub (a b)

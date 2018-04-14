@@ -9,61 +9,54 @@
   (scene nil :read-only nil))
 
 
-(defun make (&key
-              (layout 'a4-landscape)
-              (stroke-width 1d0)
-              (rep-scale 1.3d0))
-  (make-plot-svg
-    :layout layout
-    :stroke-width stroke-width
-    :rep-scale rep-scale
-    :scene (case layout (a4-landscape
-                          (cl-svg:make-svg-toplevel
-                            'cl-svg:svg-1.1-toplevel
-                            :height "210mm"
-                            :width "297mm"
-                            :view-box "0 0 1414.285 1000"))
-                        (a4-portrait
-                          (cl-svg:make-svg-toplevel
-                            'cl-svg:svg-1.1-toplevel
-                            :height "297mm"
-                            :width "210mm"
-                            :view-box "0 0 1000 1414.285"))
-                        (otherwise
-                          (error "invalid layout. use: 'plot-svg:a4-portrait or
-                                  'plot-svg:a4-landscape.")))))
+(defun make (&key (layout 'a4-landscape) (stroke-width 1d0) (rep-scale 1.3d0))
+  (make-plot-svg :layout layout
+                 :stroke-width stroke-width
+                 :rep-scale rep-scale
+                 :scene (case layout
+                          (a4-landscape
+                            (cl-svg:make-svg-toplevel
+                              'cl-svg:svg-1.1-toplevel
+                              :height "210mm"
+                              :width "297mm"
+                              :view-box "0 0 1414.285 1000"))
+                          (a4-portrait
+                            (cl-svg:make-svg-toplevel
+                              'cl-svg:svg-1.1-toplevel
+                              :height "297mm"
+                              :width "210mm"
+                              :view-box "0 0 1000 1414.285"))
+                          (otherwise
+                            (error "invalid layout. use: 'plot-svg:a4-portrait or
+                                    'plot-svg:a4-landscape.")))))
 
 
 (defun make* (&key height width (stroke-width 1.1) (rep-scale 1.3d0))
-  (make-plot-svg
-    :layout 'custom
-    :stroke-width stroke-width
-    :rep-scale rep-scale
-    :scene (cl-svg:make-svg-toplevel
-              'cl-svg:svg-1.1-toplevel
-              :height height
-              :width width)))
+  (make-plot-svg :layout 'custom
+                 :stroke-width stroke-width
+                 :rep-scale rep-scale
+                 :scene (cl-svg:make-svg-toplevel 'cl-svg:svg-1.1-toplevel
+                                                  :height height
+                                                  :width width)))
 
 
 (defun accumulate-path (pth a &optional b (offset (vec:zero)))
-  (array-push
-    (vec:with-xy-short ((vec:add a offset) x y)
-      (if (> (length pth) 0)
-        (cl-svg:line-to x y)
-        (cl-svg:move-to x y)))
-    pth)
+  (array-push (vec:with-xy-short ((vec:add a offset) x y)
+                (if (> (length pth) 0)
+                  (cl-svg:line-to x y)
+                  (cl-svg:move-to x y)))
+              pth)
 
-  (when b (array-push
-            (vec:with-xy-short ((vec:add b offset) x y)
-              (cl-svg:line-to x y))
-            pth)))
+  (when b (array-push (vec:with-xy-short ((vec:add b offset) x y)
+                        (cl-svg:line-to x y))
+                      pth)))
 
 
 (defun finalize-path (pth)
-  (let ((res (cl-svg:make-path)))
-    (loop for x across pth do
-      (cl-svg:with-path res x))
-    res))
+  (loop with res = (cl-svg:make-path)
+        for x across pth
+        do (cl-svg:with-path res x)
+        finally (return res)))
 
 
 (defun path (psvg pts &key sw (fill "none") closed)
@@ -73,10 +66,10 @@
     (cl-svg:draw scene
       (:path :d (cl-svg:path (finalize-path
                                (let ((pth (make-generic-array)))
-                                     (loop for p in pts do
-                                       (accumulate-path pth p))
-                                     (if closed (array-push "Z" pth))
-                                     pth))))
+                                      (loop for p in pts
+                                            do (accumulate-path pth p))
+                                      (when closed (array-push "Z" pth))
+                                      pth))))
       :fill fill
       :stroke "black"
       :stroke-width (if sw sw stroke-width))))
@@ -99,20 +92,18 @@
 (defun -get-pts (pts closed)
   (let ((res (make-generic-array))
         (is-cons (equal (type-of pts) 'cons)))
-    (if is-cons
-      (loop for p in pts do (array-push p res))
-      (loop for p across pts do (array-push p res)))
-    (if closed (array-push (if is-cons (first pts) (aref pts 0)) res))
+    (if is-cons (loop for p in pts do (array-push p res))
+                (loop for p across pts do (array-push p res)))
+    (when closed (array-push (if is-cons (first pts) (aref pts 0)) res))
     res))
 
-(defun hatch (psvg pts
-              &key (angles (list 0d0 (* 0.5d0 PI)))
-                   (rnd #'identity)
-                   (steps (lambda (n) (math:linspace n 0d0 1d0)))
-                   stitch drop closed rs sw
-              &aux (draw (if drop
-                           (lambda (p) (rnd:prob drop nil (plot-svg:path psvg p :sw sw)))
-                           (lambda (p) (plot-svg:path psvg p :sw sw)))))
+(defun hatch (psvg pts &key (angles (list 0d0 (* 0.5d0 PI)))
+                            (rnd #'identity)
+                            (steps (lambda (n) (math:linspace n 0d0 1d0)))
+                            stitch drop closed rs sw
+                       &aux (draw (if drop
+                                    (lambda (p) (rnd:prob drop nil (plot-svg:path psvg p :sw sw)))
+                                    (lambda (p) (plot-svg:path psvg p :sw sw)))))
   (with-struct (plot-svg- rep-scale) psvg
     (let ((res (math:hatch (-get-pts pts closed)
                            :angles angles

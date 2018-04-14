@@ -59,37 +59,28 @@
 
 ; PRIMITIVES
 
-(defun -exec-with-args (fxn args &optional ea)
-  (apply fxn (if ea (append args ea) args)))
-
-(defun -sel-args (snk p ea)
-  (if ea ea (get-args snk :p p)))
-
 (defun psvg-get-prm-types (psvg)
   (declare (type plot-svg::plot-svg psvg))
   (labels ((stdfx (type fxn)
-            (list type (lambda (snk p &optional ea
-                                      &aux (ea* (-sel-args snk p ea)))
-              (-exec-with-args fxn (list psvg (snek:get-prm-verts snk :p p))
-                                   ea*))))
+            (list type (lambda (snk p &optional ea)
+              (exec-with-args fxn (list psvg (snek:get-prm-verts snk :p p))
+                                  ea))))
 
-           (circfx (snk p &optional ea
-                          &aux (ea* (-sel-args snk p ea)))
-             (-exec-with-args #'plot-svg:circ
-                              (list psvg (first (get-prm-verts snk :p p))
-                                         (get-props snk :p p))))
-           (circsfx (snk p &optional ea
-                           &aux (ea* (-sel-args snk p ea)))
-             (-exec-with-args #'plot-svg:circs
-                              (list psvg (get-prm-verts snk :p p)
-                                         (get-props snk :p p)))))
+           (circfx (snk p &optional ea)
+             (exec-with-args #'plot-svg:circ
+                             (list psvg (first (get-prm-verts snk :p p))
+                                        (get-prm-props snk :p p))))
+           (circsfx (snk p &optional ea)
+             (exec-with-args #'plot-svg:circs
+                             (list psvg (get-prm-verts snk :p p)
+                                        (get-prm-props snk :p p)))))
 
-    (append (mapcar #'stdfx (list 'bzspl 'path 'hatch)
+    (append (mapcar #'stdfx (list :bzspl :path :hatch)
                             (list #'plot-svg:bzspl
                                   #'plot-svg:path
                                   #'plot-svg:hatch))
-            (list (list 'circs #'circsfx)
-                  (list 'circ #'circfx)))))
+            (list (list :circs #'circsfx)
+                  (list :circ #'circfx)))))
 
 
 ; SANDPAINT

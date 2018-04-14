@@ -512,12 +512,12 @@
 (defun test-snek-prm ()
   (let ((snk (snek:make :max-verts 22 :grp-size 30
                         :prms (list
-                                (list 'snek::path
+                                (list :path
                                       (lambda (snk p &optional extra-args)
                                         (snek:get-prm-vert-inds snk :p p)))))))
-    (let ((p1 (snek:add-prm! snk :type 'snek::path))
+    (let ((p1 (snek:add-prm! snk :type :path))
           (p2 (snek:add-prm! snk))
-          (p3 (snek:add-prm! snk :type 'path)))
+          (p3 (snek:add-prm! snk :type :path)))
       (snek:add-vert! snk (vec:vec 100d0 200d0) :p p1)
       (snek:add-vert! snk (vec:vec 200d0 300d0) :p p2)
       (snek:add-vert! snk (vec:vec 300d0 400d0) :p p3)

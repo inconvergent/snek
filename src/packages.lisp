@@ -244,9 +244,11 @@
     :adaptive-pos
     :len
     :make
+    :normal
     :pos
     :pos*
     :rndpos
+    :tangent
     :with-rndpos)
   (:import-from :common-lisp-user
     :array-push
@@ -406,7 +408,10 @@
     :get-prm
     :get-prm-vert-inds
     :get-prm-verts
-    :get-props
+    :get-grp-props
+    :get-prm-props
+    :set-grp-props
+    :set-prm-props
     :get-vert
     :get-vert-inds
     :get-verts
@@ -426,6 +431,7 @@
     :prmr
     :psvg-get-prm-types
     :split-edge?
+    :sel-args
     :verts-in-rad
     :with
     :with-dx
@@ -439,6 +445,7 @@
     :close-path
     :flatten
     :get-dfloat-tup
+    :exec-with-args
     :make-dfloat-array
     :make-generic-array
     :make-hash-table-init

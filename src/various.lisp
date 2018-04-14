@@ -32,6 +32,10 @@
   (when (= 0 (mod i n)) (format t "~%itt: ~a~%" i)))
 
 
+(defun exec-with-args (fxn args &optional ea)
+  (apply fxn (if ea (append args ea) args)))
+
+
 (defun dhalf (l)
   (declare (double-float l))
   (* l 0.5d0))

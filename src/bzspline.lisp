@@ -187,6 +187,36 @@
            (when (< err lim) (return curr))))
 
 
+
+(defun -modin (i stp)
+  (let ((a (- i stp)))
+    (if (< a 0d0) (+ a 1d0) a)))
+
+; TODO: this is probably not very accurate
+(defun tangent (bz pos &key (scale 1d0) (offset 1d-10) &aux (scale* (* 0.5d0 scale)))
+  (declare (bzspl bz))
+  (declare (double-float pos scale))
+  (with-struct (bzspl- closed) bz
+    (let* ((left (if closed (-modin pos offset) (max (- pos offset) 0d0)))
+           (right (if closed (math:inc pos offset) (min 1d0 (+ pos offset))))
+           (pt (pos bz pos))
+           (v (vec:norm (vec:sub (pos bz right) (pos bz left)) scale*)))
+     (list (vec:sub pt v)
+           (vec:add pt v)))))
+
+
+(defun normal (bz pos &key (scale 1d0) (offset 1d-10) &aux (scale* (* 0.5d0 scale)))
+  (declare (bzspl bz))
+  (declare (double-float pos scale))
+  (with-struct (bzspl- closed) bz
+    (let* ((left (if closed (-modin pos offset) (max (- pos offset) 0d0)))
+           (right (if closed (math:inc pos offset) (min 1d0 (+ pos offset))))
+           (pt (pos bz pos))
+           (v (vec:perp (vec:norm (vec:sub (pos bz right) (pos bz left)) scale*))))
+     (list (vec:sub pt v)
+           (vec:add pt v)))))
+
+
 (defun make (pts &key closed &aux (n (length pts)))
   (declare (list pts))
   (declare (boolean closed))

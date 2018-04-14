@@ -18,8 +18,7 @@
 
     (vec:with-loop-grid ((math:linspace n left right) xy)
       (let* ((snk (snek:make :prms (snek:psvg-get-prm-types psvg)))
-             (p (snek:add-prm! snk :type 'snek::bzspl
-                                   :props 3d0)))
+             (p (snek:add-prm! snk :type :bzspl :props 3d0)))
 
         (snek:add-verts! snk (rnd:nin-box 3 bs bs :xy xy) :p p)
         (loop repeat 10
@@ -27,8 +26,13 @@
                    (snek:add-vert? (rnd:in-box bs bs :xy xy) :p p))
                  (snek:prmr snk :p p))
 
-        (snek:prmr snk :p p :type 'snek::circs)
-        (snek:prmr snk :p p :type 'snek::hatch
+        (print (snek:prmr snk :p p :type :v))
+        (print (snek:prmr snk :p p :type :vv))
+
+        (print (snek:get-prm-props snk :p p))
+
+        (snek:prmr snk :p p :type :circs)
+        (snek:prmr snk :p p :type :hatch
                             :args (list :closed t :rs 0.2 :angles (rnd:nrnd 2)))))
 
     (plot-svg:save psvg fn)))

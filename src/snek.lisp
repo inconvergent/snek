@@ -22,7 +22,7 @@
   (name nil :type symbol)
   (grph nil :type graph::graph)
   (type nil :type symbol :read-only t)
-  (props nil :read-only t))
+  (props nil))
 
 
 (defstruct (prm (:constructor -make-prm))
@@ -31,7 +31,7 @@
   (verts (make-generic-array :type 'integer) :read-only nil)
   (num-verts 0 :type integer)
   (args nil :type list :read-only nil)
-  (props nil :read-only t))
+  (props nil))
 
 ; ----- END -----
 
@@ -69,12 +69,16 @@
                                            '(split-edge-alt do-split-edge-alt)
                                            '(add-edge*-alt do-add-edge*-alt))
                                      alts)
-              :prm-names (-make-fxns (list
-                           (list nil (lambda (snk p &optional extra-args)
-                                             (get-prm-vert-inds snk :p p))))
-                                     prms)
+              :prm-names (-make-fxns
+                           (list
+                             (list nil (lambda (snk p &optional extra-args)
+                                               (get-prm-vert-inds snk :p p)))
+                             (list :v (lambda (snk p &optional extra-args)
+                                              (get-prm-vert-inds snk :p p)))
+                             (list :vv (lambda (snk p &optional extra-args)
+                                               (get-prm-verts snk :p p))))
+                           prms)
               :grps (make-hash-table-init (list
-                      (list nil (-make-grp
-                                  :name 'main :type 'main
-                                  :grph (graph:make :size grp-size)))))))
+                      (list nil (-make-grp :name :main :type :main
+                                           :grph (graph:make :size grp-size)))))))
 
