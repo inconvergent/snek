@@ -380,6 +380,7 @@
     :add-edge!
     :add-edge*?
     :add-edges!
+    :del-edge?
     :add-grp!
     :add-path!
     :add-path*!
@@ -413,6 +414,10 @@
     :set-grp-props
     :set-prm-props
     :get-vert
+    :get-vert-ind-by-name
+    :get-vert-by-name
+    :get-vert-inds-by-name
+    :get-verts-by-name
     :get-vert-inds
     :get-verts
     :is-vert-in-grp
@@ -429,6 +434,7 @@
     :mutate
     :prmf
     :prmr
+    :prune-edges-by-len
     :psvg-get-prm-types
     :split-edge?
     :sel-args

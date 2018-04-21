@@ -12,6 +12,7 @@
   (alt-names nil :read-only t)
   (grps (make-hash-table :test #'equal))
   (prms (make-hash-table :test #'equal))
+  (vert-names (make-hash-table :test #'equal))
   (max-verts nil :type integer :read-only t)
   (grp-size nil :type integer :read-only t))
 
@@ -67,6 +68,7 @@
                                            '(join-verts-alt do-join-verts-alt)
                                            '(append-edge-alt do-append-edge-alt)
                                            '(split-edge-alt do-split-edge-alt)
+                                           '(del-edge-alt do-del-edge-alt)
                                            '(add-edge*-alt do-add-edge*-alt))
                                      alts)
               :prm-names (-make-fxns

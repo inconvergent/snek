@@ -84,7 +84,7 @@
             collect (progn ,@body)))))
 
 
-(defun add-vert! (snk xy &key p)
+(defun add-vert! (snk xy &key p name)
   "
   adds a new vertex to snek
 
@@ -97,7 +97,12 @@
     (setf (aref verts num-verts 0) (vec::vec-x xy)
           (aref verts num-verts 1) (vec::vec-y xy)))
 
-  (let ((i (- (incf (snek-num-verts snk)) 1)))
+  (let ((i (1- (incf (snek-num-verts snk)))))
+    (when name
+      (multiple-value-bind (val exists)
+        (gethash name (snek-vert-names snk))
+        (when exists (error "vert name already exists: ~a" name))
+        (setf (gethash name (snek-vert-names snk)) i)))
     (when p
       (with-struct (prm- verts) (gethash p (snek-prms snk))
         (array-push i verts)
@@ -105,7 +110,7 @@
     i))
 
 
-(defun add-verts! (snk vv &key p)
+(defun add-verts! (snk vv &key p names)
   "
   adds new vertices to snek
 
@@ -113,8 +118,14 @@
   "
   (declare (snek snk))
   (declare (list vv))
-  (loop for xy of-type vec:vec in vv
-        collect (add-vert! snk xy :p p)))
+  (if names
+    (progn
+      (if (not (= (length names) (length vv)))
+        (error "must provide same number of verts and names"))
+      (loop for xy of-type vec:vec in vv and name in names
+            collect (add-vert! snk xy :p p :name name)))
+    (loop for xy of-type vec:vec in vv
+          collect (add-vert! snk xy :p p))))
 
 
 (defun get-prm-props (snk &key p)
@@ -246,14 +257,6 @@
         (funcall fxn snk p  (snek:sel-args snk p args))))))
 
 
-;(defmacro prmf (snk fx &key p args)
-;  (with-gensyms (sname pname fname)
-;    `(let* ((,sname ,snk)
-;            (,pname (gethash ,p (snek-prms ,sname)))
-;            (,fname ,fx))
-;      )))
-
-
 (defun get-prm-vert-inds (snk &key p)
   (declare (snek snk))
   (when (not p) (error "must provide a prm name."))
@@ -291,6 +294,34 @@
         (error "grp does not exist: ~a" grp)))))
 
 
+(defun get-vert-ind-by-name (snk &key name)
+  (declare (snek snk))
+  (multiple-value-bind (i exists)
+    (gethash name (snek-vert-names snk))
+    (when exists i)))
+
+
+(defun get-vert-by-name (snk &key name)
+  (declare (snek snk))
+  (multiple-value-bind (i exists)
+    (gethash name (snek-vert-names snk))
+    (when exists (get-vert snk i))))
+
+
+(defun get-verts-by-name (snk &key names)
+  (declare (snek snk))
+  (declare (list names))
+  (loop for name in names
+        collect (get-vert-by-name snk :name name)))
+
+
+(defun get-vert-inds-by-name (snk &key names)
+  (declare (snek snk))
+  (declare (list names))
+  (loop for name in names
+        collect (get-vert-ind-by-name snk :name name)))
+
+
 (defun get-num-edges (snk &key g)
   (declare (snek snk))
   (with-grp (snk grp g)
@@ -305,14 +336,13 @@
       (graph:get-edges grph))))
 
 
+; TODO: get-all-incident-edges?
 (defun get-incident-edges (snk v &key g)
   (declare (snek snk))
   (declare (integer v))
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
       (graph:get-incident-edges grph v))))
-
-; TODO: get-all-incident-edges?
 
 
 (defun add-edge! (snk ee &key g)
@@ -354,13 +384,6 @@
       (destructuring-bind (a b) ee
         (declare (integer a b))
         (graph:del grph a b)))))
-
-
-(defmacro with-verts-in-rad ((snk xy rad v) &body body)
-  (with-gensyms (sname)
-    `(let ((,sname ,snk))
-      (zmap:with-verts-in-rad ((snek-zmap ,sname) (snek-verts ,sname) ,xy ,rad ,v)
-        (progn ,@body)))))
 
 
 (defun verts-in-rad (snk xy rad)

@@ -54,6 +54,13 @@
           (progn ,@body)))))
 
 
+(defmacro with-verts-in-rad ((snk xy rad v) &body body)
+  (with-gensyms (sname)
+    `(let ((,sname ,snk))
+      (zmap:with-verts-in-rad ((snek-zmap ,sname) (snek-verts ,sname) ,xy ,rad ,v)
+        (progn ,@body)))))
+
+
 (defmacro with-dx ((snk vv dx d) &body body)
   (with-gensyms (sname)
     `(let ((,sname ,snk))

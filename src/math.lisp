@@ -56,10 +56,11 @@
 
 (defun lget (l ii)
   "
-  avoid using this; it is slow if l is large.
+  get indices ii from l
   "
   (declare (list l ii))
-  (loop for i in ii collect (nth i l)))
+  (loop with arr = (to-array l)
+        for i of-type integer in ii collect (aref arr i)))
 
 
 (defun inc (x stp)

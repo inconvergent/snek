@@ -14,11 +14,22 @@
 
 
 (defun edge-length (snk e)
+  (declare (snek snk))
+  (declare (list e))
   (with-struct (snek- verts) snk
     (destructuring-bind (a b) e
       (declare (type integer a b))
       (vec:dst (vec:arr-get verts a)
                (vec:arr-get verts b)))))
+
+
+(defun prune-edges-by-len (snk lim &optional (fx #'>))
+  (declare (snek snk))
+  (declare (double-float lim))
+  (with (snk)
+    (itr-edges (snk e)
+      (when (funcall fx (edge-length snk e) lim)
+            (del-edge? e)))))
 
 
 ; primitives?

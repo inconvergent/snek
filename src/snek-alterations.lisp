@@ -105,6 +105,23 @@
           (add-edge! snk (list v w) :g g))))))
 
 
+; DEL EDGE
+
+(defstruct (del-edge-alt
+    (:constructor del-edge? (e &key g)))
+  (e nil :type list :read-only t)
+  (g nil :type symbol :read-only t))
+
+
+(defun do-del-edge-alt (snk a)
+  "
+  del edge v and w.
+  "
+  (with-struct (snek- num-verts) snk
+    (with-struct (del-edge-alt- e g) a
+      (del-edge! snk e :g g))))
+
+
 ; SPLIT EDGE
 
 (defstruct (split-edge-alt
