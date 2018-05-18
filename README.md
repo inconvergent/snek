@@ -41,14 +41,14 @@ but I haven't found one yet.
 The pattern depends on the concept of `alterations`. In short: an `alteration`
 is a change that will be applied to the structure at the end of a given
 context. `alterations` are further described in
-http://inconvergent.net/2017/snek-is-not-an-acronym/.
+https://inconvergent.net/2017/snek-is-not-an-acronym/.
 
 I have also written about things related to `snek` at
 
-  - http://inconvergent.net/2017/a-propensity-for-mistakes/ (indirectly about `snek`)
-  - http://inconvergent.net/2017/a-method-for-mistakes/
-  - http://inconvergent.net/2017/arbitrary-alterations/
-  - http://inconvergent.net/2017/grains-of-sand/ (about "sandpainting", see
+  - https://inconvergent.net/2017/a-propensity-for-mistakes/ (indirectly about `snek`)
+  - https://inconvergent.net/2017/a-method-for-mistakes/
+  - https://inconvergent.net/2017/arbitrary-alterations/
+  - https://inconvergent.net/2017/grains-of-sand/ (about "sandpainting", see
     `src/sandpaint.lisp`)
 
 Here is and example of manipulating a `snek` instance called `snk` using
@@ -77,7 +77,7 @@ Here is and example of manipulating a `snek` instance called `snk` using
 
 You can define your own arbitrary alterations. There is an example of this in
 `ex/custom-alt.lisp`. I have also written about it here:
-http://inconvergent.net/2017/arbitrary-alterations/
+https://inconvergent.net/2017/arbitrary-alterations/
 
 
 ## Examples
@@ -100,10 +100,10 @@ as vector images for plotting.
 
 Here are some plotted examples:
 
- - http://inconvergent.net/2017/spline-script-plots/
- - http://inconvergent.net/mechanical-plotter-drawings/
- - http://inconvergent.net/mechanical-plotter-drawings/3/
- - http://inconvergent.net/mechanical-plotter-drawings/5/
+ - https://inconvergent.net/2017/spline-script-plots/
+ - https://inconvergent.net/mechanical-plotter-drawings/
+ - https://inconvergent.net/mechanical-plotter-drawings/3/
+ - https://inconvergent.net/mechanical-plotter-drawings/5/
 
 
 ## Dependencies
