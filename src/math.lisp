@@ -50,8 +50,8 @@
   ; TODO
   ; (declare (integer a))
   (if (not b)
-    (loop for x of-type integer from 0 below a collect x)
-    (loop for x of-type integer from a below b collect x)))
+      (loop for x of-type integer from 0 below a collect x)
+      (loop for x of-type integer from a below b collect x)))
 
 
 (defun lget (l ii)
@@ -161,10 +161,72 @@
   (declare (list a))
   (reduce #'+ a))
 
+
+(defun mean (a)
+  (declare (list a))
+  (/ (sum a) (length a)))
+
+
+(defun copy-sort (a fx &key (key #'identity)
+                       &aux (aa (copy-seq a)))
+  (declare (list a))
+  (sort aa fx :key key))
+
+
+(defun percentiles (aa)
+  (declare (list aa))
+  (let ((n (length aa))
+        (percentiles (list 0.05d0 0.1d0 0.5d0 0.9d0 0.95d0))
+        (srt (make-generic-array :init (copy-sort aa #'>))))
+    (to-array (append
+      (list (aref srt 0))
+      (loop for m in percentiles
+          collect (aref srt (floor (* n m))))
+      (list (array-last srt))))))
+
 ; TODO: expt, sqrt, ...
 
 
+(defun range-search (ranges f &aux (n (1- (length ranges)))
+                                   (ranges* (if (equal (type-of ranges) 'cons)
+                                              (to-array ranges)
+                                              ranges)))
+  "
+  binary range search.
+
+  range must be sorted in ascending order. f is a value inside the range you
+  are looking for.
+  "
+  (if (or (< f (aref ranges* 0)) (> f (aref ranges* n)))
+    (error "querying position outside range: ~a" f))
+
+  (loop with l = 0
+        with r = n
+        with mid = 0
+        until (<= (aref ranges* mid) f
+                  (aref ranges* (1+ mid)))
+        do (setf mid (floor (+ l r) 2))
+           (cond ((> f (aref ranges* mid))
+                   (setf l (progn mid)))
+                 ((< f (aref ranges* mid))
+                   (setf r (1+ mid))))
+        finally (return mid)))
+
+
 ; PATHS
+
+(defun path-tangents (aa &key closed (default (vec:v 0d0))
+                         &aux (aa* (if (equal (type-of aa) 'cons)
+                                       (make-generic-array :init aa :type 'vec)
+                                       aa)))
+  (when closed (array-push (aref aa* 0) aa*))
+  (loop with res = (make-generic-array :type 'vec)
+        for i from 0 below (1- (length aa*))
+        do (array-push (vec:nsub (aref aa* (1+ i)) (aref aa* i)
+                                 :default default)
+                       res)
+        finally (return res)))
+
 
 (defun path-angles (pts)
   (let ((res (make-generic-array)))
@@ -175,7 +237,7 @@
     res))
 
 
-(defun -path-simplify-rdp* (pts lim &optional left right)
+(defun -path-simplify (pts lim &optional left right)
   (declare (double-float lim))
   (let ((res (make-generic-array))
         (dmax -1d0)
@@ -193,51 +255,21 @@
 
       (if (> dmax lim)
         (progn
-          (loop for i in (butlast (-path-simplify-rdp* pts lim l index))
-                do (array-push i res))
-          (loop for i in (-path-simplify-rdp* pts lim index r)
+          (loop with ps = (-path-simplify pts lim l index)
+                for i from 0 below (1- (length ps))
+                do (array-push (aref ps i) res))
+          (loop for i across (-path-simplify pts lim index r)
                 do (array-push i res)))
-        (progn
-          (array-push l res)
-          (array-push r res))))
-    (sort (to-list res) #'<)))
+        (progn (array-push l res)
+               (array-push r res))))
+    (sort res #'<)))
 
 
-(defun path-simplify-rdp (pts lim)
+(defun path-simplify (pts lim)
+  ;https://hydra.hull.ac.uk/resources/hull:8338
   (let ((pts* (if (equal (type-of pts) 'cons) (to-array pts) pts)))
-    (loop for i in (-path-simplify-rdp* pts* lim)
+    (loop for i across (-path-simplify pts* lim)
           collect (aref pts* i))))
-
-
-(defun path-simplify-par (pts len lim)
-  ; very naive paty simplification
-  ; it removes backtracking sections of the path.
-  ; a good default lim is -0.99d0
-  (let* ((n (length pts))
-         (i 1)
-         (res (make-generic-array))
-         (pts* (if (equal (type-of pts) 'cons) (to-array pts) pts))
-         (angles (path-angles pts*)))
-
-    (array-push (aref pts* 0) res)
-
-    (loop while (< i (1- n)) do
-      (if (and
-            (< (vec:dst (aref pts* (1- i))
-                        (aref pts* i)) len)
-            (< (vec:dot (aref angles (1- i))
-                        (aref angles i)) lim))
-        (progn (array-push (aref pts* (1+ i)) res)
-               (incf i 2))
-        (progn (array-push (aref pts* i) res)
-               (incf i))))
-
-    (if (< i n)
-      (array-push (aref pts* i) res))
-
-    (if (< (length res) n)
-      (path-simplify-par res len lim)
-      res)))
 
 
 (defun -scale-offset (w a b &key (fxn #'sin))
@@ -325,7 +357,7 @@
 (defun path-offset (pts width &key (s 1d0) closed
                                    (clim -0.5) (slim -0.95)
                                    (simplify 1d0))
-  (let ((diag (-get-diagonals (to-array (path-simplify-rdp pts simplify))
+  (let ((diag (-get-diagonals (to-array (path-simplify pts simplify))
                 width clim slim closed)))
     (loop for d across diag collect (vec:on-line* s d))))
 

@@ -263,7 +263,7 @@
   (with-struct (plot-svg- rep-scale) psvg
     (let ((rep (math:int (ceiling (* (if rs rs rep-scale) width))))
           (diagonals (math::-get-diagonals
-                       (to-array (math:path-simplify-rdp pts* simplify))
+                       (to-array (math:path-simplify pts* simplify))
                        width* clim slim closed)))
       (path psvg (-accumulate-cpath diagonals rep closed)))))
 

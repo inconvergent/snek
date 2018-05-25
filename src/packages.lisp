@@ -6,6 +6,7 @@
     :angle
     :arr-get
     :arr-set
+    :all-inside
     :copy
     :cos-sin
     :cross
@@ -23,6 +24,7 @@
     :ladd*
     :ldiv
     :ldiv*
+    :ldot
     :ldst
     :ldst*
     :len
@@ -72,6 +74,7 @@
     :with-xy-short
     :zero)
   (:import-from :common-lisp-user
+    :make-generic-array
     :close-path
     :array-push
     :PII
@@ -83,6 +86,7 @@
     :add
     :close-path
     :convex-split
+    :copy-sort
     :cpath
     :dfloat
     :dfloat*
@@ -96,6 +100,7 @@
     :iscale*
     :lget
     :linspace
+    :percentiles
     :mid-rad
     :mod+
     :mod-
@@ -106,9 +111,10 @@
     :path-normals-closed
     :path-normals-open
     :path-offset
-    :path-simplify-par
-    :path-simplify-rdp
+    :path-simplify
+    :path-tangents
     :range
+    :range-search
     :rep
     :scale
     :scale*
@@ -120,6 +126,7 @@
     :with-linspace)
   (:import-from :common-lisp-user
     :array-push
+    :array-last
     :to-array
     :to-list
     :make-generic-array
@@ -454,7 +461,7 @@
     :exec-with-args
     :make-dfloat-array
     :make-generic-array
-    :make-hash-table-init
+    :make-generic-hash-table
     :to-list
     :array-push
     :with-gensyms

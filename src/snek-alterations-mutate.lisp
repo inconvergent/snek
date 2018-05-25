@@ -54,9 +54,9 @@
        (mapcar (lambda (,a)
                  (if (< (rnd:rnd) (mutate-prob ,mut))
                    (progn
-                     ;(setf (mutate-ind ,mut)
-                     ;      (-ok-ind (+ (mutate-ind ,mut)
-                     ;                 (rnd:rndi -1 2))))
+                     (setf (mutate-ind ,mut)
+                           (-ok-ind (+ (mutate-ind ,mut)
+                                      (rnd:rndi -1 2))))
                      ;(setf (mutate-xy ,mut)
                      ;      (math:add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0d0)))
                      (do-mutate (mutate-rules ,mut) ,a ,mut))

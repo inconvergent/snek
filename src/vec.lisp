@@ -57,6 +57,15 @@
         (progn ,@body)))
 
 
+(defun all-inside (path &optional (lim 1d6))
+  (if (every #'identity
+             (loop for v in path
+                   collect (and (>= (vec-x v) (- lim)) (<= (vec-x v) lim)
+                                (>= (vec-y v) (- lim)) (<= (vec-y v) lim))))
+      path
+      nil))
+
+
 (defstruct (vec (:constructor vec (x y)))
   (x nil :type double-float :read-only t)
   (y nil :type double-float :read-only t))
@@ -193,6 +202,11 @@
        (funcall fx (vec-y a) (vec-y b))))
 
 
+(defun vabs (a)
+  (declare (vec a))
+  (vec (abs (vec-x a)) (abs (vec-y a))))
+
+
 (defun add (a b)
   (declare (vec a b))
   (vec (+ (vec-x a) (vec-x b))
@@ -237,6 +251,11 @@
   (declare (vec a b))
   (+ (* (vec-x a) (vec-x b))
      (* (vec-y a) (vec-y b))))
+
+
+(defun ldot (aa bb)
+  (declare (list aa bb))
+  (mapcar (lambda (a b) (declare (type vec a b)) (dot a b)) aa bb))
 
 
 (defun div (a b)
@@ -305,21 +324,23 @@
   (loop for a in aa collect (dst a b)))
 
 
-(defun norm (a &optional (s 1d0))
+(defun norm (a &key (s 1d0) (default (vec:v 0d0)))
   (declare (vec a))
   (declare (double-float s))
   (let ((l (len a)))
-    (if (> l 0d0) (scale a (/ s l)) 0d0)))
+    (if (> l 0d0) (scale a (/ s l)) default)))
 
 
-(defun nsub (a b)
+(defun nsub (a b &key (s 1d0) (default (vec:v 0d0)))
   (declare (vec a b))
-  (norm (sub a b)))
+  (norm (sub a b) :s s :default default))
 
 
 (defun sum (aa)
   (declare (list aa))
-  (reduce (lambda (a b) (declare (type vec a b)) (declare (vec a b)) (add a b)) aa))
+  (reduce (lambda (a b)
+            (declare (vec a b))
+            (add a b)) aa))
 
 
 (defun rot (v a &key (xy (zero)))

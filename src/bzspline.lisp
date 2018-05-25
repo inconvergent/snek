@@ -200,7 +200,7 @@
     (let* ((left (if closed (-modin pos offset) (max (- pos offset) 0d0)))
            (right (if closed (math:inc pos offset) (min 1d0 (+ pos offset))))
            (pt (pos bz pos))
-           (v (vec:norm (vec:sub (pos bz right) (pos bz left)) scale*)))
+           (v (vec:norm (vec:sub (pos bz right) (pos bz left)) :s scale*)))
      (list (vec:sub pt v)
            (vec:add pt v)))))
 
@@ -212,7 +212,7 @@
     (let* ((left (if closed (-modin pos offset) (max (- pos offset) 0d0)))
            (right (if closed (math:inc pos offset) (min 1d0 (+ pos offset))))
            (pt (pos bz pos))
-           (v (vec:perp (vec:norm (vec:sub (pos bz right) (pos bz left)) scale*))))
+           (v (vec:perp (vec:norm (vec:sub (pos bz right) (pos bz left)) :s scale*))))
      (list (vec:sub pt v)
            (vec:add pt v)))))
 

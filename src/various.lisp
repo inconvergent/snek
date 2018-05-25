@@ -6,6 +6,14 @@
 (defvar PI5 (* PI 0.5d0))
 
 
+(defmacro square-loop ((x y n) &body body)
+  (with-gensyms (n*)
+    `(let ((,n* ,n))
+      (loop for ,x of-type integer from 0 below ,n* do
+        (loop for ,y of-type integer from 0 below ,n* do
+          ,@body)))))
+
+
 ;http://cl-cookbook.sourceforge.net/os.html
 (defun cmd-args ()
   (or #+SBCL *posix-argv*
@@ -30,6 +38,15 @@
 
 (defun print-every (i n)
   (when (= 0 (mod i n)) (format t "~%itt: ~a~%" i)))
+
+
+(defun string-list-concat (l)
+  (format nil "~{~a~}" l))
+
+(defun numshow (a)
+  (if (< 1d-6 (abs a) 1d6)
+    (format nil "~,6f " a)
+    (format nil "~,1e " a)))
 
 
 (defun exec-with-args (fxn args &optional ea)
@@ -73,13 +90,13 @@
 
 (defun make-generic-array (&key init (type t) (size 100))
   (let ((res (if init (make-array (length init) :fill-pointer 0
-                                       :initial-contents init
-                                       :element-type type
-                                       :adjustable t)
+                                                :initial-contents init
+                                                :element-type type
+                                                :adjustable t)
                       (make-array size :fill-pointer 0
                                        :element-type type
                                        :adjustable t))))
-    (if init (array-add res init))
+    (when init (array-add res init))
     res))
 
 
@@ -96,11 +113,34 @@
               :adjustable t))
 
 
-(defun make-hash-table-init (init &key (test #'equal))
+(defun make-generic-hash-table (&key init
+                                     (test #'equal)
+                                     (getter (lambda (x) x))
+                                &aux (init* (if (equal (type-of init) 'cons)
+                                                (to-generic-array init)
+                                                init)))
   (loop with res = (make-hash-table :test test)
-        for (k v) in init
+        for (k v) across init*
         do (setf (gethash k res) v)
         finally (return res)))
+
+
+(defun count-things (data &key (test #'equal)
+                               (getter (lambda (x) x))
+                               (key (lambda (x) (second x)))
+                               (compare #'>)
+                               num
+                          &aux (data* (if (equal (type-of data) 'cons)
+                                                (to-generic-array data)
+                                                data))
+                               (num* (if num num (* 2 (length data)))))
+  (loop with res = (make-hash-table :test test)
+        for d across data*
+        do (incf (gethash (funcall getter d) res 0))
+        finally (return (sort
+                          (loop for k being the hash-keys of res
+                                  using (hash-value v)
+                                collect (list k v)) compare :key key))))
 
 
 (defun to-list (a)
@@ -163,12 +203,4 @@
 
 (defun close-path (p)
   (append p (list (nth 0 p))))
-
-
-(defmacro square-loop ((x y n) &body body)
-  (with-gensyms (n*)
-    `(let ((,n* ,n))
-      (loop for ,x of-type integer from 0 below ,n* do
-        (loop for ,y of-type integer from 0 below ,n* do
-          ,@body)))))
 

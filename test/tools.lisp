@@ -36,6 +36,16 @@
   (do-test (vec:mid (vec:vec 1.0d0 2.0d0) (vec:vec 3.0d0 4.0d0))
            (vec:vec 2.0d0 3.0d0))
 
+  (do-test (vec:sum (list (vec:vec 1.0d0 2.0d0) (vec:vec 0.5d0 4.322d0)))
+           (vec:vec 1.5d0 6.322d0))
+
+  (do-test (to-list
+             (math:path-tangents (list (vec:vec 1.0d0 2.0d0)
+                                       (vec:vec 1.0d0 2.0d0)
+                                       (vec:vec 0.5d0 4.322d0))))
+           (list (vec:v 0d0)
+                 (vec:vec -0.21050655592417808d0 0.977592445711883d0)))
+
   (do-test (math:inc 0.1 0.4)
            0.5)
 

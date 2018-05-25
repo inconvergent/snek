@@ -38,7 +38,7 @@
 
 
 (defun -make-fxns (defaults &optional extras)
-  (loop with res = (make-hash-table-init defaults)
+  (loop with res = (make-generic-hash-table :init defaults)
         for (a fx of-type function) in extras do (setf (gethash a res) fx)
         finally (return res)))
 
@@ -80,7 +80,7 @@
                              (list :vv (lambda (snk p &optional extra-args)
                                                (get-prm-verts snk :p p))))
                            prms)
-              :grps (make-hash-table-init (list
+              :grps (make-generic-hash-table :init (list
                       (list nil (-make-grp :name :main :type :main
                                            :grph (graph:make :size grp-size)))))))
 
