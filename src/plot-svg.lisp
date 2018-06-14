@@ -1,43 +1,91 @@
 
 (in-package :plot-svg)
 
+(defvar *short* 1000d0)
+(defvar *long* 1414.285d0)
+
 
 (defstruct plot-svg
   (layout nil :type symbol :read-only t)
   (stroke-width nil :type double-float :read-only t)
   (rep-scale nil :type double-float :read-only t)
+  (width 0d0 :type double-float :read-only t)
+  (height 0d0 :type double-float :read-only t)
   (scene nil :read-only nil))
 
 
-(defun make (&key (layout 'a4-landscape) (stroke-width 1d0) (rep-scale 1.3d0))
-  (make-plot-svg :layout layout
-                 :stroke-width stroke-width
-                 :rep-scale rep-scale
-                 :scene (case layout
-                          (a4-landscape
-                            (cl-svg:make-svg-toplevel
-                              'cl-svg:svg-1.1-toplevel
-                              :height "210mm"
-                              :width "297mm"
-                              :view-box "0 0 1414.285 1000"))
-                          (a4-portrait
-                            (cl-svg:make-svg-toplevel
-                              'cl-svg:svg-1.1-toplevel
-                              :height "297mm"
-                              :width "210mm"
-                              :view-box "0 0 1000 1414.285"))
-                          (otherwise
-                            (error "invalid layout. use: 'plot-svg:a4-portrait or
-                                    'plot-svg:a4-landscape.")))))
+(defun -view-box (width height)
+  (format nil "0 0 ~f ~f" width height))
 
 
-(defun make* (&key height width (stroke-width 1.1) (rep-scale 1.3d0))
+(defun -get-scene (layout)
+  (case layout
+    (a4-landscape
+      (cl-svg:make-svg-toplevel
+        'cl-svg:svg-1.1-toplevel
+        :height "210mm"
+        :width "297mm"
+        :view-box (-view-box *long* *short*)))
+    (a4-portrait
+      (cl-svg:make-svg-toplevel
+        'cl-svg:svg-1.1-toplevel
+        :height "297mm"
+        :width "210mm"
+        :view-box (-view-box *short* *long*)))
+    (a3-landscape
+      (cl-svg:make-svg-toplevel
+        'cl-svg:svg-1.1-toplevel
+        :height "297mm"
+        :width "420mm"
+        :view-box (-view-box *long* *short*)))
+    (a3-portrait
+      (cl-svg:make-svg-toplevel
+        'cl-svg:svg-1.1-toplevel
+        :height "420mm"
+        :width "297mm"
+        :view-box (-view-box *short* *long*)))
+    (otherwise (error "invalid layout. use: 'plot-svg:a4-portrait,
+      'plot-svg:a4-landscape, plot-svg:a3-landscape or plot-svg:a3-portrait."))))
+
+
+(defun -get-width-height (layout)
+  (case layout (a4-landscape (list *long* *short*))
+               (a4-portrait (list *short* *long*))
+               (a3-landscape (list *long* *short*))
+               (a3-portrait (list *short* *long*))))
+
+
+(defun make (&key (layout 'a4-landscape) (stroke-width 1.1d0) (rep-scale 1.3d0))
+  (destructuring-bind (width height)
+    (-get-width-height layout)
+    (make-plot-svg :layout layout
+                   :stroke-width stroke-width
+                   :rep-scale rep-scale
+                   :height height
+                   :width width
+                   :scene (-get-scene layout))))
+
+
+(defun make* (&key height width (stroke-width 1.1d0) (rep-scale 1.3d0))
   (make-plot-svg :layout 'custom
                  :stroke-width stroke-width
                  :rep-scale rep-scale
+                 :height height
+                 :width width
                  :scene (cl-svg:make-svg-toplevel 'cl-svg:svg-1.1-toplevel
                                                   :height height
                                                   :width width)))
+
+
+(defun show-boundary (psvg &key sw (stroke "red"))
+  (declare (plot-svg psvg))
+  (with-struct (plot-svg- width height) psvg
+    (let ((mw (* 0.5d0 width))
+          (mh (* 0.5d0 height)))
+      (path psvg (vec:rect mw mh :xy (vec:vec mw mh))
+                                 :closed t
+                                 :sw sw
+                                 :stroke stroke))))
 
 
 (defun accumulate-path (pth a &optional b (offset (vec:zero)))
@@ -59,7 +107,7 @@
         finally (return res)))
 
 
-(defun path (psvg pts &key sw (fill "none") closed)
+(defun path (psvg pts &key sw (fill "none") (stroke "black") closed)
   (declare (plot-svg psvg))
   (declare (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
@@ -71,7 +119,7 @@
                                       (when closed (array-push "Z" pth))
                                       pth))))
       :fill fill
-      :stroke "black"
+      :stroke stroke
       :stroke-width (if sw sw stroke-width))))
 
 

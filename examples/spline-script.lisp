@@ -43,7 +43,7 @@
 
 
 (defun draw (snk sand)
-  (let ((state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*))))
+  (let ((state-gen (get-walker-state-gen (lambda () (rnd:get-acc-circ-stp*))))
         (grains 15)
         (drift (vec:scale (vec:sin-cos -0.1d0) 0.009d0)))
     (loop for p in (math:linspace 500 0 1)

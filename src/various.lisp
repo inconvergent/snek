@@ -30,9 +30,9 @@
   (format nil "~a-~8,'0d" fn i))
 
 
-(defun ensure-filename (fn postfix)
+(defun ensure-filename (fn &optional (postfix "") (silent nil))
   (let ((fn* (append-postfix (if fn fn "tmp") postfix)))
-    (format t "~%file: ~a~%~%" fn*)
+    (format (not silent) "~%file: ~a~%~%" fn*)
     fn*))
 
 
@@ -115,14 +115,15 @@
 
 (defun make-generic-hash-table (&key init
                                      (test #'equal)
-                                     (getter (lambda (x) x))
                                 &aux (init* (if (equal (type-of init) 'cons)
                                                 (to-generic-array init)
                                                 init)))
-  (loop with res = (make-hash-table :test test)
-        for (k v) across init*
-        do (setf (gethash k res) v)
-        finally (return res)))
+  (if (< (length init) 1)
+    (make-hash-table :test test)
+    (loop with res = (make-hash-table :test test)
+          for (k v) across init*
+          do (setf (gethash k res) v)
+          finally (return res))))
 
 
 (defun count-things (data &key (test #'equal)
@@ -131,8 +132,8 @@
                                (compare #'>)
                                num
                           &aux (data* (if (equal (type-of data) 'cons)
-                                                (to-generic-array data)
-                                                data))
+                                          (to-generic-array data)
+                                          data))
                                (num* (if num num (* 2 (length data)))))
   (loop with res = (make-hash-table :test test)
         for d across data*

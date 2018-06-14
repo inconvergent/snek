@@ -109,7 +109,7 @@
                             line-chars
                             (vec:vec border y)
                             (vec:vec 17d0 30d0)))
-            (state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
+            (state-gen (get-walker-state-gen (lambda () (rnd:get-acc-circ-stp*)))))
 
         (loop for i from 0 below 500 do
           (snek:with (snk)

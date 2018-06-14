@@ -12,8 +12,7 @@
 
 
 (defmacro awhen (test-form &body body)
-  `(aif ,test-form
-        (progn ,@body)))
+  `(aif ,test-form (progn ,@body)))
 
 
 (defun flatten (x)

@@ -41,7 +41,7 @@
   (destructuring-bind (a b) ab
     (let ((av (aref pts a))
           (bv (aref pts b)))
-      (rnd:prob 0.4
+      (rnd:prob 0.5
         (rot-offset av bv offset)
         (normal-offset av bv (* offset 0.8d0))))))
 

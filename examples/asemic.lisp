@@ -46,7 +46,7 @@
                             (- size (* 2.0 border))
                             line-chars char-num char-rad))
             (drift (rnd:get-acc-circ-stp*))
-            (state-gen (get-state-gen
+            (state-gen (get-walker-state-gen
                          (lambda () (rnd:get-acc-circ-stp*)))))
 
         (snek:with (snk)

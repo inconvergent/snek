@@ -339,7 +339,9 @@
       (destructuring-bind (corner na)
         (funcall corner-test i)
 
-        (let ((diag (-offset (aref pts i) (vec:scale na (-scale-offset width (aref angles i) na)))))
+        (let ((diag (-offset (aref pts i)
+                             (vec:scale na (-scale-offset width
+                                                          (aref angles i) na)))))
           (mapcar (lambda (d) (array-push d res))
                   (case corner
                     (:chamfer (-chamfer width diag (aref pts i) na (aref angles i)

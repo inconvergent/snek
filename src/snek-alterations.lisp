@@ -13,6 +13,8 @@
   "
   add vert at xy.
   "
+  (declare (snek snk))
+  (declare (add-vert-alt a))
   (with-struct (add-vert-alt- xy p) a
     (add-vert! snk xy :p p)))
 
@@ -30,6 +32,8 @@
   "
   add verts xya and xyb, and create an edge between them.
   "
+  (declare (snek snk))
+  (declare (add-edge*-alt a))
   (with-struct (add-edge*-alt- xya xyb g) a
     (add-edge! snk (list (add-vert! snk xya)
                          (add-vert! snk xyb))
@@ -51,6 +55,8 @@
   if rel: move relative to original position.
   else: move to xy.
   "
+  (declare (snek snk))
+  (declare (move-vert-alt a))
   (with-struct (snek- verts num-verts) snk
     (declare (type (array double-float) verts))
     (with-struct (move-vert-alt- v xy rel) a
@@ -73,8 +79,10 @@
 
 (defun do-append-edge-alt (snk a)
   "
-
+  add edge between vert v and new vert xy
   "
+  (declare (snek snk))
+  (declare (append-edge-alt a))
   (with-struct (snek- num-verts) snk
     (with-struct (append-edge-alt- v xy rel g) a
       (-valid-vert (num-verts v :err nil)
@@ -83,6 +91,43 @@
           (declare (integer w))
           (add-edge! snk (list v w) :g g)
           w)))))
+
+
+(defstruct (append-edge-segx-alt
+    (:constructor append-edge-segx? (v xy &key (rel t) x g)))
+  (xy nil :type vec:vec :read-only t)
+  (v nil :type integer :read-only t)
+  (g nil :type symbol :read-only t)
+  (x nil :type symbol :read-only t)
+  (rel t :type boolean :read-only t))
+
+
+(defun -line-segx-edges (snk line &key g)
+  (declare (snek snk))
+  (declare (list line))
+  (loop for e of-type list across (get-edges snk :g g)
+        if (multiple-value-bind (x p)
+             (vec:segx line (get-verts snk e))
+             (and x (> p 1d-7)))
+        do (return t)))
+
+
+(defun do-append-edge-segx-alt (snk a)
+  "
+  add edge between vert v and new vert xy if the new edge does not intersect
+  any of the existing edges (in g).
+
+  if x, the new edge is only added if it intersects.
+  "
+  (declare (snek snk))
+  (declare (append-edge-segx-alt a))
+  (with-struct (append-edge-segx-alt- v xy rel x g) a
+    (let* ((p1 (get-vert snk v))
+           (p2 (if rel (vec:add p1 xy) xy))
+           (hit (-line-segx-edges snk (list p1 p2) :g g)))
+      (when (or (and (not x) (not hit))
+                (and x hit))
+        (add-edge! snk (list v (add-vert! snk p2)) :g g)))))
 
 
 ; JOIN VERTS
@@ -98,6 +143,8 @@
   "
   create edge between valid verts v and w.
   "
+  (declare (snek snk))
+  (declare (join-verts-alt a))
   (with-struct (snek- num-verts) snk
     (with-struct (join-verts-alt- v w g) a
       (-valid-vert (num-verts v :err nil)
@@ -114,9 +161,12 @@
 
 
 (defun do-del-edge-alt (snk a)
+
   "
   del edge v and w.
   "
+  (declare (snek snk))
+  (declare (del-edge-alt a))
   (with-struct (snek- num-verts) snk
     (with-struct (del-edge-alt- e g) a
       (del-edge! snk e :g g))))
@@ -135,6 +185,8 @@
   insert a vert, v, at the middle of edge e = (a b)
   such that we get edges (a v) and (v b).
   "
+  (declare (snek snk))
+  (declare (split-edge-alt a))
   (with-struct (split-edge-alt- e g) a
     (let ((res (del-edge! snk e :g g))
           (verts (snek-verts snk)))
@@ -142,9 +194,33 @@
       (destructuring-bind (a b) e
         (declare (integer a b))
         (if res
-          (let ((c (add-vert! snk
-                      (vec:mid (vec:arr-get verts a)
-                               (vec:arr-get verts b)))))
+          (let ((c (add-vert! snk (vec:mid (vec:arr-get verts a)
+                                           (vec:arr-get verts b)))))
             (add-edge! snk (list a c) :g g)
             (add-edge! snk (list c b) :g g)))))))
+
+
+; ALT THEN
+
+(defstruct (alt-then
+    (:constructor alt-then? (alt &key (then (lambda (a r) nil))
+                                      (else (lambda (a) nil)))))
+  (alt nil :read-only t)
+  (then nil :type function :read-only t)
+  (else nil :type function :read-only t))
+
+
+(defun do-alt-then (snk a)
+  "
+  execute then if alteration is successful, otherwise execute else.
+    then gets the alteration and its result as arguments.
+    else gets the alteration as its argument.
+  "
+  (declare (snek snk))
+  (declare (alt-then a))
+  (with-struct (alt-then- alt then else) a
+    (let ((res (funcall (gethash (type-of alt)
+                                 (snek-alt-names snk)) snk alt)))
+      (if res (funcall then alt res)
+              (funcall else alt)))))
 

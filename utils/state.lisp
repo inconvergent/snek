@@ -1,5 +1,5 @@
 
-(defun get-state-gen (get-state-fun)
+(defun get-walker-state-gen (get-state-fun)
   (let ((state (make-hash-table :test #'equal)))
     (lambda (i noise)
       (multiple-value-bind (curr exists)

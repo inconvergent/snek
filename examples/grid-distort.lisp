@@ -17,7 +17,7 @@
   (let* ((ngrid 80)
          (snk (snek:make :max-verts 10000))
          (grid (get-grid size 50d0 ngrid))
-         (state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*))))
+         (state-gen (get-walker-state-gen (lambda () (rnd:get-acc-circ-stp*))))
          (sand (sandpaint:make size
                                :fg (color:white 0.05)
                                :bg (color:dark))))

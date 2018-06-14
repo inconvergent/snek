@@ -80,6 +80,7 @@
     :PII
     :with-gensyms))
 
+
 (defpackage :math
   (:use :common-lisp)
   (:export
@@ -166,6 +167,7 @@
     :on-line
     :on-line*
     :prob
+    :probsel
     :rcond
     :rnd
     :rnd*
@@ -183,6 +185,19 @@
     :to-array
     :array-push
     :make-generic-array
+    :with-gensyms))
+
+
+(defpackage :state
+  (:use :common-lisp)
+  (:export
+    :awith
+    :kset
+    :make
+    :sget
+    :sset
+    :with)
+  (:import-from :common-lisp-user
     :with-gensyms))
 
 
@@ -222,6 +237,7 @@
     :mem*
     :num
     :to-list))
+
 
 (defpackage :graph
   (:use :common-lisp)
@@ -279,6 +295,7 @@
     :set-dfloat-tup
     :with-struct))
 
+
 (defpackage :zmap
   (:use :common-lisp)
   (:export
@@ -291,6 +308,7 @@
     :make-int-vec
     :with-struct
     :with-gensyms))
+
 
 (defpackage :sandpaint
   (:use :common-lisp)
@@ -317,29 +335,12 @@
     :square-loop
     :with-struct))
 
-(defpackage :plot
-  (:use :common-lisp)
-  (:export
-    :circ
-    :dot-stroke
-    :line
-    :make
-    :path
-    :save
-    :stipple-stroke
-    :stipple-strokes)
-  (:import-from :common-lisp-user
-    :aif
-    :ensure-filename
-    :half
-    :make-generic-array
-    :square-loop
-    :with-struct))
-
 
 (defpackage :plot-svg
   (:use :common-lisp)
   (:export
+    :a3-landscape
+    :a3-portrait
     :a4-landscape
     :a4-portrait
     :bzspl
@@ -347,6 +348,7 @@
     :circ
     :circs
     :cpath
+    :show-boundary
     :hatch
     :make
     :make*
@@ -367,6 +369,22 @@
     :with-struct))
 
 
+(defpackage :plot-tile-svg
+  (:use :common-lisp)
+  (:export
+    :make
+    :path
+    :save)
+  (:import-from :common-lisp-user
+    :ensure-filename
+    :make-generic-array
+    :append-postfix
+    :array-push
+    :to-generic-array
+    :length-1
+    :with-struct))
+
+
 (defpackage :obj
   (:use :common-lisp)
   (:export
@@ -381,13 +399,13 @@
     :make-generic-array
     :with-struct))
 
+
 (defpackage :snek
   (:use :common-lisp)
   (:export
     :add-edge!
     :add-edge*?
     :add-edges!
-    :del-edge?
     :add-grp!
     :add-path!
     :add-path*!
@@ -396,8 +414,11 @@
     :add-vert!
     :add-vert?
     :add-verts!
+    :alt-then?
+    :append-edge-segx?
     :append-edge?
     :del-edge!
+    :del-edge?
     :draw-circ
     :draw-edges
     :draw-verts
@@ -409,31 +430,29 @@
     :get-edges
     :get-grp
     :get-grp-as-bzspl
+    :get-grp-props
     :get-grp-verts
     :get-incident-edges
     :get-num-edges
     :get-num-verts
     :get-prm
+    :get-prm-props
     :get-prm-vert-inds
     :get-prm-verts
-    :get-grp-props
-    :get-prm-props
-    :set-grp-props
-    :set-prm-props
     :get-vert
-    :get-vert-ind-by-name
     :get-vert-by-name
-    :get-vert-inds-by-name
-    :get-verts-by-name
+    :get-vert-ind-by-name
     :get-vert-inds
+    :get-vert-inds-by-name
     :get-verts
+    :get-verts-by-name
     :is-vert-in-grp
     :itr-all-verts
     :itr-edges
     :itr-grps
+    :itr-prm-verts
     :itr-prms
     :itr-verts
-    :itr-prm-verts
     :join-verts?
     :make
     :make-mutate
@@ -443,8 +462,10 @@
     :prmr
     :prune-edges-by-len
     :psvg-get-prm-types
-    :split-edge?
     :sel-args
+    :set-grp-props
+    :set-prm-props
+    :split-edge?
     :verts-in-rad
     :with
     :with-dx

@@ -67,9 +67,12 @@
                                            '(move-vert-alt do-move-vert-alt)
                                            '(join-verts-alt do-join-verts-alt)
                                            '(append-edge-alt do-append-edge-alt)
+                                           '(append-edge-segx-alt do-append-edge-segx-alt)
                                            '(split-edge-alt do-split-edge-alt)
                                            '(del-edge-alt do-del-edge-alt)
-                                           '(add-edge*-alt do-add-edge*-alt))
+                                           '(add-edge*-alt do-add-edge*-alt)
+                                           '(alt-then do-alt-then)
+                                           '(alt-then* do-alt-then*))
                                      alts)
               :prm-names (-make-fxns
                            (list

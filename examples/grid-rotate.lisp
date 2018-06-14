@@ -22,7 +22,7 @@
 (defun main (size fn)
   (let* ((ngrid 100)
          (snk (snek:make :max-verts 100000))
-         (state-gen (get-state-gen (lambda () (rnd:get-circ-stp*))))
+         (state-gen (get-walker-state-gen (lambda () (rnd:get-circ-stp*))))
          (sand (sandpaint:make size
                  :fg (color:black 0.05)
                  :bg (color:white))))

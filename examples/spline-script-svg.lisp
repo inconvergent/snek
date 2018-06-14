@@ -34,7 +34,7 @@
 
 
 (defun draw (snk psvg)
-  (let ((state-gen (get-state-gen (lambda () (rnd:get-acc-circ-stp*))))
+  (let ((state-gen (get-walker-state-gen (lambda () (rnd:get-acc-circ-stp*))))
         (drift (vec:scale (vec:sin-cos -0.1d0) 0.009d0)))
     (loop for p in (math:linspace 200 0 1)
           and i from 0 do

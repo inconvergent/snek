@@ -35,12 +35,21 @@
 ; GENERIC
 
 
+;TODO: combine with aget and always convert to array first?
 (defun lget (l)
   (nth (random (length l)) l))
 
 
 (defun aget (l)
   (aref l (random (length l))))
+
+
+(defun probsel (p a &aux (a* (if (eql (type-of a) 'cons) (to-array a) a)))
+  (declare (double-float p))
+  (loop with res = (make-generic-array)
+        for i across a*
+        do (prob p (array-push i res))
+        finally (return res)))
 
 
 (defun nrnd-u-from (n a)

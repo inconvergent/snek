@@ -13,7 +13,7 @@
 
 (asdf:defsystem "snek"
   :description "SNEK - A Generative System for Writing Generative Systems"
-  :version "2.10.0"
+  :version "2.20.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t
@@ -21,6 +21,7 @@
   :components ((:file "pg-utils")
                (:file "various")
                (:file "packages")
+               (:file "state")
                (:file "vec")
                (:file "math")
                (:file "color")
@@ -30,8 +31,8 @@
                (:file "bzspline")
                (:file "linear-path")
                (:file "sandpaint")
-               (:file "plot")
                (:file "plot-svg")
+               (:file "plot-tile-svg")
                (:file "obj")
                (:file "zone-map")
                (:file "snek-macros")

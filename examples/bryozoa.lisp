@@ -50,9 +50,9 @@
         ;                         100d0))
         (snk (init-fan 40 1400 (vec:vec 500d0 1300d0)))
         ;(snk (init-spiral 20 20 800d0 (vec:vec 500d0 500d0)))
-        (v-state-gen (get-state-gen
+        (v-state-gen (get-walker-state-gen
                      (lambda () (rnd:get-acc-circ-stp*))))
-        (h-state-gen (get-state-gen
+        (h-state-gen (get-walker-state-gen
                      (lambda () (rnd:get-acc-lin-stp (rnd:rnd)))))
         (sand (sandpaint:make size
                               :fg (color:white 0.01)
