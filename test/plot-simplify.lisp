@@ -2,9 +2,7 @@
 
 (load "../src/load")
 
-
 (setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
 
 
 (defun main (size fn)
@@ -20,7 +18,7 @@
           (plot-svg:cpath psvg (vec:ladd* path (vec:vec -20d0 0d0)) :simplify 10d0
                           :width 10d0))))
 
-    (plot-svg:save psvg fn)))
+    (plot-svg:save psvg "plot-simplify")))
 
 (time (main 1000 (second (cmd-args))))
 

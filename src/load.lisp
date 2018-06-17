@@ -13,7 +13,7 @@
 
 (asdf:defsystem "snek"
   :description "SNEK - A Generative System for Writing Generative Systems"
-  :version "2.20.0"
+  :version "2.20.2"
   :author "inconvergent"
   :licence "MIT"
   :serial t

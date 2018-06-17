@@ -31,10 +31,10 @@
 (defun -make-grid (nxny dw dh)
   (destructuring-bind (nx ny) nxny
     (let ((res (make-generic-array)))
-      (loop for x in (math:linspace (1+ nx) 0d0 dw)
-            do (array-push (list (vec:vec x 0d0) (vec:vec x dh)) res))
-      (loop for y in (math:linspace (1+ ny) 0d0 dh)
-            do (array-push (list (vec:vec 0d0 y) (vec:vec dw y)) res))
+      (array-push* (loop for x in (math:linspace (1+ nx) 0d0 dw)
+                         collect (list (vec:vec x 0d0) (vec:vec x dh))) res)
+      (array-push* (loop for y in (math:linspace (1+ ny) 0d0 dh)
+                         collect (list (vec:vec 0d0 y) (vec:vec dw y))) res )
       res)))
 
 
@@ -81,8 +81,7 @@
 
 (defun -make-linear-ratios (segment grid)
   (let ((res (make-generic-array)))
-    (array-push 0d0 res)
-    (array-push 1d0 res)
+    (array-push* (list 0d0 1d0) res)
     (loop for g across grid
           do (multiple-value-bind (x p) (vec:segx segment g)
                (when x (array-push p res))))
@@ -117,6 +116,9 @@
 (defun path (msvg pts &key sw (stroke "black") closed
                       &aux (pts* (if (eql (type-of pts) 'cons)
                                      (to-generic-array pts) pts)))
+  "
+  draw path
+  "
   (declare (plot-tile-svg msvg))
   (declare (list pts))
   (with-struct (plot-tile-svg- paper-id-fx paper-fx grid
@@ -134,16 +136,69 @@
                :stroke stroke))))
 
 
+(defun lstipple (msvg line &key (len 0.5d0) (num 10) sw (stroke "black"))
+  "
+  draw num stipples along line.
+  the total length of the stipples will be len
+  note that len is a ratio of the full length of line
+  (a number between 0 and 1)
+  "
+  (declare (plot-tile-svg msvg))
+  (declare (list line))
+  (declare (double-float len))
+  (let ((stip (math:stipple num len)))
+    (loop for (a b) across stip
+          do (path msvg (list (vec:on-line* a line)
+                              (vec:on-line* b line))
+                   :sw sw :stroke stroke))))
+
+(defun lstipple* (msvg line &key (len 100d0) (num 10) sw (stroke "black"))
+  "
+  draw num stipples along line.
+  the length of the stipples is limited to the (absolute) length len.
+
+  if the length of the line is shorter than len, a single line (no stipples)
+  will be drawn.
+  "
+  (declare (plot-tile-svg msvg))
+  (declare (list line))
+  (declare (double-float len))
+  (let ((d (vec:dst* line)))
+    (if (<= d len)
+      (path msvg line :sw sw :stroke stroke)
+      (lstipple msvg line
+                :len (/ len d)
+                :num num
+                :sw sw :stroke stroke))))
+
+
+(defun rstipple (msvg n pts &key sw (stroke "black") closed
+                            &aux (pts* (if (eql (type-of pts) 'cons)
+                                           (to-array pts) pts)))
+  "
+  draw n stipples along path pts
+  WARN: this is incomplete and will probably not perform as expected
+  "
+  (declare (plot-tile-svg msvg))
+  (declare (list pts))
+  (declare (integer n))
+  (loop with all = (to-array (lin-path:pos*
+                               (lin-path:make pts :closed closed)
+                               (sort (rnd:nrnd (* 2 n)) (rnd:either #'< #'>))))
+        for i from 0 below (* 2 n) by 2
+        do (path msvg (list (aref all i) (aref all (1+ i)))
+                 :sw sw :stroke stroke)))
+
+
 (defun save (msvg fn)
   (declare (plot-tile-svg msvg))
   (with-struct (plot-tile-svg- papers overview grid) msvg
-    (plot-svg:show-boundary overview)
+    (plot-svg:show-crop overview)
     (loop for path across grid do (plot-svg:path overview path :stroke "blue"))
-    (plot-svg:save overview
-      (append-postfix (ensure-filename fn "" t) "-overview"))
-
     (loop for (nx ny) being the hash-keys of papers using (hash-value paper)
-          do (plot-svg:show-boundary paper)
+          do (plot-svg:show-crop paper)
              (plot-svg:save paper
-               (ensure-filename fn (format nil "-part-~ax~a" nx ny) t)))))
+               (ensure-filename fn (format nil "-part-~ax~a" nx ny) t)))
+    (plot-svg:save overview
+      (append-postfix (ensure-filename fn "" t) "-overview"))))
 

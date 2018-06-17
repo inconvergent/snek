@@ -132,8 +132,8 @@
   (declare (vec v))
   (declare (integer i))
   (declare (type (array double-float) a))
-  (setf (aref a i 0) (vec::vec-x v)
-        (aref a i 1) (vec::vec-y v)))
+  (setf (aref a i 0) (vec-x v)
+        (aref a i 1) (vec-y v)))
 
 
 ; MATHS
@@ -312,6 +312,10 @@
   (declare (vec a b))
   (len (sub a b)))
 
+(defun dst* (aa)
+  (declare (list aa))
+  (dst (first aa) (second aa)))
+
 
 (defun ldst (a b)
   (declare (list a b))
@@ -338,9 +342,7 @@
 
 (defun sum (aa)
   (declare (list aa))
-  (reduce (lambda (a b)
-            (declare (vec a b))
-            (add a b)) aa))
+  (reduce (lambda (a b) (declare (vec a b)) (add a b)) aa))
 
 
 (defun rot (v a &key (xy (zero)))
@@ -356,8 +358,22 @@
 (defun lrot (pts a &key (xy (zero)))
   (declare (list pts))
   (declare (double-float a))
-  (mapcar (lambda (p) (declare (vec p))
-                      (rot p a :xy xy)) pts))
+  (mapcar (lambda (p) (declare (vec p)) (rot p a :xy xy)) pts))
+
+
+(defun shift-scale (pt shift s &optional (unshift (zero)))
+  "shift scale (unshift)"
+  (declare (vec pt shift))
+  (declare (double-float s))
+  (add (scale (sub pt shift) s) unshift))
+
+
+(defun shift-scale* (pts shift s &optional unshift)
+  (declare (list pts))
+  (declare (vec shift))
+  (declare (double-float s))
+  (mapcar (lambda (pt) (declare (vec pt))
+            (shift-scale pt shift s unshift)) pts))
 
 
 (defun segdst (aa v)
@@ -404,7 +420,7 @@
 (defun segx* (l &key parallel)
   (declare (list l))
   (destructuring-bind (a b) l
-    (vec:segx a b :parallel parallel)))
+    (segx a b :parallel parallel)))
 
 
 (defun cross (a b)
@@ -417,22 +433,22 @@
   (declare (list convex))
   (declare (vec v))
   (loop for a in (close-path convex)
-        and b in (cdr (close-path convex)) always
-    (>= (cross (sub b a) (sub v b)) 0d0)))
+        and b in (cdr (close-path convex))
+        always (>= (cross (sub b a) (sub v b)) 0d0)))
 
 
 ; SHAPES
 
-(defun on-circ (p rad &key (xy (vec:zero)))
+(defun on-circ (p rad &key (xy (zero)))
   (declare (double-float p rad))
   (declare (vec xy))
-  (vec:add xy (vec:scale (vec:cos-sin (* p PII)) rad)))
+  (add xy (scale (cos-sin (* p PII)) rad)))
 
 
 (defun on-line (p a b)
   (declare (double-float p))
   (declare (vec a b))
-  (vec:add a (vec:scale (vec:sub b a) p)))
+  (add a (scale (sub b a) p)))
 
 
 (defun on-line* (p ab)
@@ -442,20 +458,20 @@
     (on-line p a b)))
 
 
-(defun on-spiral (p rad &key (xy (vec:zero)) (rot 0d0))
+(defun on-spiral (p rad &key (xy (zero)) (rot 0d0))
   (declare (double-float p rad rot))
   (declare (vec xy))
-  (vec:add xy (vec:scale (vec:cos-sin (+ rot (* p PII)))
-                         (* p rad))))
+  (add xy (scale (cos-sin (+ rot (* p PII)))
+                     (* p rad))))
 
 
-(defun rect (w h &key (xy (vec:zero)))
+(defun rect (w h &key (xy (zero)))
   (declare (double-float w h))
   (declare (vec xy))
-  (list (vec:add xy (vec:vec w (- h)))
-        (vec:add xy (vec:vec w h))
-        (vec:add xy (vec:vec (- w) h))
-        (vec:sub xy (vec:vec w h))))
+  (list (add xy (vec w (- h)))
+        (add xy (vec w h))
+        (add xy (vec (- w) h))
+        (sub xy (vec w h))))
 
 
 (defun square (bs &key xy)
@@ -464,11 +480,11 @@
   (rect bs bs :xy xy))
 
 
-(defun polygon (n rad &key (xy (vec:zero)) (rot 0d0))
+(defun polygon (n rad &key (xy (zero)) (rot 0d0))
   (declare (integer n))
   (declare (double-float rad rot))
   (declare (vec xy))
   (loop for i from 0 below n
-        collect (vec:add (vec:scale (vec:cos-sin (+ rot (* (/ i n) PII))) rad)
-                         xy)))
+        collect (add (scale (cos-sin (+ rot (* (/ i n) PII))) rad)
+                     xy)))
 

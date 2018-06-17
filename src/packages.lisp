@@ -3,16 +3,17 @@
   (:use :common-lisp)
   (:export
     :add
+    :all-inside
     :angle
     :arr-get
     :arr-set
-    :all-inside
     :copy
     :cos-sin
     :cross
     :div
     :dot
     :dst
+    :dst*
     :dst2
     :flip
     :idiv
@@ -33,8 +34,8 @@
     :lmid
     :lmult
     :lmult*
-    :lround
     :lrot
+    :lround
     :lscale*
     :lsub
     :lsub*
@@ -52,13 +53,15 @@
     :perp
     :polygon
     :ptinside
+    :rect
     :rep
     :rot
-    :rect
     :scale
     :segdst
     :segx
     :segx*
+    :shift-scale
+    :shift-scale*
     :sin-cos
     :square
     :sub
@@ -74,10 +77,10 @@
     :with-xy-short
     :zero)
   (:import-from :common-lisp-user
-    :make-generic-array
-    :close-path
-    :array-push
     :PII
+    :array-push
+    :close-path
+    :make-generic-array
     :with-gensyms))
 
 
@@ -101,7 +104,6 @@
     :iscale*
     :lget
     :linspace
-    :percentiles
     :mid-rad
     :mod+
     :mod-
@@ -114,6 +116,7 @@
     :path-offset
     :path-simplify
     :path-tangents
+    :percentiles
     :range
     :range-search
     :rep
@@ -121,23 +124,24 @@
     :scale*
     :sfloat
     :sfloat*
+    :stipple
     :stitch
     :sub
     :sum
     :with-linspace)
   (:import-from :common-lisp-user
-    :array-push
     :array-last
-    :to-array
-    :to-list
+    :array-push
     :make-generic-array
+    :to-array
+    :to-generic-array
+    :to-list
     :with-gensyms))
 
 
 (defpackage :rnd
   (:use :common-lisp)
   (:export
-    :aget
     :array-split
     :bernoulli
     :either
@@ -149,7 +153,6 @@
     :get-lin-stp*
     :in-box
     :in-circ
-    :lget
     :nin-box
     :nin-circ
     :non-circ
@@ -172,6 +175,7 @@
     :rnd
     :rnd*
     :rndbtwn
+    :rndget
     :rndi
     :rndi*
     :rndspace
@@ -182,9 +186,9 @@
     :with-rndspace)
   (:import-from :common-lisp-user
     :PII
-    :to-array
     :array-push
     :make-generic-array
+    :to-array
     :with-gensyms))
 
 
@@ -257,8 +261,9 @@
   (:import-from :common-lisp-user
     :flatten
     :make-generic-array
-    :with-struct
-    :with-gensyms))
+    :with-gensyms
+    :with-struct))
+
 
 
 (defpackage :bzspl
@@ -275,21 +280,21 @@
     :with-rndpos)
   (:import-from :common-lisp-user
     :array-push
-    :to-list
-    :make-generic-array
-    :with-gensyms
     :make-dfloat-array
+    :make-generic-array
+    :to-list
+    :with-gensyms
     :with-struct))
 
 
 (defpackage :lin-path
   (:use :common-lisp)
   (:export
+    :make
+    :move
     :pos
     :pos*
-    :rndpos
-    :make
-    :move)
+    :rndpos)
   (:import-from :common-lisp-user
     :make-dfloat-array
     :set-dfloat-tup
@@ -300,14 +305,15 @@
   (:use :common-lisp)
   (:export
     :make
-    :with*
     :verts-in-rad
+    :with*
     :with-verts-in-rad)
   (:import-from :common-lisp-user
     :get-dfloat-tup
     :make-int-vec
-    :with-struct
-    :with-gensyms))
+    :with-gensyms
+    :with-struct))
+
 
 
 (defpackage :sandpaint
@@ -315,13 +321,13 @@
   (:export
     :arr-circ
     :arr-pix
+    :bzspl-stroke
     :chromatic-aberration
     :circ
     :clear
     :dens-stroke
     :lin-path
     :make
-    :bzspl-stroke
     :pix
     :pixel-hack
     :save
@@ -348,22 +354,23 @@
     :circ
     :circs
     :cpath
-    :show-boundary
     :hatch
     :make
     :make*
     :mhatch
     :path
     :save
+    :show-boundary
+    :show-crop
     :wbzspl
     :wcirc
     :wpath)
   (:import-from :common-lisp-user
     :aif
-    :ensure-filename
-    :make-generic-array
     :array-push
     :close-path
+    :ensure-filename
+    :make-generic-array
     :to-array
     :to-list
     :with-struct))
@@ -372,16 +379,21 @@
 (defpackage :plot-tile-svg
   (:use :common-lisp)
   (:export
+    :lstipple
+    :lstipple*
     :make
     :path
+    :rstipple
     :save)
   (:import-from :common-lisp-user
-    :ensure-filename
-    :make-generic-array
     :append-postfix
     :array-push
-    :to-generic-array
+    :array-push*
+    :ensure-filename
     :length-1
+    :make-generic-array
+    :to-array
+    :to-generic-array
     :with-struct))
 
 
@@ -472,19 +484,19 @@
     :with-grp
     :with-rnd-edge
     :with-rnd-vert
-    :zwith
-    :with-verts-in-rad)
+    :with-verts-in-rad
+    :zwith)
   (:import-from :common-lisp-user
     :append-postfix
+    :array-push
     :close-path
+    :exec-with-args
     :flatten
     :get-dfloat-tup
-    :exec-with-args
     :make-dfloat-array
     :make-generic-array
     :make-generic-hash-table
     :to-list
-    :array-push
     :with-gensyms
     :with-struct))
 

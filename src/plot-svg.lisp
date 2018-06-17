@@ -20,30 +20,26 @@
 
 (defun -get-scene (layout)
   (case layout
-    (a4-landscape
-      (cl-svg:make-svg-toplevel
-        'cl-svg:svg-1.1-toplevel
-        :height "210mm"
-        :width "297mm"
-        :view-box (-view-box *long* *short*)))
-    (a4-portrait
-      (cl-svg:make-svg-toplevel
-        'cl-svg:svg-1.1-toplevel
-        :height "297mm"
-        :width "210mm"
-        :view-box (-view-box *short* *long*)))
-    (a3-landscape
-      (cl-svg:make-svg-toplevel
-        'cl-svg:svg-1.1-toplevel
-        :height "297mm"
-        :width "420mm"
-        :view-box (-view-box *long* *short*)))
-    (a3-portrait
-      (cl-svg:make-svg-toplevel
-        'cl-svg:svg-1.1-toplevel
-        :height "420mm"
-        :width "297mm"
-        :view-box (-view-box *short* *long*)))
+    (a4-landscape (cl-svg:make-svg-toplevel
+                    'cl-svg:svg-1.1-toplevel
+                    :height "210mm"
+                    :width "297mm"
+                    :view-box (-view-box *long* *short*)))
+    (a4-portrait (cl-svg:make-svg-toplevel
+                    'cl-svg:svg-1.1-toplevel
+                    :height "297mm"
+                    :width "210mm"
+                    :view-box (-view-box *short* *long*)))
+    (a3-landscape (cl-svg:make-svg-toplevel
+                    'cl-svg:svg-1.1-toplevel
+                    :height "297mm"
+                    :width "420mm"
+                    :view-box (-view-box *long* *short*)))
+    (a3-portrait (cl-svg:make-svg-toplevel
+                    'cl-svg:svg-1.1-toplevel
+                    :height "420mm"
+                    :width "297mm"
+                    :view-box (-view-box *short* *long*)))
     (otherwise (error "invalid layout. use: 'plot-svg:a4-portrait,
       'plot-svg:a4-landscape, plot-svg:a3-landscape or plot-svg:a3-portrait."))))
 
@@ -88,15 +84,23 @@
                                  :stroke stroke))))
 
 
+(defun show-crop (psvg &key (len 3d0) sw (stroke "red"))
+  (declare (plot-svg psvg))
+  (with-struct (plot-svg- width height) psvg
+    (loop for m in (list (list (vec:vec 0d0 0d0) (vec:vec len 0d0))
+                         (list (vec:vec width 0d0) (vec:vec (- width len) 0d0))
+                         (list (vec:vec 0d0 height) (vec:vec len height))
+                         (list (vec:vec width height) (vec:vec (- width len) height)))
+          do (path psvg m :closed t :sw sw :stroke stroke))))
+
+
 (defun accumulate-path (pth a &optional b (offset (vec:zero)))
   (array-push (vec:with-xy-short ((vec:add a offset) x y)
-                (if (> (length pth) 0)
-                  (cl-svg:line-to x y)
-                  (cl-svg:move-to x y)))
+                (if (> (length pth) 0) (cl-svg:line-to x y)
+                                       (cl-svg:move-to x y)))
               pth)
-
   (when b (array-push (vec:with-xy-short ((vec:add b offset) x y)
-                        (cl-svg:line-to x y))
+                                         (cl-svg:line-to x y))
                       pth)))
 
 
@@ -270,12 +274,11 @@
           (accumulate-path pth a)
           (loop for s in (math:linspace rep rdown rup)
                 and i from 0
-                do
-            (accumulate-path
-                pth
-                (if (= (math:mod2 i) 0) a b)
-                (if (= (math:mod2 i) 0) b a)
-                (vec:scale (vec:norm (vec:perp (vec:sub b a))) s)))
+                do (accumulate-path pth
+                                    (if (= (math:mod2 i) 0) a b)
+                                    (if (= (math:mod2 i) 0) b a)
+                                    (vec:scale (vec:norm (vec:perp (vec:sub b a)))
+                                               s)))
           (accumulate-path pth b))
 
         (cl-svg:draw scene

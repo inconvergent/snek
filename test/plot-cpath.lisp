@@ -2,9 +2,7 @@
 
 (load "../src/load")
 
-
 (setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
 
 
 (defun make-line (xy s &optional a)
@@ -147,7 +145,7 @@
       (loop for (c box) across res do
         (plot-svg:cpath psvg box :width 15d0 :closed c)))
 
-    (plot-svg:save psvg fn)))
+    (plot-svg:save psvg "plot-cpath")))
 
 (time (main 1000 (second (cmd-args))))
 

@@ -1,7 +1,6 @@
 
 (abbrev array-push vector-push-extend)
 
-
 (defvar PII (* PI 2d0))
 (defvar PI5 (* PI 0.5d0))
 
@@ -105,12 +104,22 @@
   (make-array (length init) :initial-contents init))
 
 
+; TODO: array push macro?
+(defun array-push* (xx arr &aux (xx* (if (eql (type-of xx) 'cons)
+                                         (to-array xx) xx)))
+  (loop for x across xx* do (array-push x arr)))
+
+
 (defun to-generic-array (init &key (type t))
   (make-array (* (length init))
               :fill-pointer (length init)
               :initial-contents init
               :element-type type
               :adjustable t))
+
+
+(defun ensure-array (o &key (fx #'to-array))
+  (if (equal (type-of o) 'cons) (funcall fx o) o))
 
 
 (defun make-generic-hash-table (&key init

@@ -35,12 +35,12 @@
                  :bg (color:white))))
 
     (setf verts (loop for i from 1 to 100
-                      collect (snek:add-vert! snk (rnd:lget lattice))))
+                      collect (snek:add-vert! snk (rnd:rndget lattice))))
 
     (loop for i from 0 to itt do
       (if (eql (mod i 100) 0) (format t "~a~%" i))
       (destructuring-bind (p1 p2)
-        (list (rnd:lget verts) (rnd:lget verts))
+        (list (rnd:rndget verts) (rnd:rndget verts))
         (if (< (vec:dst (snek:get-vert snk p1) (snek:get-vert snk p2)) 100.0)
           (progn (sum-alter-velocity velocities noise 100)
                  (snek:with (snk)

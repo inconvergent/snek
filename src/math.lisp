@@ -368,6 +368,10 @@
 
 
 (defun stitch (lines)
+  "
+  randomly mix the hatches in lines according to where the lines intersect.
+  this is somewhat inefficient
+  "
   (let ((res (make-generic-array)))
     (loop for i from 0 below (length lines) do
       (let ((ss (make-generic-array))
@@ -431,6 +435,9 @@
                        (steps (lambda (n) (math:linspace n 0d0 1d0)))
                        (rs 0.25d0)
                        (rnd #'identity))
+  "
+  draw hatches at angles inside the area enclosed by the path in pts
+  "
   (multiple-value-bind (mid dst)
     (mid-rad pts)
     (let ((res (make-generic-array)))
@@ -508,4 +515,31 @@
     (-get-splits n pts)
     (list (-split-ind-to-pts pts (-split-get-left a b n) s)
           (-split-ind-to-pts pts (-split-get-right a b n) s))))
+
+
+; ----- STIPPLE -----
+
+; more or less as suggested in
+; https://gist.github.com/evanmiltenburg/dfd571f27372477487cb14f2bdf8b35c
+
+(defun -stipple-get-lengths (num-lines len)
+  (let* ((lens (rnd:nrnd num-lines))
+         (s (math:sum lens)))
+    (loop for l in lens collect (/ (* l len) s))))
+
+(defun stipple (num-lines len)
+  "
+  draw num-lines stipples between (0 1) the stipples will have a total length
+  of len
+  "
+  (declare (double-float len))
+  (let ((lengths (-stipple-get-lengths num-lines len))
+        (gaps (-stipple-get-lengths (1- num-lines) (- 1d0 len))))
+    (loop with curr = (first lengths)
+          with res = (to-generic-array (list (list 0d0 curr)) :type 'vec:vec)
+          for l of-type double-float in (cdr lengths)
+          and g of-type double-float in gaps
+          do (array-push (list curr (+ curr l)) res)
+             (incf curr (+ l g))
+          finally (return res))))
 

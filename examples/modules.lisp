@@ -8,7 +8,7 @@
 (defun run-join (snk)
   (snek:with (snk :zwidth 100.0d0)
     (snek:with-rnd-vert (snk v)
-      (snek:join-verts? (rnd:aget (snek:verts-in-rad snk (snek:get-vert snk v) 100.0d0)) v))))
+      (snek:join-verts? (rnd:rndget (snek:verts-in-rad snk (snek:get-vert snk v) 100.0d0)) v))))
 
 (defun run-move (snk)
   (snek:with (snk)
@@ -31,7 +31,7 @@
     (let ((fns (list 'run-join 'run-move)))
       (loop for i from 0 to itt
             do (print-every i 1000)
-               (funcall (rnd:lget fns) snk)))
+               (funcall (rnd:rndget fns) snk)))
 
     ;(snek-export-2obj snk (append-postfix fn ".2obj"))
     (snek:draw-edges snk sand 1000)
