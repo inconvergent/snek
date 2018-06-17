@@ -33,9 +33,6 @@
         (char-rad 22d0)
         (line-chars 30)
         (line-num 20)
-        ;(mut (snek:make-mutate
-        ;       :prob 0.001d0
-        ;       :noise 10.d0))
         (sand (sandpaint:make size
                               :fg (color:black 0.009)
                               :bg (color:white))))
@@ -55,7 +52,6 @@
 
         (loop for i from 0 below 200 do
           (snek:with (snk)
-            ;(snek:mutate (mut)
             (snek:itr-all-verts (snk v)
               ;(snek:move-vert? v (funcall state-gen v 0.00009d0))
               (snek:move-vert? v (rnd:in-circ 0.4d0))))

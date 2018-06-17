@@ -45,8 +45,7 @@
                         (vec:rep (* 0.5d0 size))))
         (sand (sandpaint:make size
                               :fg (color:white 0.05)
-                              :bg (color:dark)))
-        (mut (snek:make-mutate :noise 100 :prob 0.000005)))
+                              :bg (color:dark))))
 
       (let ((state-gen (get-walkers-state-gen snk)))
 
@@ -55,12 +54,10 @@
             (print-every i 100000)
 
             (snek:with (snk)
-              ; try to enable this to see what happens
-              ;(mutate (mut)
-                (snek:itr-grps (snk g)
-                  (snek:itr-verts (snk v :g g)
-                    ; get an alteration for vert v
-                    (funcall state-gen v noise))));)
+              (snek:itr-grps (snk g)
+                (snek:itr-verts (snk v :g g)
+                  ; get an alteration for vert v
+                  (funcall state-gen v noise))))
 
             ;(sandpaint:set-fg-color sand (color:hsv 0.51 1 1 0.05))
             (snek:itr-grps (snk g :collect nil)

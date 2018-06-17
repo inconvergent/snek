@@ -1,9 +1,26 @@
 #!/usr/bin/sbcl --script
 
 (load "../src/load")
+(load "../utils/snek-alterations-mutate")
 
 (setf *print-pretty* t)
 (setf *random-state* (make-random-state t))
+
+
+(defmacro mutate ((mutate) &body body)
+  (with-gensyms (bd mut a)
+    `(let ((,bd (flatten (list ,@body)))
+           (,mut ,mutate))
+       (mapcar (lambda (,a)
+                 (if (< (rnd:rnd) (snek::mutate-prob ,mut))
+                   (progn (setf (snek::mutate-ind ,mut)
+                                (snek::-ok-ind (+ (snek::mutate-ind ,mut)
+                                            (rnd:rndi -1 2))))
+                          ;(setf (mutate-xy ,mut)
+                          ;      (math:add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0d0)))
+                          (snek::do-mutate (snek::mutate-rules ,mut) ,a ,mut))
+                   ,a))
+               ,bd))))
 
 
 (defun circ-stroke (sand vv)
@@ -57,10 +74,9 @@
 
       (loop for p in (math:linspace itt 0 1 :end nil) do
         (snek:with (snk)
-          (snek:mutate (mut)
-            (list
-              (snek:move-vert? v1 (lin-path:pos pa (funcall lsa noise)) :rel nil)
-              (snek:move-vert? v2 (lin-path:pos pb (funcall lsb noise)) :rel nil))))
+          (mutate (mut)
+            (list (snek:move-vert? v1 (lin-path:pos pa (funcall lsa noise)) :rel nil)
+                  (snek:move-vert? v2 (lin-path:pos pb (funcall lsb noise)) :rel nil))))
         (snek:draw-edges snk sand 100)))
 
     (sandpaint:save sand fn)))
