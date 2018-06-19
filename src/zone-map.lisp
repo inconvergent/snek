@@ -79,11 +79,10 @@
           (multiple-value-bind (,vals ,exists)
               (gethash ,z ,zone-to-verts)
               (when ,exists
-                (map nil
-                     (lambda (,v) (declare (integer ,v))
-                        (when (< (vec:dst2 ,xy* (vec:arr-get ,verts* ,v)) ,rad2)
-                          (progn ,@body)))
-                      ,vals))))))))
+                (map nil (lambda (,v) (declare (integer ,v))
+                           (when (< (vec:dst2 ,xy* (vec:arr-get ,verts* ,v)) ,rad2)
+                             (progn ,@body)))
+                         ,vals))))))))
 
 
 (defun verts-in-rad (zm verts xy rad &aux
@@ -101,11 +100,9 @@
         (loop for z in (npairs za zb) do
           (multiple-value-bind (vals exists)
             (gethash z zone-to-verts)
-            (when exists
-                (map nil (lambda (zj)
-                           (declare (integer zj))
+            (when exists (map nil (lambda (zj) (declare (integer zj))
                            (when (< (vec:dst2 xy (vec:arr-get verts zj)) rad2)
                              (vector-push-extend zj inds)))
-                     vals)))))
+                           vals)))))
       inds)))
 

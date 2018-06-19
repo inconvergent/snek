@@ -114,8 +114,7 @@
 
 
 (defun path (msvg pts &key sw (stroke "black") closed
-                      &aux (pts* (if (eql (type-of pts) 'cons)
-                                     (to-generic-array pts) pts)))
+                      &aux (pts* (ensure-array pts :fx #'to-generic-array)))
   "
   draw path
   "
@@ -173,8 +172,7 @@
 
 
 (defun rstipple (msvg n pts &key sw (stroke "black") closed
-                            &aux (pts* (if (eql (type-of pts) 'cons)
-                                           (to-array pts) pts)))
+                            &aux (pts* (ensure-array pts)))
   "
   draw n stipples along path pts
   WARN: this is incomplete and will probably not perform as expected

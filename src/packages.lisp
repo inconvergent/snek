@@ -132,6 +132,7 @@
   (:import-from :common-lisp-user
     :array-last
     :array-push
+    :ensure-array
     :make-generic-array
     :to-array
     :to-generic-array
@@ -226,6 +227,7 @@
     :white
     :with)
   (:import-from :common-lisp-user
+    :ensure-array
     :with-gensyms))
 
 
@@ -345,6 +347,8 @@
 (defpackage :plot-svg
   (:use :common-lisp)
   (:export
+    :*short*
+    :*long*
     :a3-landscape
     :a3-portrait
     :a4-landscape
@@ -389,6 +393,7 @@
     :append-postfix
     :array-push
     :array-push*
+    :ensure-array
     :ensure-filename
     :length-1
     :make-generic-array

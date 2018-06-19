@@ -131,8 +131,7 @@
 (defun rndpos (b n &key order)
   (declare (bzspl b))
   (declare (integer n))
-  (pos* b (if order (sort (rnd:rndspace n 0d0 1d0) #'<)
-                    (rnd:rndspace n 0d0 1d0))))
+  (pos* b (rnd:rndspace n 0d0 1d0 :order order)))
 
 
 (defun -set-v (vpts opts a b)

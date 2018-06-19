@@ -7,9 +7,7 @@
 
 
 (defun init-snek (n)
-  (let ((snk (snek:make
-               :max-verts 5000000
-               :grp-size 100)))
+  (let ((snk (snek:make :max-verts 5000000 :grp-size 100)))
     (math:nrep n (snek:add-vert! snk (vec:rep (rnd:rnd 100d0))))
     snk))
 
@@ -20,12 +18,11 @@
          (snk (init-snek num)))
 
     (loop for i from 0 below itt do
-      (if (= (mod i 100) 0)
+      (when (= (mod i 100) 0)
         (format t "itt ~a edges ~a ~%" i (length (snek:get-edges snk))))
 
       (snek:with (snk)
         (snek:join-verts? (rnd:rndi num) (rnd:rndi num)))
-
       ;(snek:del-edge! snk (nrep 2 (rnd:rndi num)))
       )))
 

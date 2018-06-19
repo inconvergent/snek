@@ -30,11 +30,10 @@ this is a naive wrapper around hash-map. not sure how efficient it will be?
 
 (defun mem (s e)
   (declare (integer e))
-  (the boolean
-       (multiple-value-bind (val exists)
-         (gethash e s)
-         (declare (ignore val))
-         exists)))
+  (the boolean (multiple-value-bind (val exists)
+                 (gethash e s)
+                 (declare (ignore val))
+                 exists)))
 
 
 (defun mem* (s ee)

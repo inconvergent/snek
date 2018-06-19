@@ -153,7 +153,7 @@
 
   (do-test
     (let ((a (list)))
-      (rnd:with-rndspace (10 0 7 v)
+      (rnd:with-rndspace (10 0d0 7d0 v)
         (setf a (append a (list v))))
       a)
    '(2.73326206290543d0 2.5174792293563932d0 5.492487217048299d0

@@ -104,10 +104,15 @@
   (make-array (length init) :initial-contents init))
 
 
+(defun ensure-array (o &key (fx #'to-array))
+  (if (equal (type-of o) 'cons) (funcall fx o) o))
+
+
 ; TODO: array push macro?
-(defun array-push* (xx arr &aux (xx* (if (eql (type-of xx) 'cons)
-                                         (to-array xx) xx)))
-  (loop for x across xx* do (array-push x arr)))
+(defun array-push* (xx arr)
+  (if (eql (type-of xx) 'cons)
+    (loop for x in xx do (array-push x arr))
+    (loop for x across xx do (array-push x arr))))
 
 
 (defun to-generic-array (init &key (type t))
@@ -118,15 +123,9 @@
               :adjustable t))
 
 
-(defun ensure-array (o &key (fx #'to-array))
-  (if (equal (type-of o) 'cons) (funcall fx o) o))
-
-
-(defun make-generic-hash-table (&key init
-                                     (test #'equal)
-                                &aux (init* (if (equal (type-of init) 'cons)
-                                                (to-generic-array init)
-                                                init)))
+(defun make-generic-hash-table (&key init (test #'equal)
+                                &aux (init* (ensure-array init
+                                              :fx #'to-generic-array)))
   (if (< (length init) 1)
     (make-hash-table :test test)
     (loop with res = (make-hash-table :test test)
@@ -140,9 +139,7 @@
                                (key (lambda (x) (second x)))
                                (compare #'>)
                                num
-                          &aux (data* (if (equal (type-of data) 'cons)
-                                          (to-generic-array data)
-                                          data))
+                          &aux (data* (ensure-array data :fx #'to-generic-array))
                                (num* (if num num (* 2 (length data)))))
   (loop with res = (make-hash-table :test test)
         for d across data*

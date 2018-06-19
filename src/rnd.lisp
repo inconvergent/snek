@@ -38,7 +38,7 @@
   (if (eql (type-of l) 'cons) (nth (random (length l)) l)
                               (aref l (random (length l)))))
 
-(defun probsel (p a &aux (a* (if (eql (type-of a) 'cons) (to-array a) a)))
+(defun probsel (p a &aux (a* (ensure-array a)))
   (declare (double-float p))
   (loop with res = (make-generic-array)
         for i across a*
@@ -47,11 +47,10 @@
 
 
 (defun nrnd-u-from (n a)
-  (let* ((a* (if (eql (type-of a) 'cons) (to-array a) a))
+  (let* ((a* (ensure-array a))
          (resind nil)
          (anum (length a*)))
-    (when (> n anum)
-      (error "not enough distinct elements in a."))
+    (when (> n anum) (error "not enough distinct elements in a."))
     (loop until (>= (hset:num (hset:make :init resind)) n)
           do (setf resind (nrndi n 0 anum)))
     (loop for i in resind collect (aref a* i))))
@@ -143,14 +142,17 @@
   (loop repeat n collect (rnd* x)))
 
 
-(defmacro with-rndspace ((n a b rn) &body body)
+(defmacro with-rndspace ((n a b rn &key collect) &body body)
+  (declare (integer n))
+  (declare (double-float a b))
+  (declare (symbol rn))
   (with-gensyms (a* b* d)
     `(destructuring-bind (,a* ,b*)
       (sort (list (math:dfloat ,a) (math:dfloat ,b)) #'<)
       (let ((,d (- ,b* ,a*)))
-        (loop repeat ,n
-              do (let ((,rn (+ ,a* (random ,d))))
-                   (progn ,@body)))))))
+        (loop repeat ,n ,(if collect 'collect 'do)
+          (let ((,rn (+ ,a* (random ,d))))
+            (progn ,@body)))))))
 
 
 (defun rndspace (n a b &key order)

@@ -7,9 +7,7 @@
 
 
 (defun init-snek (n mid)
-  (let ((snk (snek:make
-               :max-verts 5000000
-               :grp-size 500000)))
+  (let ((snk (snek:make :max-verts 5000000 :grp-size 500000)))
     (math:nrep n (snek:add-vert! snk (rnd:in-box mid mid :xy (vec:v mid))))
     snk))
 
@@ -41,8 +39,7 @@
         (let ((v (rnd:rndi num)))
           (snek:with-verts-in-rad (snk (snek:get-vert snk v) farl w)
              (snek:with-dx (snk (list v w) dx d)
-               (list dx d)))
-          ))))
+               (list dx d)))))))
 
     (format t "verts: ~a~%" (snek::snek-num-verts snk))))
 
@@ -53,4 +50,3 @@
                          ;:mode :time
                          :report :graph)
  (main))
-;(main)

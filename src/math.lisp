@@ -82,14 +82,14 @@
   (mod i 2))
 
 
-(defmacro with-linspace ((n a b rn &key (end t)) &body body)
+(defmacro with-linspace ((n a b rn &key (end t) collect) &body body)
   (with-gensyms (a* b* n* nn i ba)
   `(let* ((,n* (int ,n))
           (,nn (dfloat (if ,end (1- ,n*) ,n*)))
           (,a* (dfloat ,a))
           (,b* (dfloat ,b))
           (,ba (- ,b* ,a*)))
-    (loop for ,i from 0 below ,n* do
+    (loop for ,i from 0 below ,n* ,(if collect 'collect 'do)
       (let ((,rn (dfloat (+ ,a* (* ,i (/ ,ba ,nn))))))
         (progn ,@body))))))
 
@@ -188,9 +188,7 @@
 
 
 (defun range-search (ranges f &aux (n (1- (length ranges)))
-                                   (ranges* (if (equal (type-of ranges) 'cons)
-                                              (to-array ranges)
-                                              ranges)))
+                                   (ranges* (ensure-array ranges)))
   "
   binary range search.
 
@@ -267,7 +265,7 @@
 
 (defun path-simplify (pts lim)
   ;https://hydra.hull.ac.uk/resources/hull:8338
-  (let ((pts* (if (equal (type-of pts) 'cons) (to-array pts) pts)))
+  (let ((pts* (ensure-array pts)))
     (loop for i across (-path-simplify pts* lim)
           collect (aref pts* i))))
 

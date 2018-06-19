@@ -12,14 +12,13 @@
 
   (format t "rndspace:~%")
   (time
-    (loop repeat rep do
-      (rnd:rndspace num 0d0 1d0)))
+    (loop repeat rep
+          do (rnd:rndspace num 0d0 1d0)))
 
   (format t "with-rndspace:~%")
   (time
-    (loop repeat rep do
-      (rnd:with-rndspace (num 0d0 1d0 v)
-        v)))))
+    (loop repeat rep
+          do (rnd:with-rndspace (num 0d0 1d0 v) v)))))
 
 ;(require :sb-sprof)
 ;(sb-sprof:with-profiling (:max-samples 200000
@@ -28,5 +27,5 @@
 ;                         ;:mode :time
 ;                         :report :graph)
 ; (main))
-
 (main)
+

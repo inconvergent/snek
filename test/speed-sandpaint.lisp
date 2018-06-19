@@ -10,17 +10,14 @@
   (let* ((num 1000000)
          (pix-num 1000000)
          (grains 100)
-         (sand (sandpaint:make 1000
-                :fg (color:black 0.01)
-                :bg (color:white))))
-
+         (sand (sandpaint:make 1000 :fg (color:black 0.01)
+                                    :bg (color:white))))
 
   (format t "strokes:~%")
   (time
     (sandpaint:strokes sand
-     (math:nrep num (list
-                     (rnd:in-box 500d0 500d0 :xy (vec:v 500d0))
-                     (rnd:in-box 500d0 500d0 :xy (vec:v 500d0))))
+      (math:nrep num (list (rnd:in-box 500d0 500d0 :xy (vec:v 500d0))
+                           (rnd:in-box 500d0 500d0 :xy (vec:v 500d0))))
      grains))
 
   (format t "pix:~%")
@@ -38,3 +35,4 @@
 ; (main))
 
 (main)
+

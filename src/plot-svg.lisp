@@ -95,13 +95,15 @@
 
 
 (defun accumulate-path (pth a &optional b (offset (vec:zero)))
-  (array-push (vec:with-xy-short ((vec:add a offset) x y)
-                (if (> (length pth) 0) (cl-svg:line-to x y)
-                                       (cl-svg:move-to x y)))
-              pth)
-  (when b (array-push (vec:with-xy-short ((vec:add b offset) x y)
-                                         (cl-svg:line-to x y))
-                      pth)))
+  (array-push
+    (vec:with-xy-short ((vec:add a offset) x y)
+      (if (> (length pth) 0) (cl-svg:line-to x y)
+                             (cl-svg:move-to x y)))
+    pth)
+  (when b (array-push
+            (vec:with-xy-short ((vec:add b offset) x y)
+              (cl-svg:line-to x y))
+            pth)))
 
 
 (defun finalize-path (pth)
@@ -118,10 +120,10 @@
     (cl-svg:draw scene
       (:path :d (cl-svg:path (finalize-path
                                (let ((pth (make-generic-array)))
-                                      (loop for p in pts
-                                            do (accumulate-path pth p))
-                                      (when closed (array-push "Z" pth))
-                                      pth))))
+                                 (loop for p in pts
+                                       do (accumulate-path pth p))
+                                 (when closed (array-push "Z" pth))
+                                 pth))))
       :fill fill
       :stroke stroke
       :stroke-width (if sw sw stroke-width))))
@@ -179,18 +181,17 @@
   (declare (plot-svg psvg))
   (with-struct (plot-svg- rep-scale) psvg
     (let ((res (make-generic-array)))
-
-      (loop for pts across mpts do
-        (loop for h across (math:hatch (-get-pts pts closed)
-                                       :angles angles
-                                       :steps steps
-                                       :rs (if rs rs rep-scale)
-                                       :rnd rnd)
-            do (array-push h res)))
+      (loop for pts across mpts
+            do (loop for h across (math:hatch (-get-pts pts closed)
+                                              :angles angles
+                                              :steps steps
+                                              :rs (if rs rs rep-scale)
+                                              :rnd rnd)
+                     do (array-push h res)))
 
       (loop for h across (if stitch (math:stitch res) res) do
-        (if (and (> (length h) 0) (every #'identity h))
-          (funcall draw h))))))
+        (when (and (> (length h) 0) (every #'identity h))
+              (funcall draw h))))))
 
 
 ; ----- BZSPL HELPERS -----
@@ -267,19 +268,17 @@
             (rup (/ width 2d0))
             (rdown (- (/ width 2d0))))
 
-        (if (= 0 (math:mod2 rep)) (setf rep (1+ rep)))
+        (when (= 0 (math:mod2 rep)) (setf rep (1+ rep)))
         (loop for a in pts
               and b in (cdr pts)
-              do
-          (accumulate-path pth a)
-          (loop for s in (math:linspace rep rdown rup)
-                and i from 0
-                do (accumulate-path pth
-                                    (if (= (math:mod2 i) 0) a b)
-                                    (if (= (math:mod2 i) 0) b a)
-                                    (vec:scale (vec:norm (vec:perp (vec:sub b a)))
-                                               s)))
-          (accumulate-path pth b))
+              do (accumulate-path pth a)
+                 (loop for s in (math:linspace rep rdown rup)
+                       and i from 0
+                       do (accumulate-path pth
+                            (if (= (math:mod2 i) 0) a b)
+                            (if (= (math:mod2 i) 0) b a)
+                            (vec:scale (vec:norm (vec:perp (vec:sub b a))) s)))
+                 (accumulate-path pth b))
 
         (cl-svg:draw scene
           (:path :d (cl-svg:path (finalize-path pth)))
@@ -294,10 +293,10 @@
           and k from 0 do
       (loop for i from 0 below n
             and i- downfrom (1- n)
-            do (array-push (vec:on-line* s
-                             (aref diagonals
-                                   (if closed i (if (= (math:mod2 k) 0) i i-))))
-                           res))
+            do (array-push
+                 (vec:on-line* s
+                   (aref diagonals (if closed i (if (= (math:mod2 k) 0) i i-))))
+                 res))
     finally (return (to-list res))))
 
 
