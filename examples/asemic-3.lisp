@@ -10,10 +10,9 @@
 
 (defun test-centroids (counts nc ncn)
   (reduce (lambda (x y) (and x y))
-          (loop for i from 0 below nc collect
-                (multiple-value-bind (val exists)
-                  (gethash i counts)
-                  (and exists (>= val ncn))))))
+          (loop for i from 0 below nc
+                collect (multiple-value-bind (val exists) (gethash i counts)
+                          (and exists (>= val ncn))))))
 
 
 (defun get-dst (centroids cand)
@@ -30,8 +29,7 @@
     (loop for i from 0 do
       (vec:with-xy (bbox bx by)
         (let ((cand (rnd:in-box bx by :xy xy)))
-          (destructuring-bind (c dst)
-            (get-dst centroids cand)
+          (destructuring-bind (c dst) (get-dst centroids cand)
             (multiple-value-bind (val exists)
               (gethash c counts)
 
@@ -47,14 +45,13 @@
       until (test-centroids counts nc ncn))
 
     (let ((pts (loop for i from 0 below nc
-                          collect (gethash i centroid-pts))))
+                     collect (gethash i centroid-pts))))
       (apply #'append pts))))
 
 
 (defun make-glyph (xy bbox nc ncn)
   (vec:with-xy ((vec:scale bbox 0.5d0) bx by)
-    (-glyph-generate-pts xy
-                         bbox
+    (-glyph-generate-pts xy bbox
                          (rnd:nin-box nc bx by :xy xy)
                          nc
                          ncn)))

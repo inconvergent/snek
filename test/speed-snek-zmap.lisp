@@ -8,7 +8,7 @@
 
 (defun init-snek (n mid)
   (let ((snk (snek:make :max-verts 5000000 :grp-size 500000)))
-    (math:nrep n (snek:add-vert! snk (rnd:in-box mid mid :xy (vec:v mid))))
+    (math:nrep n (snek:add-vert! snk (rnd:in-box mid mid :xy (vec:vec mid))))
     snk))
 
 

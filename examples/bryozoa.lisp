@@ -22,7 +22,7 @@
 (defun init-fan (n size xy)
   (let ((snk (snek:make :max-verts (* n n))))
     (loop for a in (math:linspace n pi (* 2d0 pi)) collect
-      (snek:add-path! snk (math:rep (rad (math:linspace n 0 size))
+      (snek:add-path! snk (math:rep (rad (math:linspace n 0d0 size))
                             (vec:add (vec:scale (vec:cos-sin a) rad) xy))
                       :g (snek:add-grp! snk)))
   snk))
@@ -45,10 +45,10 @@
         (vnoise 0.0000001d0)
         (hnoise 0.000001d0)
         (dens 0.25d0)
-        ;(snk (init-vertical 20 size (vec:vec (* 0.5d0 size)
+        ;(snk (init-vertical 20 (math:dfloat size) (vec:vec (* 0.5d0 size)
         ;                            (math:dfloat (- size 100d0)))
         ;                         100d0))
-        (snk (init-fan 40 1400 (vec:vec 500d0 1300d0)))
+        (snk (init-fan 40 1400d0 (vec:vec 500d0 1300d0)))
         ;(snk (init-spiral 20 20 800d0 (vec:vec 500d0 500d0)))
         (v-state-gen (get-walker-state-gen
                      (lambda () (rnd:get-acc-circ-stp*))))

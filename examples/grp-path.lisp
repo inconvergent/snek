@@ -7,9 +7,9 @@
 
 
 (defun init (snk rep rad)
-  (loop for x in (math:linspace rep 200 800) for i from 0 do
-    (loop for y in (math:linspace rep 200 800) for j from 0 do
-      (let ((g (snek:add-grp! snk :type 'path :closed t)))
+  (loop for x in (math:linspace rep 200d0 800d0) for i from 0 do
+    (loop for y in (math:linspace rep 200d0 800d0) for j from 0 do
+      (let ((g (snek:add-grp! snk :type 'path)))
         (snek:add-path! snk
                         (rnd:nin-box 8 rad rad :xy (vec:vec x y))
                         :closed t :g g)
@@ -35,10 +35,9 @@
     (let ((grp-states (make-hash-table :test #'equal)))
       (snek:itr-grps (snk g)
         (setf (gethash g grp-states)
-              (list
-                (lin-path:make (snek:get-grp-verts snk :g g))
-                (rnd:get-acc-lin-stp* (rnd:rnd))
-                (rnd:get-acc-lin-stp* (rnd:rnd)))))
+              (list (lin-path:make (snek:get-grp-verts snk :g g))
+                    (rnd:get-acc-lin-stp* (rnd:rnd))
+                    (rnd:get-acc-lin-stp* (rnd:rnd)))))
 
       (loop for i from 0 to itt do
         (print-every i 1000)

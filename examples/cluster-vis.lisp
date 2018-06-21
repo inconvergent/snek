@@ -55,13 +55,12 @@
       (sandpaint:save sand (append-postfix fn "-1") :gamma 1.5))
 
     (let ((sand (sandpaint:make size
-                :fg (color:black 0.08)
-                :bg (color:white))))
+                  :fg (color:black 0.08)
+                  :bg (color:white))))
       (sandpaint:set-fg-color sand (color:black 0.009))
       (loop for pt in (get-distributed-pts centroids size 450d0 300000) do
-        (destructuring-bind (i dst)
-         (get-dst centroids pt)
-         (sandpaint:stroke sand (list (nth i centroids) pt) 700)))
+        (destructuring-bind (i dst) (get-dst centroids pt)
+          (sandpaint:stroke sand (list (nth i centroids) pt) 700)))
 
       (draw-circ sand colors centroids)
 

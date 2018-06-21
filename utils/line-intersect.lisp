@@ -13,7 +13,7 @@
         (mid (* 0.5d0 (+ right left))))
     (to-array
       (loop for i from 0 below n
-            collect (list (rnd:in-box w w :xy (vec:v mid)) (rnd:on-circ 1d0))))))
+            collect (list (rnd:in-box w w :xy (vec:vec mid)) (rnd:on-circ 1d0))))))
 
 
 (defun make-lines (left right len noise dims &key xspace)

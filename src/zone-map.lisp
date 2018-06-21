@@ -45,12 +45,11 @@
 (defmacro -add-v-to-zone (verts zone-to-verts v zwidth)
   `(let ((z (list (floor (aref ,verts ,v 0) ,zwidth)
                   (floor (aref ,verts ,v 1) ,zwidth))))
-    (multiple-value-bind (vals exists)
-    (gethash z ,zone-to-verts)
-    (when (not exists)
-      (setf vals (make-int-vec 256)
-            (gethash z ,zone-to-verts) vals))
-    (vector-push-extend ,v vals))))
+    (multiple-value-bind (vals exists) (gethash z ,zone-to-verts)
+      (when (not exists)
+        (setf vals (make-int-vec 256)
+              (gethash z ,zone-to-verts) vals))
+      (vector-push-extend ,v vals))))
 
 
 (defun make (verts num-verts zwidth)
@@ -73,16 +72,15 @@
             (,xy* ,xy)
             (,zwidth (zmap-zwidth ,zm*))
             (,zone-to-verts (zmap-zone-to-verts ,zm*)))
-      (multiple-value-bind (,za ,zb)
-        (-xy-to-zone ,xy* ,zwidth)
-        (loop for ,z in (npairs ,za ,zb) do
-          (multiple-value-bind (,vals ,exists)
-              (gethash ,z ,zone-to-verts)
-              (when ,exists
-                (map nil (lambda (,v) (declare (integer ,v))
-                           (when (< (vec:dst2 ,xy* (vec:arr-get ,verts* ,v)) ,rad2)
-                             (progn ,@body)))
-                         ,vals))))))))
+      (multiple-value-bind (,za ,zb) (-xy-to-zone ,xy* ,zwidth)
+        (loop for ,z in (npairs ,za ,zb)
+              do (multiple-value-bind (,vals ,exists) (gethash ,z ,zone-to-verts)
+                   (when ,exists
+                     (map nil (lambda (,v) (declare (integer ,v))
+                                (when (< (vec:dst2 ,xy* (vec:arr-get ,verts* ,v))
+                                         ,rad2)
+                                      (progn ,@body)))
+                              ,vals))))))))
 
 
 (defun verts-in-rad (zm verts xy rad &aux

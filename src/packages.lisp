@@ -67,7 +67,6 @@
     :sub
     :sum
     :tolist
-    :v
     :vec
     :vec*
     :vec-coerce
@@ -189,6 +188,7 @@
     :PII
     :array-push
     :make-generic-array
+    :ensure-array
     :to-array
     :with-gensyms))
 
@@ -340,7 +340,7 @@
     :aif
     :ensure-filename
     :get-dfloat-tup
-    :square-loop
+    :with-gensyms
     :with-struct))
 
 

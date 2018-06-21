@@ -2,6 +2,15 @@
 (in-package :sandpaint)
 
 
+(defmacro square-loop ((x y n) &body body)
+  (declare (symbol x y))
+  (with-gensyms (nname)
+    `(let ((,nname ,n))
+      (loop for ,x of-type integer from 0 below ,nname
+            do (loop for ,y of-type integer from 0 below ,nname
+                     do ,@body)))))
+
+
 (defun make-rgba-array (size)
   (make-array (list size size 4)
               :adjustable nil
@@ -260,7 +269,7 @@
     (loop for u of-type vec:vec in path and w of-type vec:vec in (cdr path) do
       (let ((stps (math:int (+ 1 (* dens (vec:dst u w))))))
         (declare (integer stps))
-        (math:rep (p (math:linspace stps 0 1 :end nil))
+        (math:rep (p (math:linspace stps 0d0 1d0 :end nil))
           (-draw-circ vals size (vec:on-line p u w) rad grains rgba))))))
 
 

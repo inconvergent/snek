@@ -21,11 +21,9 @@
 
 (defmacro -swap (n m n* m*)
   (with-gensyms (h w)
-    `(progn
-      (setf ,n ,n*)
-      (setf ,m ,m*)
-      (destructuring-bind (,h ,w)
-        (rnd-dir)
+    `(progn (setf ,n ,n*)
+            (setf ,m ,m*)
+      (destructuring-bind (,h ,w) (rnd-dir)
         (setf ,n* (+ ,n ,h))
         (setf ,m* (+ ,m ,w))))))
 
@@ -56,13 +54,13 @@
         (nwalkers 4)
         (noise 0.00001d0)
         (grains 10)
-        (edge 60)
+        (edge 60d0)
         (sand (sandpaint:make size
-                              :fg (color:white 0.05)
-                              :bg (color:dark))))
+                :fg (color:white 0.05)
+                :bg (color:dark))))
 
 
-    (let* ((grid (get-grid size edge 5))
+    (let* ((grid (get-grid (math:dfloat size) edge 5))
            (walkers-a (math:nrep nwalkers (get-walker grid)))
            (walkers-b (math:nrep nwalkers (get-walker grid))))
 

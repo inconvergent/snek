@@ -3,16 +3,17 @@
 
 
 (defmacro inside* ((size xy x y) &body body)
+  (declare (symbol x y))
   (with-gensyms (sname)
     `(let ((,sname ,size))
-      (destructuring-bind (,x ,y)
-        (vround ,xy)
+      (destructuring-bind (,x ,y) (vround ,xy)
         (if (and (>= ,x 0) (< ,x ,sname)
                  (>= ,y 0) (< ,y ,sname))
             (progn ,@body))))))
 
 
 (defmacro inside ((size xy x y) &body body)
+  (declare (symbol x y))
   (with-gensyms (sname xyname)
     `(let* ((,sname (math:dfloat ,size))
             (,xyname ,xy)
@@ -24,32 +25,40 @@
 
 
 (defmacro with-xy ((v x y) &body body)
-  `(let ((,x (vec-x ,v))
-         (,y (vec-y ,v)))
-    (progn ,@body)))
+  (declare (symbol x y))
+  (with-gensyms (vname)
+   `(let* ((,vname ,v)
+           (,x (vec-x ,vname))
+           (,y (vec-y ,vname)))
+     (progn ,@body))))
 
 
 (defmacro with-xy-short ((v x y) &body body)
-  `(let ((,x (math:sfloat (vec-x ,v)))
-         (,y (math:sfloat (vec-y ,v))))
-    (progn ,@body)))
+  (declare (symbol x y))
+  (with-gensyms (vname)
+     `(let* ((,vname ,v)
+             (,x (math:sfloat (vec-x ,vname)))
+             (,y (math:sfloat (vec-y ,vname))))
+       (progn ,@body))))
 
 
 (defmacro with-loop-grid ((grid xy) &body body)
+  (declare (symbol xy))
   (with-gensyms (grid* x y)
     `(let ((,grid* ,grid))
-      (loop for ,y in ,grid* do
-        (loop for ,x in ,grid* do
-          (let ((,xy (vec ,x ,y)))
-            (progn ,@body)))))))
+      (loop for ,y of-type double-float in ,grid*
+            do (loop for ,x of-type double-float in ,grid*
+                     do (let ((,xy (vec ,x ,y)))
+                          (progn ,@body)))))))
 
 
 (defmacro with-loop-grid* ((grid xy) &body body)
+  (declare (symbol xy))
   (with-gensyms (x y)
-    `(loop for ,y in ,grid do
-      (loop for ,x in ,grid do
-        (let ((,xy (vec ,x ,y)))
-          (progn ,@body))))))
+    `(loop for ,y of-type double-float in ,grid
+           do (loop for ,x of-type double-float in ,grid
+                    do (let ((,xy (vec ,x ,y)))
+                         (progn ,@body))))))
 
 
 (defmacro rep (&body body)
@@ -66,9 +75,17 @@
       nil))
 
 
-(defstruct (vec (:constructor vec (x y)))
+(defstruct (vec (:constructor -make-vec))
   (x nil :type double-float :read-only t)
   (y nil :type double-float :read-only t))
+
+
+(defun vec (x &optional y)
+  (declare (double-float x))
+  (if (not y)
+    (-make-vec :x x :y x)
+    (progn (check-type y double-float)
+           (-make-vec :x x :y y))))
 
 
 (defun zero ()
@@ -77,11 +94,6 @@
 
 (defun one ()
   (vec 1d0 1d0))
-
-
-(defun v (v)
-  (declare (double-float v))
-  (vec v v))
 
 
 (defun copy (v)
@@ -108,6 +120,7 @@
   (vec (vec-y v) (- (vec-x v))))
 
 
+; TODO: this is probably unexpected behaviour (returning list, not vec)
 (defun vround (v)
   (declare (vec v))
   (list (round (vec-x v))
@@ -116,8 +129,7 @@
 
 (defun vec* (xy)
   (declare (list xy))
-  (destructuring-bind (x y)
-    (math:dfloat* xy)
+  (destructuring-bind (x y) (math:dfloat* xy)
     (declare (double-float x y))
     (vec x y)))
 
@@ -328,14 +340,14 @@
   (loop for a in aa collect (dst a b)))
 
 
-(defun norm (a &key (s 1d0) (default (vec:v 0d0)))
+(defun norm (a &key (s 1d0) (default (vec:vec 0d0)))
   (declare (vec a))
   (declare (double-float s))
   (let ((l (len a)))
     (if (> l 0d0) (scale a (/ s l)) default)))
 
 
-(defun nsub (a b &key (s 1d0) (default (vec:v 0d0)))
+(defun nsub (a b &key (s 1d0) (default (vec:vec 0d0)))
   (declare (vec a b))
   (norm (sub a b) :s s :default default))
 
@@ -421,6 +433,17 @@
   (declare (list l))
   (destructuring-bind (a b) l
     (segx a b :parallel parallel)))
+
+
+; TODO: incomplete
+(defun lsegx* (lines line &key parallel)
+  (declare (list lines line))
+  (loop with res = (make-generic-array)
+        for l of-type list in lines
+        ; TODO: sort and rearrange
+        do (multiple-value-bind (x p q) (segx l line)
+             (when x (array-push (list x p q) res)))
+        finally (return res)))
 
 
 (defun cross (a b)

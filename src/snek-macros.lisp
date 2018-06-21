@@ -7,6 +7,7 @@
   all alterations created in this context will be flattened
   and applied to snk at the end of the context.
   "
+  (declare (symbol snk))
   (declare (type boolean collect))
   (declare (type boolean include-alts))
   (with-gensyms (sname zw aname rec x y resalts do-funcall finally)
@@ -46,6 +47,7 @@
   "
   creates a snek context. the zmap is constant inside this context.
   "
+  (declare (symbol snk))
   (with-gensyms (sname zw y)
     `(let ((,sname ,snk)
            (,zw ,zwidth))
@@ -55,6 +57,7 @@
 
 
 (defmacro with-verts-in-rad ((snk xy rad v) &body body)
+  (declare (symbol snk))
   (with-gensyms (sname)
     `(let ((,sname ,snk))
       (zmap:with-verts-in-rad ((snek-zmap ,sname) (snek-verts ,sname) ,xy ,rad ,v)
@@ -62,6 +65,7 @@
 
 
 (defmacro with-dx ((snk vv dx d) &body body)
+  (declare (symbol snk))
   (with-gensyms (sname)
     `(let ((,sname ,snk))
        (let* ((,dx (apply #'vec:isub (get-verts ,sname ,vv)))
@@ -77,6 +81,7 @@
   select a grp from a snek instance. the grp will be available
   in the context as g.
   "
+  (declare (symbol snk))
   (with-gensyms (grps exists gname sname)
     `(let ((,sname ,snk)
            (,gname ,g))
@@ -96,6 +101,7 @@
   if a grp is supplied it will select an edge from g, otherwise it will
   use the main grp.
   "
+  (declare (symbol snk))
   (with-gensyms (grp edges grph ln)
     `(with-grp (,snk ,grp ,g)
       (let ((,grph (grp-grph ,grp)))
@@ -113,6 +119,7 @@
   select an arbitrary vert from a snek instance. the vert will be
   available in the context as i.
   "
+  (declare (symbol snk))
   (with-gensyms (num)
     `(let ((,num (snek-num-verts ,snk)))
        (when (> ,num 0)
@@ -129,6 +136,7 @@
 
   if g is not provided, the main grp wil be used.
   "
+  (declare (symbol snk))
   (declare (type boolean collect))
   (with-gensyms (grp sname)
     `(let ((,sname ,snk))
@@ -142,6 +150,7 @@
   "
   iterates over all verts in prm p as i.
   "
+  (declare (symbol snk))
   (declare (type boolean collect))
   (with-gensyms (prm pr sname)
     `(let* ((,sname ,snk))
@@ -154,6 +163,7 @@
   "
   iterates over all verts in snk as i.
   "
+  (declare (symbol snk))
   (declare (type boolean collect))
   (with-gensyms (sname)
     `(let ((,sname ,snk))
@@ -167,6 +177,7 @@
 
   if g is not provided, the main grp will be used.
   "
+  (declare (symbol snk))
   (declare (type boolean collect))
   (with-gensyms (grp grph)
     `(with-grp (,snk ,grp ,g)
@@ -180,6 +191,7 @@
   "
   iterates over all grps of snk as g.
   "
+  (declare (symbol snk))
   (declare (type boolean collect))
   (with-gensyms (grps sname main*)
     `(let ((,sname ,snk)
@@ -194,6 +206,7 @@
   "
   iterates over all prms of snk as p.
   "
+  (declare (symbol snk))
   (declare (type boolean collect))
   (with-gensyms (prms sname)
     `(let ((,sname ,snk))

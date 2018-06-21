@@ -12,7 +12,7 @@
     (mapcar
       (lambda (g) (let ((mid (rnd:in-circ (* 0.5d0 (- size 200d0)) :xy xy)))
                     (snek:add-path! snk
-                                    (math:rep (p (math:linspace n 0 1 :end nil))
+                                    (math:rep (p (math:linspace n 0d0 1d0 :end nil))
                                       (vec:on-circ p 20d0 :xy mid))
                                     :g g
                                     :closed t)))
@@ -37,9 +37,7 @@
           (map 'list (lambda (w) (force? snk v w -0.05))
                      (snek:verts-in-rad snk (snek:get-vert snk v) 60.0d0))
           ;(snek:with-verts-in-rad (snk (snek:get-vert snk v) 60d0 w)
-          ;  (cons)
-
-          ;                        )
+          ;  (cons))
 
           )
         (snek:itr-grps (snk g)

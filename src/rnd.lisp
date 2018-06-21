@@ -143,8 +143,6 @@
 
 
 (defmacro with-rndspace ((n a b rn &key collect) &body body)
-  (declare (integer n))
-  (declare (double-float a b))
   (declare (symbol rn))
   (with-gensyms (a* b* d)
     `(destructuring-bind (,a* ,b*)

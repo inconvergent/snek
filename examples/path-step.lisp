@@ -18,8 +18,8 @@
         (points-b (close-path (rnd:nin-box 3 1500d0 1500d0 :xy (vec:vec 1000d0 1000d0))))
         (points-c (close-path (rnd:nin-box 3 1500d0 1500d0 :xy (vec:vec 1000d0 1000d0))))
         (sand (sandpaint:make size
-                              :fg (list 0 0 0 0.01)
-                              :bg (list 1 1 1 1.0))))
+                              :fg (color:black 0.01d0)
+                              :bg (color:white))))
 
     (let ((v1 (snek:add-vert! snk (vec:vec 0d0 0d0)))
           (v2 (snek:add-vert! snk (vec:vec 0d0 0d0)))

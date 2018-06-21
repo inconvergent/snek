@@ -25,7 +25,7 @@
 
 (defun circ-stroke (sand vv)
  (sandpaint:circ sand
-   (lin-path:pos* (lin-path:make vv) (math:linspace 10000 0 1 :end nil))
+   (lin-path:pos* (lin-path:make vv) (math:linspace 10000 0d0 1d0 :end nil))
    1 20))
 
 
@@ -72,7 +72,7 @@
 
       (snek:add-edge! snk (list v1 v2))
 
-      (loop for p in (math:linspace itt 0 1 :end nil) do
+      (loop for p in (math:linspace itt 0d0 1d0 :end nil) do
         (snek:with (snk)
           (mutate (mut)
             (list (snek:move-vert? v1 (lin-path:pos pa (funcall lsa noise)) :rel nil)

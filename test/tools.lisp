@@ -43,7 +43,7 @@
              (math:path-tangents (list (vec:vec 1.0d0 2.0d0)
                                        (vec:vec 1.0d0 2.0d0)
                                        (vec:vec 0.5d0 4.322d0))))
-           (list (vec:v 0d0)
+           (list (vec:vec 0d0)
                  (vec:vec -0.21050655592417808d0 0.977592445711883d0)))
 
   (do-test (math:inc 0.1 0.4)
@@ -52,16 +52,16 @@
   (do-test (math:inc 0.1 -0.4)
            0.7)
 
-  (do-test (math:linspace 1 0 10)
+  (do-test (math:linspace 1 0d0 10d0)
            (list 0.0))
 
-  (do-test (math:linspace 3 0 10)
+  (do-test (math:linspace 3 0d0 10d0)
            (list 0.0 5.0 10.0))
 
-  (do-test (math:linspace 2 0 10 :end nil)
+  (do-test (math:linspace 2 0d0 10d0 :end nil)
            (list 0.0 5.0))
 
-  (do-test (math:linspace 2 0 10 :end t)
+  (do-test (math:linspace 2 0d0 10d0 :end t)
            (list 0.0 10.0))
 
   (do-test (math:range 2 5)
@@ -72,7 +72,7 @@
 
   (do-test
     (let ((a (list)))
-      (math:with-linspace (10 0 7 v)
+      (math:with-linspace (10 0d0 7d0 v)
         (setf a (append a (list v))))
       a)
    '(0.0d0 0.7777777777777778d0 1.5555555555555556d0 2.3333333333333335d0
@@ -81,7 +81,7 @@
 
   (do-test
     (let ((a (list)))
-      (math:with-linspace (10 0 7 v :end nil)
+      (math:with-linspace (10 0d0 7d0 v :end nil)
         (setf a (append a (list v))))
       a)
    '(0.0d0 0.7d0 1.4d0 2.0999999999999996d0 2.8d0 3.5d0 4.199999999999999d0
@@ -209,7 +209,7 @@
                    (vec:vec 0.3d0 3.0d0)
                    (vec:vec 10.1d0 25.0d0))))
     (do-test
-      (bzspl:pos* (bzspl:make pts-c) (math:linspace 5 0 1))
+      (bzspl:pos* (bzspl:make pts-c) (math:linspace 5 0d0 1d0))
       (list (vec:vec -32.0d0 79.0d0)
             (vec:vec -17.25625d0 47.125d0)
             (vec:vec -5.325000000000003d0 27.5d0)
@@ -217,15 +217,15 @@
             (vec:vec 10.099999999999994d0 25.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-c :closed t) (math:linspace 5 0 1))
+      (bzspl:pos* (bzspl:make pts-c :closed t) (math:linspace 5 0d0 1d0))
       (list (vec:vec -15.85d0 41.0d0)
-        (vec:vec  2.0468749999999982d0 11.5625d0)
-        (vec:vec 3.612499999999999d0 29.0d0)
-        (vec:vec -19.150000000000002d0 61.4375d0)
-        (vec:vec -15.850000000000001d0 41.0d0)))
+            (vec:vec  2.0468749999999982d0 11.5625d0)
+            (vec:vec 3.612499999999999d0 29.0d0)
+            (vec:vec -19.150000000000002d0 61.4375d0)
+            (vec:vec -15.850000000000001d0 41.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-a) (math:linspace 10 0 1))
+      (bzspl:pos* (bzspl:make pts-a) (math:linspace 10 0d0 1d0))
       (list (vec:vec -20.0d0 99.0d0)
             (vec:vec -11.851851851851851d0 60.75308641975309d0)
             (vec:vec -5.185185185185184d0 33.12345679012347d0)
@@ -233,12 +233,12 @@
             (vec:vec 3.703703703703706d0 9.716049382716065d0)
             (vec:vec 7.160493827160495d0 13.481481481481485d0)
             (vec:vec 17.77777777777777d0 24.666666666666664d0)
-            (vec:vec 36.79012345679013d0 42.814814814814824d0)
+            (vec:vec 36.7901234567901d0 42.814814814814795d0)
             (vec:vec 64.19753086419752d0 67.92592592592591d0)
             (vec:vec 100.0d0 100.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-b) (math:linspace 10 0 1))
+      (bzspl:pos* (bzspl:make pts-b) (math:linspace 10 0d0 1d0))
       (list (vec:vec -20.0d0 99.0d0)
             (vec:vec -5.185185185185184d0 33.12345679012347d0)
             (vec:vec 3.703703703703706d0 9.716049382716065d0)
@@ -246,12 +246,12 @@
             (vec:vec 36.9753086419753d0 43.728395061728385d0)
             (vec:vec 70.23456790123457d0 72.91358024691358d0)
             (vec:vec 72.11111111111111d0 69.55555555555556d0)
-            (vec:vec 37.72839506172839d0 29.481481481481474d0)
+            (vec:vec 37.728395061728435d0 29.48148148148152d0)
             (vec:vec 8.098765432098773d0 1.0370370370370452d0)
             (vec:vec 0.0d0 4.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-a :closed t) (math:linspace 10 0 1))
+      (bzspl:pos* (bzspl:make pts-a :closed t) (math:linspace 10 0d0 1d0))
       (list (vec:vec -10.0d0 50.0d0)
             (vec:vec -2.098765432098765d0 18.000000000000007d0)
             (vec:vec 3.8271604938271615d0 9.111111111111121d0)
@@ -259,12 +259,12 @@
             (vec:vec 36.9753086419753d0 43.728395061728385d0)
             (vec:vec 69.81481481481481d0 75.77777777777779d0)
             (vec:vec 68.33333333333334d0 95.33333333333331d0)
-            (vec:vec 27.53086419753086d0 98.79012345679011d0)
+            (vec:vec 27.530864197530907d0 98.79012345679013d0)
             (vec:vec -5.061728395061721d0 83.97530864197532d0)
             (vec:vec -10.0d0 50.0d0)))
 
     (do-test
-      (bzspl:pos* (bzspl:make pts-b :closed t) (math:linspace 10 0 1))
+      (bzspl:pos* (bzspl:make pts-b :closed t) (math:linspace 10 0d0 1d0))
       (list (vec:vec -10.0d0 50.0d0)
             (vec:vec 1.1111111111111098d0 10.666666666666671d0)
             (vec:vec 12.777777777777777d0 20.22222222222222d0)
@@ -272,7 +272,7 @@
             (vec:vec 72.11111111111111d0 69.55555555555554d0)
             (vec:vec 20.055555555555543d0 10.16666666666666d0)
             (vec:vec -1.5d0 -6.5d0)
-            (vec:vec -4.611111111111115d0 23.944444444444468d0)
+            (vec:vec -4.611111111111106d0 23.94444444444442d0)
             (vec:vec -14.444444444444446d0 72.44444444444446d0)
             (vec:vec -10.0d0 50.0d0)))
 

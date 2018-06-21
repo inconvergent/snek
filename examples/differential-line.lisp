@@ -11,7 +11,7 @@
   (let ((snk (snek:make :max-verts 5000000)))
 
     (snek:add-path! snk
-                    (math:rep (p (math:linspace n 0 1 :end nil))
+                    (math:rep (p (math:linspace n 0d0 1d0 :end nil))
                               (vec:on-circ p 20d0 :xy xy))
                     :closed t)
     snk))
@@ -40,9 +40,8 @@
                          (snek:with-dx (snk (list v w) dx d)
                            (let ((ndx (vec:iscale dx d))
                                  (s (* (- 1.0d0 (/ d farl)) stp)))
-                             (list
-                               (snek:move-vert? v (vec:scale ndx (* -1 s)))
-                               (snek:move-vert? w (vec:scale ndx s)))))))
+                             (list (snek:move-vert? v (vec:scale ndx (* -1 s)))
+                                   (snek:move-vert? w (vec:scale ndx s)))))))
                      (with-timer ("in-rad")
                        (snek:verts-in-rad snk (snek:get-vert snk v) farl))))
         (snek:itr-edges (snk e)

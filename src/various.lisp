@@ -5,14 +5,6 @@
 (defvar PI5 (* PI 0.5d0))
 
 
-(defmacro square-loop ((x y n) &body body)
-  (with-gensyms (n*)
-    `(let ((,n* ,n))
-      (loop for ,x of-type integer from 0 below ,n* do
-        (loop for ,y of-type integer from 0 below ,n* do
-          ,@body)))))
-
-
 ;http://cl-cookbook.sourceforge.net/os.html
 (defun cmd-args ()
   (or #+SBCL *posix-argv*

@@ -40,12 +40,11 @@
                  50))
 
              (count-control (v)
-               (multiple-value-bind (c exists)
-                 (gethash v curr)
-                 (if exists
-                   (if (> c 20)
-                       (print (remhash v curr))
-                       (incf (gethash v curr))))))
+               (multiple-value-bind (c exists) (gethash v curr)
+                 (when exists
+                       (if (> c 20)
+                           (print (remhash v curr))
+                           (incf (gethash v curr))))))
 
              (do-append-edge-alt* (snk a)
                (let ((v (snek::append-edge-alt-v a)))

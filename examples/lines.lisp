@@ -16,7 +16,7 @@
                               :fg (color:black 0.01)
                               :bg (color:white))))
 
-    (loop for i in (math:linspace repeat 100 900)
+    (loop for i in (math:linspace repeat 100d0 900d0)
           for j from 1 to repeat do
       (print-every j 2)
       (let ((snk (snek:make))
@@ -25,7 +25,7 @@
             (p1 (vec:vec 100d0 i))
             (p2 (vec:vec 900d0 i)))
 
-        (loop for s in (math:linspace itt 0.0 1.0) do
+        (loop for s in (math:linspace itt 0d0 1d0) do
           (let ((v1 (snek:add-vert! snk (vec:on-line s p1 p2)))
                 (v2 (snek:add-vert! snk (vec:add va (vec:on-line s p1 p2)))))
 

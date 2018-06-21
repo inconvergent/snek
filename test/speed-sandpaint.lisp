@@ -16,15 +16,15 @@
   (format t "strokes:~%")
   (time
     (sandpaint:strokes sand
-      (math:nrep num (list (rnd:in-box 500d0 500d0 :xy (vec:v 500d0))
-                           (rnd:in-box 500d0 500d0 :xy (vec:v 500d0))))
+      (math:nrep num (list (rnd:in-box 500d0 500d0 :xy (vec:vec 500d0))
+                           (rnd:in-box 500d0 500d0 :xy (vec:vec 500d0))))
      grains))
 
   (format t "pix:~%")
   (time
     (loop repeat 100 do
       (sandpaint:pix sand
-        (math:nrep pix-num (rnd:in-box 500d0 500d0 :xy (vec:v 500d0))))))))
+        (math:nrep pix-num (rnd:in-box 500d0 500d0 :xy (vec:vec 500d0))))))))
 
 ;(require :sb-sprof)
 ;(sb-sprof:with-profiling (:max-samples 200000

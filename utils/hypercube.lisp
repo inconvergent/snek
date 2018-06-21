@@ -80,13 +80,13 @@
 
 (defun tris (psvg proj n abc)
   (destructuring-bind (a b c) abc
-    (loop for s in (math:linspace n 0 1) do
+    (loop for s in (math:linspace n 0d0 1d0) do
       (plot-svg:path psvg (list (vec:on-line s (funcall proj a)  (funcall proj b))
                                 (vec:on-line s (funcall proj a)  (funcall proj c)))))))
 
 (defun quads (psvg proj n abcd)
   (destructuring-bind (a b c d) abcd
-    (loop for s in (math:linspace n 0 1) do
+    (loop for s in (math:linspace n 0d0 1d0) do
       (plot-svg:path psvg (list (vec:on-line s (funcall proj a)  (funcall proj b))
                                 (vec:on-line s (funcall proj c)  (funcall proj d)))))))
 

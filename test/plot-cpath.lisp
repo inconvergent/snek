@@ -62,7 +62,7 @@
                               :rep-scale 0.5d0)))
     (let (( res (make-generic-array) ))
 
-      (loop for a in (math:linspace 15 0 (* 2d0 PI))
+      (loop for a in (math:linspace 15 0d0 (* 2d0 PI))
             and x in (math:linspace 15 60d0 940d0) do
         (array-push (list nil (make-box (vec:vec x 100d0) 10d0 a)) res)
         (array-push (list nil (make-box* (vec:vec x 200d0) 10d0 a)) res)

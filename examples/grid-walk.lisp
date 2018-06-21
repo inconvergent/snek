@@ -74,8 +74,7 @@
         ;  2.0
         ;  1)
         (sandpaint:stroke sand
-          (loop for w in walkers collect
-            (funcall w noise))
+          (loop for w in walkers collect (funcall w noise))
           grains)))
 
     (sandpaint:save sand fn :gamma 2.2)))

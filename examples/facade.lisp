@@ -8,8 +8,7 @@
 
 
 (defun mpath (lines p)
-  (mapcar (lambda (l)
-            (lin-path:pos (lin-path:make l) p))
+  (mapcar (lambda (l) (lin-path:pos (lin-path:make l) p))
           lines))
 
 
@@ -28,21 +27,19 @@
         (sand (sandpaint:make size
                               :fg (color:white 0.05)
                               :bg (color:dark))))
-          (let ((lines (get-lines -500d0 1500d0 40)))
+    (let ((lines (get-lines -500d0 1500d0 40)))
 
-            (loop
-              for u in (rnd:rndspace nlines 0d0 1d0)
-              do
-                (let ((pa (lin-path:make (mpath lines u)))
-                      (pb (lin-path:make (mpath lines (+ (rnd:rnd* 0.05d0) u)))))
-                  (let ((r1 (rnd:rnd))
-                        (r2 (rnd:rnd)))
-                    ;(sandpaint:lin-path sand (lin-path:pos* pa (math:linspace 100 r1 r2)) 1.0 20)
-                    ;(sandpaint:lin-path sand (lin-path:pos* pb (math:linspace 100 r1 r2)) 1.0 20)
-                    (rnd:with-rndspace (nsteps r1 r2 v)
-                      (sandpaint:stroke sand
-                        (list (lin-path:pos pa v) (lin-path:pos pb v))
-                        grains))))))
+      (loop for u in (rnd:rndspace nlines 0d0 1d0) do
+        (let ((pa (lin-path:make (mpath lines u)))
+              (pb (lin-path:make (mpath lines (+ (rnd:rnd* 0.05d0) u)))))
+          (let ((r1 (rnd:rnd))
+                (r2 (rnd:rnd)))
+            ;(sandpaint:lin-path sand (lin-path:pos* pa (math:linspace 100 r1 r2)) 1.0 20)
+            ;(sandpaint:lin-path sand (lin-path:pos* pb (math:linspace 100 r1 r2)) 1.0 20)
+            (rnd:with-rndspace (nsteps r1 r2 v)
+              (sandpaint:stroke sand
+                (list (lin-path:pos pa v) (lin-path:pos pb v))
+                grains))))))
 
     (sandpaint:save sand fn)))
 

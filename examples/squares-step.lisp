@@ -18,7 +18,7 @@
 
     (loop for x in (math:linspace rep 200d0 800d0) for i from 0 do
       (loop for y in (math:linspace rep 200d0 800d0) for j from 0 do
-        (let ((g (snek:add-grp! snk :type 'path :closed t)))
+        (let ((g (snek:add-grp! snk :type 'path)))
           (snek:add-polygon! snk 4 rad
                              :xy (vec:vec x y)
                              :g g))))
@@ -42,8 +42,7 @@
         ;      (snek:move-vert? v (rnd:in-circ 0.3d0) :rel t))))
 
         (snek:itr-grps (snk g :collect nil)
-          (destructuring-bind (path lina linb ns)
-            (gethash g grp-states)
+          (destructuring-bind (path lina linb ns) (gethash g grp-states)
             ;(lin-path:move path (get-grp-vert-vals snk :g g) :rel nil) ;closed must be set in constr.
             (sandpaint:stroke sand
               (lin-path:pos* path (list (funcall linb ns)

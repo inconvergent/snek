@@ -188,6 +188,11 @@
                  :sw sw :stroke stroke)))
 
 
+(defun bzspl (msvg pts &key sw (stroke "black") closed (dens 1d0))
+  (declare (plot-tile-svg msvg))
+  (path msvg (bzspl:adaptive-pos (bzspl:make pts :closed closed) :dens dens)))
+
+
 (defun save (msvg fn)
   (declare (plot-tile-svg msvg))
   (with-struct (plot-tile-svg- papers overview grid) msvg

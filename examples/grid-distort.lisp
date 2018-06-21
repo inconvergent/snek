@@ -19,8 +19,8 @@
          (grid (get-grid size 50d0 ngrid))
          (state-gen (get-walker-state-gen (lambda () (rnd:get-acc-circ-stp*))))
          (sand (sandpaint:make size
-                               :fg (color:white 0.05)
-                               :bg (color:dark))))
+                 :fg (color:white 0.05)
+                 :bg (color:dark))))
 
     (snek:add-verts! snk (flatten grid))
 

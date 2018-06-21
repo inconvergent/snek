@@ -13,7 +13,7 @@
                           (vec:arr-get velocities (1- i))))))
 
 
-(defun make-lattice (a b n)
+(defun make-lattice (n a b)
   (apply #'append
          (loop for x in (math:linspace n a b)
                collect (loop for y in (math:linspace n a b)
@@ -26,13 +26,12 @@
         (verts nil)
         (grains 4)
         (velocities (make-dfloat-array 100))
-        (lattice (make-lattice 100 900 50))
+        (lattice (make-lattice 50 100d0 900d0))
         (noise 1.5d0)
         (itt 8000)
-        (mut (snek:make-mutate))
         (sand (sandpaint:make size
-                 :fg (color:black 0.08)
-                 :bg (color:white))))
+                :fg (color:black 0.08)
+                :bg (color:white))))
 
     (setf verts (loop for i from 1 to 100
                       collect (snek:add-vert! snk (rnd:rndget lattice))))
@@ -44,10 +43,10 @@
         (if (< (vec:dst (snek:get-vert snk p1) (snek:get-vert snk p2)) 100.0)
           (progn (sum-alter-velocity velocities noise 100)
                  (snek:with (snk)
-                   (snek:mutate (mut)
-                     (snek:join-verts? p1 p2)
-                     (snek:itr-verts (snk v)
-                       (snek:move-vert? v (vec:arr-get velocities v))))))))
+                   ; TODO mutate was used here. implement later.
+                   (snek:join-verts? p1 p2)
+                   (snek:itr-verts (snk v)
+                     (snek:move-vert? v (vec:arr-get velocities v)))))))
 
         (snek:draw-edges snk sand grains))
 

@@ -83,6 +83,7 @@
 
 
 (defmacro with-linspace ((n a b rn &key (end t) collect) &body body)
+  (declare (symbol rn))
   (with-gensyms (a* b* n* nn i ba)
   `(let* ((,n* (int ,n))
           (,nn (dfloat (if ,end (1- ,n*) ,n*)))
@@ -96,10 +97,9 @@
 
 
 (defun linspace (n a b &key (end t))
-  ; TODO
-  ; (declare (double-float a b))
-  ; (declare (integer n))
-  ; (declare (boolean end))
+  (declare (integer n))
+  (declare (double-float a b))
+  (declare (boolean end))
   (if (> n 1)
     (let ((nn (if end (1- n) n)))
       (loop for i from 0 below n
@@ -213,7 +213,7 @@
 
 ; PATHS
 
-(defun path-tangents (aa &key closed (default (vec:v 0d0))
+(defun path-tangents (aa &key closed (default (vec:vec 0d0))
                          &aux (aa* (if (equal (type-of aa) 'cons)
                                        (make-generic-array :init aa :type 'vec)
                                        aa)))

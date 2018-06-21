@@ -46,7 +46,7 @@
   (let ((state-gen (get-walker-state-gen (lambda () (rnd:get-acc-circ-stp*))))
         (grains 15)
         (drift (vec:scale (vec:sin-cos -0.1d0) 0.009d0)))
-    (loop for p in (math:linspace 500 0 1)
+    (loop for p in (math:linspace 500 0d0 1d0)
           and i from 0 do
       (snek:with (snk)
         (snek:itr-all-verts (snk v)
@@ -81,9 +81,8 @@
          (let* ((samples (funcall bbox-fxn 1000))
                 (mid (vec:lmid samples))
                 (area (apply #'max (mapcar (lambda (a) (vec:dst a mid)) samples))))
-           (if (< area 30d0)
-             (list area 4 1)
-             (list area 7 1))))
+           (if (< area 30d0) (list area 4 1)
+                             (list area 7 1))))
 
        (sort-centroids-fxn ()
          (let ((f (if (< (rnd:rnd)) #'< #'>))
@@ -92,9 +91,8 @@
              (let ((res (sort (loop for c in centroids collect
                           (list (+ rot (apply #'atan (reverse (vec:tolist c)))) c))
                           f :key #'first)))
-               (if (< (rnd:rnd) 0.6)
-                 (swap res)
-                 res))))))
+               (if (< (rnd:rnd) 0.6) (swap res)
+                                     res))))))
 
       (let ((alphabet (show-alphabet (get-alphabet *alphabet*
                         :get-bbox-fxn #'get-bbox-fxn
