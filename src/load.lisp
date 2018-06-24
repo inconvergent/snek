@@ -13,7 +13,7 @@
 
 (asdf:defsystem "snek"
   :description "A System for Making Generative Systems"
-  :version "2.23.0"
+  :version "2.24.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t
@@ -21,13 +21,14 @@
   :components ((:file "pg-utils")
                (:file "various")
                (:file "packages")
+               (:file "rnd")
                (:file "state")
                (:file "vec")
                (:file "math")
                (:file "color")
                (:file "hset")
+               (:file "rnd-extra")
                (:file "graph")
-               (:file "rnd")
                (:file "bzspline")
                (:file "linear-path")
                (:file "sandpaint")
@@ -42,4 +43,7 @@
                (:file "snek-extra")))
 
 (asdf:load-system "snek")
+
+(setf *random-state* (make-random-state t))
+(setf *print-pretty* t)
 

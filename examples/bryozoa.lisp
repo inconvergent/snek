@@ -3,8 +3,6 @@
 (load "../src/load")
 (load "../utils/state")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
 
 
 (defun roll-once (aa)

@@ -43,7 +43,7 @@
 (defmacro nrep (n &body body)
   (with-gensyms (i nname)
     `(let ((,nname ,n))
-      (loop for ,i of-type integer from 1 to ,nname collect (progn ,@body)))))
+      (loop repeat ,nname collect (progn ,@body)))))
 
 
 (defun range (a &optional (b nil))
@@ -383,9 +383,9 @@
             (vec:segx curr (aref lines j))
             (if x (array-push s ss))))
 
-        (setf ss (sort ss (if (< (random 1d0) 0.5d0) #'< #'>)))
+        (setf ss (sort ss (if (< (rnd:rnd) 0.5d0) #'< #'>)))
 
-        (loop for k from (random 2) below (1- (length ss)) by 2 do
+        (loop for k from (rnd:rndi 2) below (1- (length ss)) by 2 do
           (array-push (list (vec:on-line* (aref ss k) curr)
                             (vec:on-line* (aref ss (1+ k)) curr))
                       res))))

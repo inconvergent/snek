@@ -4,9 +4,6 @@
 (load "../utils/state")
 
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
-
 
 (defun test-centroids (counts nc ncn)
   (reduce (lambda (x y) (and x y))

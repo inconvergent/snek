@@ -109,7 +109,7 @@
                (,ln (length ,edges)))
           (declare (integer ,ln))
           (when (> ,ln 0)
-            (let ((,i (aref ,edges (random ,ln))))
+            (let ((,i (aref ,edges (rnd:rndi ,ln))))
               (declare (list ,i))
               (list ,@body))))))))
 
@@ -123,7 +123,7 @@
   (with-gensyms (num)
     `(let ((,num (snek-num-verts ,snk)))
        (when (> ,num 0)
-         (let ((,i (random ,num)))
+         (let ((,i (rnd:rndi ,num)))
            (declare (integer ,i))
            (list ,@body))))))
 

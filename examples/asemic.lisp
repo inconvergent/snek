@@ -3,8 +3,6 @@
 (load "../src/load")
 (load "../utils/state")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
 
 
 (defun init-line (sxy width line-chars char-num char-rad)

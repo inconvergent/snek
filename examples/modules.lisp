@@ -2,8 +2,6 @@
 
 (load "../src/load")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
 
 (defun run-join (snk)
   (snek:with (snk :zwidth 100.0d0)

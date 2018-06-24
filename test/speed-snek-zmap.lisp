@@ -3,7 +3,7 @@
 (load "../src/load")
 
 (setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
+(rnd:set-rnd-state 1)
 
 
 (defun init-snek (n mid)

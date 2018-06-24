@@ -4,8 +4,7 @@
 (load "../utils/state")
 (load "../utils/grid")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
+
 
 (defun up-down (p n)
   (if (< (rnd:rnd) p)

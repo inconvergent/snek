@@ -6,8 +6,6 @@
 (load "../utils/spline-script")
 (load "../utils/state")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
 
 (defvar *alphabet* "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,?-—:'")
 

@@ -3,6 +3,7 @@
 (load "../src/load")
 
 (setf *print-pretty* t)
+(rnd:set-rnd-state 1)
 
 
 (defun make-line (xy s &optional a)

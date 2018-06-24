@@ -3,8 +3,6 @@
 (load "../src/load")
 (load "../utils/time")
 
-(setf *print-pretty* t)
-;(setf *random-state* (make-random-state t))
 
 
 (defun init-snek (n size xy)

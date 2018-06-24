@@ -2,9 +2,6 @@
 
 (load "../src/load")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
-
 
 
 (defun get-make-chr (vert-num* char-rad scale)

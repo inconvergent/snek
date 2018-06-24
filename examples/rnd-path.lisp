@@ -3,8 +3,6 @@
 (load "../src/load")
 (load "../utils/snek-alterations-mutate")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
 
 
 (defmacro mutate ((mutate) &body body)

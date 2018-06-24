@@ -4,7 +4,7 @@
 (load "../utils/test")
 
 (setf *print-pretty* t)
-;(setf *random-state* (make-random-state t))
+(rnd:set-rnd-state 1)
 
 
 (defun test-snek (snk)
@@ -387,7 +387,7 @@
     (do-test
       (snek:itr-edges (snk e)
         e)
-      '(((1 2)) ((1 3)) ((0 1)) ((3 7)) ((5 6)) ((6 11))))
+      '(((1 2)) ((1 3)) ((0 1)) ((3 7)) ((5 6)) ((5 11))))
 
     (do-test
       (sort (flatten (snek:itr-edges (snk e) (snek:edge-length snk e))) #'<)

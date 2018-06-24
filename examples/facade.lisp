@@ -2,9 +2,6 @@
 
 (load "../src/load")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
-
 
 
 (defun mpath (lines p)

@@ -153,6 +153,7 @@
     :get-lin-stp*
     :in-box
     :in-circ
+    :make-rnd-state
     :nin-box
     :nin-circ
     :non-circ
@@ -180,6 +181,7 @@
     :rndi*
     :rndspace
     :rndspacei
+    :set-rnd-state
     :with-in-circ
     :with-on-line
     :with-prob

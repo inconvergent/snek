@@ -4,8 +4,6 @@
 (load "../utils/state")
 (load "../utils/grid")
 
-(setf *print-pretty* t)
-(setf *random-state* (make-random-state t))
 
 
 (defun place-grid (snk small large mid)
