@@ -83,14 +83,13 @@
   (rgba nil :type color:rgba :read-only nil))
 
 
-; TODO: with-in-circ
 (defun -draw-circ (vals size xy rad grains rgba)
   (declare (integer grains))
   (declare (double-float rad))
   (declare (color:rgba rgba))
   (declare (type (array double-float) vals))
-  (loop repeat grains do
-    (vec:inside* (size (vec:add xy (rnd:in-circ rad)) x y)
+  (rnd:with-in-circ (grains rad p :xy xy)
+    (vec:inside* (size p x y)
       (-operator-over vals x y rgba))))
 
 
@@ -260,17 +259,15 @@
       (-draw-dens-stroke vals size dens u v rgba))))
 
 
-; TODO: this is slow
 (defun lin-path (sand path rad grains &key (dens 1d0))
   (declare (double-float rad dens))
   (declare (integer grains))
   (with-struct (sandpaint- size vals rgba) sand
     (declare (type (array double-float) vals))
-    (loop for u of-type vec:vec in path and w of-type vec:vec in (cdr path) do
-      (let ((stps (math:int (+ 1 (* dens (vec:dst u w))))))
-        (declare (integer stps))
-        (math:rep (p (math:linspace stps 0d0 1d0 :end nil))
-          (-draw-circ vals size (vec:on-line p u w) rad grains rgba))))))
+    (loop for u of-type vec:vec in path
+          and w of-type vec:vec in (cdr path)
+          do (math:with-linspace ((* (vec:dst u w) dens) 0d0 1d0 p :end nil)
+               (-draw-circ vals size (vec:on-line p u w) rad grains rgba)))))
 
 
 ; TODO: 16 bit?
@@ -278,12 +275,10 @@
                      &aux (gamma* (math:dfloat gamma)))
   (with-struct (sandpaint- size vals) sand
     (declare (type (array double-float) vals))
-    (let ((png (make-instance
-                 'zpng::pixel-streamed-png
-                 :color-type :truecolor-alpha
-                 :width size
-                 :height size)))
-
+    (let ((png (make-instance 'zpng::pixel-streamed-png
+                              :color-type :truecolor-alpha
+                              :width size
+                              :height size)))
       (with-open-file
         (stream (ensure-filename fn ".png")
           :direction :output

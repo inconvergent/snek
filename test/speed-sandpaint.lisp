@@ -24,15 +24,17 @@
   (time
     (loop repeat 100 do
       (sandpaint:pix sand
-        (math:nrep pix-num (rnd:in-box 500d0 500d0 :xy (vec:vec 500d0))))))))
+        (math:nrep pix-num (rnd:in-box 500d0 500d0 :xy (vec:vec 500d0))))))
 
-;(require :sb-sprof)
-;(sb-sprof:with-profiling (:max-samples 200000
-;                         :mode :cpu
-;                         ;:mode :alloc
-;                         ;:mode :time
-;                         :report :graph)
-; (main))
+  ))
 
-(main)
+(require :sb-sprof)
+(sb-sprof:with-profiling (:max-samples 200000
+                         :mode :cpu
+                         ;:mode :alloc
+                         ;:mode :time
+                         :report :graph)
+ (main))
+
+;(main)
 

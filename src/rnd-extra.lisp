@@ -4,11 +4,12 @@
 
 (defmacro with-in-circ ((n rad v &key xy) &body body)
   (declare (symbol v))
-  (with-gensyms (rad* xy*)
-    `(let ((,rad* ,rad)
-           (,xy* ,xy))
+  (with-gensyms (rad* xy* m)
+    `(let* ((,rad* ,rad)
+            (,xy* ,xy)
+            (,m (if ,xy* ,xy* (vec:zero))))
       (loop repeat ,n
-            do (let ((,v (in-circ ,rad* :xy ,xy*)))
+            do (let ((,v (in-circ ,rad* :xy ,m)))
                  (progn ,@body))))))
 
 
@@ -18,7 +19,7 @@
     `(let* ((,a* ,a)
             (,sub (vec:sub ,b ,a*)))
       (loop repeat ,n
-            do (let ((,rn (vec:add ,a* (vec:scale ,sub (random 1d0)))))
+            do (let ((,rn  (vec:add-scaled ,a* ,sub (random 1d0))))
                  (progn ,@body))))))
 
 
@@ -65,15 +66,13 @@
   (loop repeat n collect (on-circ rad :xy xy)))
 
 
-(defun in-circ (rad &key xy)
+(defun in-circ (rad &key (xy (vec:zero)))
   (declare (double-float rad))
-  (-add-if
-    (let ((a (random 1d0))
-          (b (random 1d0)))
-      (declare (double-float a b))
-      (if (< a b) (vec:scale (vec:cos-sin (* PII (/ a b))) (* b rad))
-                  (vec:scale (vec:cos-sin (* PII (/ b a))) (* a rad))))
-    xy))
+  (let ((a (random 1d0))
+        (b (random 1d0)))
+    (declare (double-float a b))
+    (if (< a b) (vec:add-scaled xy (vec:cos-sin (* PII (/ a b))) (* b rad))
+                (vec:add-scaled xy (vec:cos-sin (* PII (/ b a))) (* a rad)))))
 
 
 (defun nin-circ (n rad &key xy)
@@ -95,7 +94,7 @@
 
 (defun on-line (a b)
   (declare (vec:vec a b))
-  (vec:add a (vec:scale (vec:sub b a) (random 1d0))))
+  (vec:add-scaled a (vec:sub b a) (random 1d0)))
 
 
 (defun on-line* (ab)

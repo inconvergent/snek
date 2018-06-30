@@ -3,6 +3,7 @@
   (:use :common-lisp)
   (:export
     :add
+    :add-scaled
     :all-inside
     :angle
     :arr-get

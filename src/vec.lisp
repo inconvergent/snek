@@ -6,10 +6,12 @@
   (declare (symbol x y))
   (with-gensyms (sname)
     `(let ((,sname ,size))
-      (destructuring-bind (,x ,y) (vround ,xy)
-        (if (and (>= ,x 0) (< ,x ,sname)
-                 (>= ,y 0) (< ,y ,sname))
-            (progn ,@body))))))
+      (declare (integer ,sname))
+      (multiple-value-bind (,x ,y) (vround* ,xy)
+        (declare (integer ,x ,y))
+        (when (and (>= ,x 0) (< ,x ,sname)
+                   (>= ,y 0) (< ,y ,sname))
+              (progn ,@body))))))
 
 
 (defmacro inside ((size xy x y) &body body)
@@ -82,10 +84,8 @@
 
 (defun vec (x &optional y)
   (declare (double-float x))
-  (if (not y)
-    (-make-vec :x x :y x)
-    (progn (check-type y double-float)
-           (-make-vec :x x :y y))))
+  (if y (-make-vec :x x :y y)
+        (-make-vec :x x :y x)))
 
 
 (defun zero ()
@@ -123,8 +123,12 @@
 ; TODO: this is probably unexpected behaviour (returning list, not vec)
 (defun vround (v)
   (declare (vec v))
-  (list (round (vec-x v))
-        (round (vec-y v))))
+  (list (round (vec-x v)) (round (vec-y v))))
+
+
+(defun vround* (v)
+  (declare (vec v))
+  (values (round (vec-x v)) (round (vec-y v))))
 
 
 (defun vec* (xy)
@@ -165,6 +169,13 @@
   (declare (vec v))
   (with-xy ((norm v) x y)
     (atan y x)))
+
+
+(defun add-scaled (a b s)
+  (declare (double-float s))
+  (declare (vec:vec a b))
+  (vec:vec (+ (vec-x a) (* s (vec-x b)))
+           (+ (vec-y a) (* s (vec-y b)))))
 
 
 (defun scale (a s)
@@ -465,13 +476,13 @@
 (defun on-circ (p rad &key (xy (zero)))
   (declare (double-float p rad))
   (declare (vec xy))
-  (add xy (scale (cos-sin (* p PII)) rad)))
+  (add-scaled xy (cos-sin (* p PII)) rad))
 
 
 (defun on-line (p a b)
   (declare (double-float p))
   (declare (vec a b))
-  (add a (scale (sub b a) p)))
+  (add-scaled a (sub b a) p))
 
 
 (defun on-line* (p ab)
@@ -485,7 +496,7 @@
   (declare (double-float p rad rot))
   (declare (vec xy))
   (add xy (scale (cos-sin (+ rot (* p PII)))
-                     (* p rad))))
+                 (* p rad))))
 
 
 (defun rect (w h &key (xy (zero)))
