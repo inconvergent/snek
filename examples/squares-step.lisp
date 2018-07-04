@@ -2,20 +2,22 @@
 
 (load "../src/load")
 
+(rnd:set-rnd-state 1)
+
 
 (defun main (size fn)
-  (let ((grains 60)
-        (itt 10000)
+  (let ((grains 220)
+        (itt 20000)
         (noise 0.0000018d0)
         (rep 5)
-        (rad 98d0)
+        (rad 185d0)
         (snk (snek:make))
         (sand (sandpaint:make size
-                              :fg (color:white 0.005)
-                              :bg (color:gray 0.1d0))))
+                :fg (color:white 0.005)
+                :bg (color:gray 0.1d0))))
 
-    (loop for x in (math:linspace rep 200d0 800d0) for i from 0 do
-      (loop for y in (math:linspace rep 200d0 800d0) for j from 0 do
+    (loop for x in (math:linspace rep 200d0 1800d0) for i from 0 do
+      (loop for y in (math:linspace rep 200d0 1800d0) for j from 0 do
         (let ((g (snek:add-grp! snk :type 'path)))
           (snek:add-polygon! snk 4 rad
                              :xy (vec:vec x y)
@@ -30,6 +32,8 @@
                     (rnd:get-acc-lin-stp* (rnd:rnd))
                     (rnd:get-acc-lin-stp* (rnd:rnd))
                     noise)))
+
+      ;(sandpaint:stroke sand (list (vec:vec 100d0) (vec:vec 900d0 100d0) ) 100000)
 
       (loop for i from 0 to itt do
         (print-every i 1000)
@@ -47,10 +51,10 @@
                                         (funcall lina ns)))
               grains)))))
 
-    (sandpaint:chromatic-aberration sand (vec:vec 500d0 500d0) :s 500d0 :noise 2d0)
+    (sandpaint:chromatic-aberration sand :s 50d0)
     (sandpaint:pixel-hack sand)
     (sandpaint:save sand fn)))
 
 
-(time (main 1000 (second (cmd-args))))
+(time (main 2000 (second (cmd-args))))
 

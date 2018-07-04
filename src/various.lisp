@@ -1,8 +1,11 @@
 
 (abbrev array-push vector-push-extend)
 
-(defvar PII (* PI 2d0))
-(defvar PI5 (* PI 0.5d0))
+
+(defconstant PII (the double-float (* PI 2d0)))
+(defconstant PI5 (the double-float (* PI 0.5d0)))
+
+(declaim (type double-float PII PI5))
 
 
 ;http://cl-cookbook.sourceforge.net/os.html
@@ -61,18 +64,6 @@
   (aref a (length-1 a)))
 
 
-(defun make-dfloat-array (rows &key (cols 2) (initial 0.0d0))
-  (make-array (list rows cols) :initial-element initial :element-type 'double-float))
-
-
-(defun make-symb-array (rows &key initial)
-  (make-array rows :initial-element initial :element-type 'symbol))
-
-
-(defun make-int-array (rows  &key (cols 2) (initial 0))
-  (make-array (list rows cols) :initial-element initial :element-type 'integer))
-
-
 (defun array-add (a vv)
   (if (eql (type-of vv) 'cons)
     (loop for v in vv do (array-push v a))
@@ -126,6 +117,7 @@
           finally (return res))))
 
 
+; TODO: what is num for?
 (defun count-things (data &key (test #'equal)
                                (getter (lambda (x) x))
                                (key (lambda (x) (second x)))
@@ -144,55 +136,6 @@
 
 (defun to-list (a)
   (coerce a 'list))
-
-
-(defun make-int-vec (&optional (s 100))
-  (make-array s :fill-pointer 0 :element-type 'integer :adjustable t))
-
-
-(defun get-atup (a i)
-  (declare (integer i))
-  (list (aref a i 0) (aref a i 1)))
-
-
-(defun get-int-tup (a i)
-  (declare (integer i))
-  (declare (type (array integer) a))
-  (list (aref a i 0) (aref a i 1)))
-
-
-(defun get-dfloat-tup (a i)
-  (declare (integer i))
-  (declare (type (array double-float) a))
-  (list (aref a i 0) (aref a i 1)))
-
-
-(defun set-atup (a i vv)
-  (declare (integer i))
-  (declare (list vv))
-  (destructuring-bind (v1 v2) vv
-    (setf (aref a i 0) v1
-          (aref a i 1) v2)))
-
-
-(defun set-int-tup (a i vv)
-  (declare (integer i))
-  (declare (type (array integer) a))
-  (declare (list vv))
-  (destructuring-bind (v1 v2) vv
-    (declare (integer v1 v2))
-    (setf (aref a i 0) v1
-          (aref a i 1) v2)))
-
-
-(defun set-dfloat-tup (a i vv)
-  (declare (integer i))
-  (declare (type (array double-float) a))
-  (declare (list vv))
-  (destructuring-bind (v1 v2) vv
-    (declare (double-float v1 v2))
-    (setf (aref a i 0) v1
-          (aref a i 1) v2)))
 
 
 (defun rep-list (colors &aux (n (length colors)))

@@ -2,28 +2,11 @@
 (in-package :vec)
 
 
-(defmacro inside* ((size xy x y) &body body)
-  (declare (symbol x y))
-  (with-gensyms (sname)
-    `(let ((,sname ,size))
-      (declare (integer ,sname))
-      (multiple-value-bind (,x ,y) (vround* ,xy)
-        (declare (integer ,x ,y))
-        (when (and (>= ,x 0) (< ,x ,sname)
-                   (>= ,y 0) (< ,y ,sname))
-              (progn ,@body))))))
+(declaim (optimize (speed 3)))
 
 
-(defmacro inside ((size xy x y) &body body)
-  (declare (symbol x y))
-  (with-gensyms (sname xyname)
-    `(let* ((,sname (math:dfloat ,size))
-            (,xyname ,xy)
-            (,x (vec::vec-x ,xyname))
-            (,y (vec::vec-y ,xyname)))
-      (if (and (>= ,x 0d0) (< ,x ,sname)
-               (>= ,y 0d0) (< ,y ,sname))
-          (progn ,@body)))))
+(defconstant PII  (* PI 2d0))
+(declaim (type double-float PII))
 
 
 (defmacro with-xy ((v x y) &body body)
@@ -32,6 +15,7 @@
    `(let* ((,vname ,v)
            (,x (vec-x ,vname))
            (,y (vec-y ,vname)))
+     (declare (double-float ,x ,y))
      (progn ,@body))))
 
 
@@ -68,18 +52,27 @@
         (progn ,@body)))
 
 
-(defun all-inside (path &optional (lim 1d6))
-  (if (every #'identity
-             (loop for v in path
-                   collect (and (>= (vec-x v) (- lim)) (<= (vec-x v) lim)
-                                (>= (vec-y v) (- lim)) (<= (vec-y v) lim))))
-      path
-      nil))
-
-
 (defstruct (vec (:constructor -make-vec))
   (x nil :type double-float :read-only t)
   (y nil :type double-float :read-only t))
+
+
+(declaim (ftype (function () vec) zero one))
+(declaim (ftype (function (double-float &optional double-float) vec) vec))
+(declaim (ftype (function (double-float) vec) cos-sin sin-cos))
+
+(declaim (ftype (function (vec double-float) vec) scale iscale))
+(declaim (ftype (function (vec vec double-float) vec) add-scaled))
+
+(declaim (ftype (function (vec vec) double-float) dot cross dst dst2))
+
+(declaim (ftype (function (vec vec) vec) sub add mult div mid))
+
+(declaim (ftype (function (vec) double-float) angle))
+
+(declaim (ftype (function (vec) vec) perp flip copy neg))
+
+(declaim (ftype (function (double-float vec vec) vec) on-line))
 
 
 (defun vec (x &optional y)
@@ -87,13 +80,17 @@
   (if y (-make-vec :x x :y y)
         (-make-vec :x x :y x)))
 
-
 (defun zero ()
   (vec 0d0 0d0))
 
-
 (defun one ()
   (vec 1d0 1d0))
+
+
+(defparameter *one*  (vec:vec 1d0))
+(defparameter *half*  (vec:vec 0.5d0))
+(defparameter *zero*  (vec:vec 0d0))
+(declaim (type vec *one* *half* *zero*))
 
 
 (defun copy (v)
@@ -126,9 +123,27 @@
   (list (round (vec-x v)) (round (vec-y v))))
 
 
-(defun vround* (v)
-  (declare (vec v))
+(declaim (inline -vfloor*)
+         (ftype (function (vec) (values fixnum fixnum)) -vround*))
+(defun -vround* (v)
+  (declare (optimize (safety 0) speed (debug 0))
+           (vec v))
   (values (round (vec-x v)) (round (vec-y v))))
+
+(declaim (inline -vfloor*)
+         (ftype (function (vec) (values fixnum fixnum)) -vfloor*))
+(defun -vfloor* (v)
+  (declare (optimize (safety 0) speed (debug 0))
+           (vec v))
+  (values (floor (vec-x v)) (floor (vec-y v))))
+
+
+;(defun -voutward-round (xy mid)
+;  (declare (vec xy mid))
+;  (with-xy (mid mx my)
+;    (with-xy (xy x y)
+;      (values (math:int (if (<= x mx) (floor x) (ceiling x)))
+;              (math:int (if (<= y my) (floor y) (ceiling y)))))))
 
 
 (defun vec* (xy)
@@ -148,11 +163,12 @@
   (declare (vec v))
   (declare (integer i))
   (declare (type (array double-float) a))
-  (setf (aref a i 0) (vec-x v)
-        (aref a i 1) (vec-y v)))
+  (setf (aref a i 0) (the double-float (vec-x v))
+        (aref a i 1) (the double-float (vec-y v))))
 
 
 ; MATHS
+
 
 
 (defun cos-sin (a)
@@ -173,14 +189,16 @@
 
 (defun add-scaled (a b s)
   (declare (double-float s))
-  (declare (vec:vec a b))
-  (vec:vec (+ (vec-x a) (* s (vec-x b)))
-           (+ (vec-y a) (* s (vec-y b)))))
+  (declare (vec a b))
+  (vec (+ (vec-x a) (* s (vec-x b)))
+       (+ (vec-y a) (* s (vec-y b)))))
 
 
+(declaim (inline scale))
 (defun scale (a s)
-  (declare (vec a))
-  (declare (double-float s))
+  (declare (optimize (safety 0) speed (debug 0))
+           (vec a)
+           (double-float s))
   (vec (* (vec-x a) s)
        (* (vec-y a) s)))
 
@@ -196,8 +214,10 @@
        (/ (vec-y a) s)))
 
 
+(declaim (inline sub))
 (defun sub (a b)
-  (declare (vec a b))
+  (declare (optimize (safety 0) speed (debug 0))
+           (vec a b))
   (vec (- (vec-x a) (vec-x b))
        (- (vec-y a) (vec-y b))))
 
@@ -229,9 +249,10 @@
   (declare (vec a))
   (vec (abs (vec-x a)) (abs (vec-y a))))
 
-
+(declaim (inline add))
 (defun add (a b)
-  (declare (vec a b))
+  (declare (optimize (safety 0) speed (debug 0))
+           (vec a b))
   (vec (+ (vec-x a) (vec-x b))
        (+ (vec-y a) (vec-y b))))
 
@@ -351,14 +372,14 @@
   (loop for a in aa collect (dst a b)))
 
 
-(defun norm (a &key (s 1d0) (default (vec:vec 0d0)))
+(defun norm (a &key (s 1d0) (default *zero*))
   (declare (vec a))
   (declare (double-float s))
   (let ((l (len a)))
     (if (> l 0d0) (scale a (/ s l)) default)))
 
 
-(defun nsub (a b &key (s 1d0) (default (vec:vec 0d0)))
+(defun nsub (a b &key (s 1d0) (default *zero*))
   (declare (vec a b))
   (norm (sub a b) :s s :default default))
 
@@ -368,7 +389,7 @@
   (reduce (lambda (a b) (declare (vec a b)) (add a b)) aa))
 
 
-(defun rot (v a &key (xy (zero)))
+(defun rot (v a &key (xy *zero*))
   (declare (vec v))
   (declare (double-float a))
   (let ((cosa (cos a))
@@ -378,13 +399,13 @@
                    (+ (* x sina) (* y cosa)))))))
 
 
-(defun lrot (pts a &key (xy (zero)))
+(defun lrot (pts a &key (xy *zero*))
   (declare (list pts))
   (declare (double-float a))
   (mapcar (lambda (p) (declare (vec p)) (rot p a :xy xy)) pts))
 
 
-(defun shift-scale (pt shift s &optional (unshift (zero)))
+(defun shift-scale (pt shift s &optional (unshift *zero*))
   "shift scale (unshift)"
   (declare (vec pt shift))
   (declare (double-float s))
@@ -397,6 +418,15 @@
   (declare (double-float s))
   (mapcar (lambda (pt) (declare (vec pt))
             (shift-scale pt shift s unshift)) pts))
+
+
+(defun all-inside (path &optional (lim 1d6))
+  (if (every #'identity
+             (loop for v in path
+                   collect (and (>= (vec-x v) (- lim)) (<= (vec-x v) lim)
+                                (>= (vec-y v) (- lim)) (<= (vec-y v) lim))))
+      path
+      nil))
 
 
 (defun segdst (aa v)
@@ -473,7 +503,7 @@
 
 ; SHAPES
 
-(defun on-circ (p rad &key (xy (zero)))
+(defun on-circ (p rad &key (xy *zero*))
   (declare (double-float p rad))
   (declare (vec xy))
   (add-scaled xy (cos-sin (* p PII)) rad))
@@ -492,14 +522,14 @@
     (on-line p a b)))
 
 
-(defun on-spiral (p rad &key (xy (zero)) (rot 0d0))
+(defun on-spiral (p rad &key (xy *zero*) (rot 0d0))
   (declare (double-float p rad rot))
   (declare (vec xy))
   (add xy (scale (cos-sin (+ rot (* p PII)))
                  (* p rad))))
 
 
-(defun rect (w h &key (xy (zero)))
+(defun rect (w h &key (xy *zero*))
   (declare (double-float w h))
   (declare (vec xy))
   (list (add xy (vec w (- h)))
@@ -514,7 +544,7 @@
   (rect bs bs :xy xy))
 
 
-(defun polygon (n rad &key (xy (zero)) (rot 0d0))
+(defun polygon (n rad &key (xy *zero*) (rot 0d0))
   (declare (integer n))
   (declare (double-float rad rot))
   (declare (vec xy))

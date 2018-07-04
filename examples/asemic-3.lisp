@@ -117,7 +117,7 @@
     ;(draw-grid size border line-chars line-num 18d0 33d0 0.8d0 60 sand)
 
     (sandpaint:pixel-hack sand)
-    (sandpaint:save sand fn :gamma 1.5)))
+    (sandpaint:save sand fn :gamma 1.5 :bits 16)))
 
 (time (main 1000 (second (cmd-args))))
 

@@ -152,7 +152,7 @@
   "
   (declare (symbol snk))
   (declare (type boolean collect))
-  (with-gensyms (prm pr sname)
+  (with-gensyms (sname)
     `(let* ((,sname ,snk))
       (map ',(if collect 'list 'nil)
           (lambda (,i) (declare (integer ,i)) (list ,@body))

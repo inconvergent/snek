@@ -2,6 +2,9 @@
 (defpackage :vec
   (:use :common-lisp)
   (:export
+    :*one*
+    :*half*
+    :*zero*
     :add
     :add-scaled
     :all-inside
@@ -18,8 +21,6 @@
     :dst2
     :flip
     :idiv
-    :inside
-    :inside*
     :iscale
     :isub
     :ladd
@@ -77,7 +78,6 @@
     :with-xy-short
     :zero)
   (:import-from :common-lisp-user
-    :PII
     :array-push
     :close-path
     :make-generic-array
@@ -188,7 +188,6 @@
     :with-prob
     :with-rndspace)
   (:import-from :common-lisp-user
-    :PII
     :array-push
     :make-generic-array
     :ensure-array
@@ -228,7 +227,8 @@
     :transparent
     :vdark
     :white
-    :with)
+    :with
+    :with*)
   (:import-from :common-lisp-user
     :ensure-array
     :with-gensyms))
@@ -285,7 +285,6 @@
     :with-rndpos)
   (:import-from :common-lisp-user
     :array-push
-    :make-dfloat-array
     :make-generic-array
     :to-list
     :with-gensyms
@@ -301,8 +300,6 @@
     :pos*
     :rndpos)
   (:import-from :common-lisp-user
-    :make-dfloat-array
-    :set-dfloat-tup
     :with-struct))
 
 
@@ -314,8 +311,7 @@
     :with*
     :with-verts-in-rad)
   (:import-from :common-lisp-user
-    :get-dfloat-tup
-    :make-int-vec
+    :make-generic-array
     :with-gensyms
     :with-struct))
 
@@ -334,15 +330,17 @@
     :lin-path
     :make
     :pix
+    :pix-overlap
+    :pix-overlap*
     :pixel-hack
     :save
     :set-fg-color
+    :set-bg-color
     :stroke
     :strokes)
   (:import-from :common-lisp-user
     :aif
     :ensure-filename
-    :get-dfloat-tup
     :with-gensyms
     :with-struct))
 
@@ -500,11 +498,16 @@
     :close-path
     :exec-with-args
     :flatten
-    :get-dfloat-tup
-    :make-dfloat-array
     :make-generic-array
     :make-generic-hash-table
     :to-list
     :with-gensyms
     :with-struct))
+
+
+;(declaim (inline rnd:rnd rnd:rndi rnd:rnd* rnd:rndbtwn rnd:on-line rnd:in-circ))
+;(declaim (inline vec:zero vec:one vec:vec vec:cos-sin vec:sin-cos vec:scale
+;                 vec:iscale vec:add-scaled vec:dot vec:cross vec:dst vec:dst2
+;                 vec:add vec:sub vec:mult vec:mid vec:div vec:perp vec:flip
+;                 vec:copy vec:neg vec:on-line))
 

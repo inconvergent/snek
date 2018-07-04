@@ -42,7 +42,7 @@
         (snek:itr-grps (snk g :collect nil)
           (snek:draw-edges snk sand grains :g g))))
 
-    (sandpaint:chromatic-aberration sand (vec:vec 500d0 500d0) :s 200d0)
+    ;(sandpaint:chromatic-aberration sand)
     (sandpaint:pixel-hack sand)
     (sandpaint:save sand fn)))
 

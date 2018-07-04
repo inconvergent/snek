@@ -12,10 +12,11 @@ Colors are stored internally with premultiplied alpha.
             (,g (rgba-g ,c*))
             (,b (rgba-b ,c*))
             (,a (rgba-a ,c*)))
+      (declare (double-float ,r ,g ,b ,a))
       (progn ,@body))))
 
 
-(defstruct (rgba (:constructor make-rgba*))
+(defstruct (rgba (:constructor -make-rgba))
   (r 0d0 :type double-float :read-only t)
   (g 0d0 :type double-float :read-only t)
   (b 0d0 :type double-float :read-only t)
@@ -26,7 +27,7 @@ Colors are stored internally with premultiplied alpha.
                              (g* (math:dfloat g))
                              (b* (math:dfloat b))
                              (a* (math:dfloat a)))
-  (make-rgba* :r (* a* r*) :g (* a* g*) :b (* a* b*) :a a*))
+  (-make-rgba :r (* a* r*) :g (* a* g*) :b (* a* b*) :a a*))
 
 
 (defun show (c)
@@ -104,14 +105,13 @@ Colors are stored internally with premultiplied alpha.
       (let ((x (* c (- 1d0 (abs (- (mod (* 6d0 h) 2d0) 1d0)))))
             (m (- v c)))
         (destructuring-bind (r g b)
-          (math:add
-            (list m m m)
-            (case (floor (mod (* h 6d0) 6d0))
-              (0 (list c x 0d0))
-              (1 (list x c 0d0))
-              (2 (list 0d0 c x))
-              (3 (list 0d0 x c))
-              (4 (list x 0d0 c))
-              (5 (list c 0d0 x))))
+          (math:add (list m m m)
+                    (case (floor (mod (* h 6d0) 6d0))
+                      (0 (list c x 0d0))
+                      (1 (list x c 0d0))
+                      (2 (list 0d0 c x))
+                      (3 (list 0d0 x c))
+                      (4 (list x 0d0 c))
+                      (5 (list c 0d0 x))))
           (make-rgba r g b a))))))
 

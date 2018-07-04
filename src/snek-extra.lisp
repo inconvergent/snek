@@ -33,7 +33,7 @@
 
 
 ; primitives?
-(defun add-circ! (snk num rad &key (xy (vec:zero)) g)
+(defun add-circ! (snk num rad &key (xy vec:*zero*) g)
   (let ((vv (loop for p of-type double-float in (math:linspace num 0.0d0 1.0d0)
                   collect (add-vert! snk (vec:on-circ p rad :xy xy)))))
     (loop for a of-type integer in vv and b of-type integer in (-roll-once vv)
@@ -41,7 +41,7 @@
 
 
 ; primitives?
-(defun add-polygon! (snk n rad &key (xy (vec:zero))
+(defun add-polygon! (snk n rad &key (xy vec:*zero*)
                                     (rot (* 0.25d0 PI)) g)
   (let ((vv (loop for v of-type vec:vec in (vec:polygon n rad :xy xy :rot rot)
                   collect (add-vert! snk v))))

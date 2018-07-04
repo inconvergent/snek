@@ -3,7 +3,6 @@
 (load "../src/load")
 
 
-
 (defun sum-alter-velocity (velocities a num)
   (loop for i from 1 to (1- num) do
     (vec:arr-set velocities i
@@ -23,7 +22,8 @@
   (let ((snk (snek:make))
         (verts nil)
         (grains 4)
-        (velocities (make-dfloat-array 100))
+        (velocities (make-array (list 100 2) :initial-element 0d0
+                                             :element-type 'double-float))
         (lattice (make-lattice 50 100d0 900d0))
         (noise 1.5d0)
         (itt 8000)

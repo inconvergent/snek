@@ -315,7 +315,7 @@
           (diagonals (math::-get-diagonals
                        (to-array (math:path-simplify pts* simplify))
                        width* clim slim closed)))
-      (path psvg (-accumulate-cpath diagonals rep closed)))))
+      (path psvg (-accumulate-cpath diagonals rep closed) :sw sw))))
 
 
 ; draw circle with arc.

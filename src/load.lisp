@@ -1,23 +1,28 @@
 
-(proclaim '(optimize speed))
-(proclaim '(optimize (space 2)))
-(proclaim '(inline last1 single append1 conc1 mklist))
-;(declaim '(optimize (debug 3)))
+(setf *efficiency-note-cost-threshold* 25)
+
+
+(declaim (optimize (speed 3)))
+;(declaim (optimize (safety 3)))
+;(declaim (optimize (space 3)))
+;(declaim (optimize (debug 3)))
+(declaim (inline last1 single append1 conc1 mklist))
 
 (load "~/quicklisp/setup.lisp")
 
 
 (ql:quickload "zpng")
+(ql:quickload "png")
 (ql:quickload "cl-svg")
 
 
 (asdf:defsystem "snek"
   :description "A System for Making Generative Systems"
-  :version "2.24.1"
+  :version "2.31.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t
-  :depends-on ("zpng" "cl-svg")
+  :depends-on ("zpng" "cl-svg" "png" "zpng")
   :components ((:file "pg-utils")
                (:file "various")
                (:file "packages")
@@ -25,6 +30,7 @@
                (:file "state")
                (:file "vec")
                (:file "math")
+               (:file "math-extra")
                (:file "color")
                (:file "hset")
                (:file "rnd-extra")
@@ -32,10 +38,11 @@
                (:file "bzspline")
                (:file "linear-path")
                (:file "sandpaint")
+               (:file "sandpaint-extra")
                (:file "plot-svg")
                (:file "plot-tile-svg")
                (:file "obj")
-               (:file "zone-map")
+               (:file "zonemap")
                (:file "snek-macros")
                (:file "snek")
                (:file "snek-utils")

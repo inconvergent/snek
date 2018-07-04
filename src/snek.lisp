@@ -59,7 +59,8 @@
     with prm types and corresponding rfxns used to render that prm type.
   "
   (-make-snek :name name
-              :verts (make-dfloat-array max-verts)
+              :verts (make-array (list max-verts 2) :initial-element 0d0
+                                                    :element-type 'double-float)
               :max-verts max-verts
               :grp-size grp-size
               :alt-names (-make-fxns (list '(add-edge-alt do-add-edge-alt)

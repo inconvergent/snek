@@ -222,7 +222,7 @@
   (declare (integer n))
   (assert (>= n 3) (n) "must have at least 3 pts. has ~a." n)
   (let ((vpts (make-array (if closed (+ (* 2 n) 1) (- (* 2 n) 3))
-                          :initial-element (vec:zero)
+                          :initial-element vec:*zero*
                           :element-type 'vec:vec)))
 
     (if closed (-set-vpts-closed vpts pts n)

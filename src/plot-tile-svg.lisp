@@ -46,13 +46,12 @@
               (floor (* y ny)))))))
 
 
-(defun -make-paper-fx (rpw rph dw dh nxny)
-  (destructuring-bind (nx ny) nxny
-    (lambda (pt paperid)
-      (destructuring-bind (idx idy) paperid
-        (vec:with-xy (pt x y)
-          (vec:vec (* (/ (- x (* idx rpw)) rpw) dw)
-                   (* (/ (- y (* idy rph)) rph) dh)))))))
+(defun -make-paper-fx (rpw rph dw dh)
+  (lambda (pt paperid)
+    (destructuring-bind (idx idy) paperid
+      (vec:with-xy (pt x y)
+        (vec:vec (* (/ (- x (* idx rpw)) rpw) dw)
+                 (* (/ (- y (* idy rph)) rph) dh))))))
 
 
 (defun make (&key (nxny (list 2 2)) (stroke-width 1.1d0))
@@ -68,7 +67,7 @@
                         :dw dw
                         :dh dh
                         :paper-id-fx (-make-paper-id-fx dw dh nxny)
-                        :paper-fx (-make-paper-fx rpw rph dw dh nxny)
+                        :paper-fx (-make-paper-fx rpw rph dw dh)
                         :grid (-make-grid nxny dw dh)
                         :papers (-make-papers nxny stroke-width))))
 
@@ -171,8 +170,7 @@
                 :sw sw :stroke stroke))))
 
 
-(defun rstipple (msvg n pts &key sw (stroke "black") closed
-                            &aux (pts* (ensure-array pts)))
+(defun rstipple (msvg n pts &key sw (stroke "black") closed)
   "
   draw n stipples along path pts
   WARN: this is incomplete and will probably not perform as expected

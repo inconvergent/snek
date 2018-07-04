@@ -47,7 +47,7 @@
                   (floor (aref ,verts ,v 1) ,zwidth))))
     (multiple-value-bind (vals exists) (gethash z ,zone-to-verts)
       (when (not exists)
-        (setf vals (make-int-vec 256)
+        (setf vals (make-generic-array :type 'integer)
               (gethash z ,zone-to-verts) vals))
       (vector-push-extend ,v vals))))
 
@@ -90,7 +90,7 @@
   (declare (vec:vec xy))
   (declare (double-float rad2))
   (with-struct (zmap- zwidth zone-to-verts) zm
-    (let ((inds (make-int-vec)))
+    (let ((inds (make-generic-array :type 'integer)))
       (declare (type (array integer) inds))
       (multiple-value-bind (za zb)
         (-xy-to-zone xy zwidth)

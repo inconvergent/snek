@@ -3,9 +3,9 @@
 
 (defstruct path
   (n nil :type integer :read-only t)
-  (lens nil :read-only t)
   (closed nil :type boolean)
-  (pts nil :read-only t))
+  (pts nil :type (array double-float) :read-only t)
+  (lens nil :type (array double-float) :read-only t))
 
 
 (defun -diff-scale (a b s) (/ (- b a) s))
@@ -64,13 +64,13 @@
 (defun make (pts &key closed
                  &aux (n (if closed (+ (length pts) 1) (length pts))))
   (declare (list pts))
-  (let ((p (make-dfloat-array n))
-        (l (make-dfloat-array n :cols 1)))
-    (loop for pt in pts and i from 0
-          do (vec:arr-set p i pt))
+  (let ((p (make-array (list n 2) :initial-element 0d0
+                                  :element-type 'double-float))
+        (l (make-array (list n 1) :initial-element 0d0
+                                  :element-type 'double-float)))
 
+    (loop for pt in pts and i from 0 do (vec:arr-set p i pt))
     (when closed (vec:arr-set p (1- n) (first pts)))
-
     (-set-path-lens p l n)
     (make-path :n n :pts p :lens l :closed closed)))
 

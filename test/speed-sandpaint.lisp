@@ -26,15 +26,22 @@
       (sandpaint:pix sand
         (math:nrep pix-num (rnd:in-box 500d0 500d0 :xy (vec:vec 500d0))))))
 
+  (format t "lin-path:~%")
+  (time
+    (loop repeat 500 do
+      (sandpaint:lin-path sand
+        (rnd:nin-box 5 500d0 500d0 :xy (vec:vec 500d0))
+        3d0 grains)))
+
   ))
 
-(require :sb-sprof)
-(sb-sprof:with-profiling (:max-samples 200000
-                         :mode :cpu
-                         ;:mode :alloc
-                         ;:mode :time
-                         :report :graph)
- (main))
+;(require :sb-sprof)
+;(sb-sprof:with-profiling (:max-samples 200000
+;                         :mode :cpu
+;                         ;:mode :alloc
+;                         ;:mode :time
+;                         :report :graph)
+; (main))
 
-;(main)
+(main)
 

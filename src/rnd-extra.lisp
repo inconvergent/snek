@@ -7,9 +7,11 @@
   (with-gensyms (rad* xy* m)
     `(let* ((,rad* ,rad)
             (,xy* ,xy)
-            (,m (if ,xy* ,xy* (vec:zero))))
+            (,m (if ,xy* ,xy* vec:*zero*)))
+      (declare (vec:vec ,m))
       (loop repeat ,n
             do (let ((,v (in-circ ,rad* :xy ,m)))
+                 (declare (vec:vec ,v))
                  (progn ,@body))))))
 
 
@@ -20,7 +22,14 @@
             (,sub (vec:sub ,b ,a*)))
       (loop repeat ,n
             do (let ((,rn  (vec:add-scaled ,a* ,sub (random 1d0))))
+                 (declare (vec:vec ,rn))
                  (progn ,@body))))))
+
+
+(declaim (ftype (function (double-float double-float &key (:xy vec:vec)) vec:vec) in-box))
+(declaim (ftype (function (vec:vec vec:vec) vec:vec) on-line))
+(declaim (ftype (function (double-float &key (:xy vec:vec)) vec:vec)
+                in-circ on-circ))
 
 
 (defun nrnd-u-from (n a)
@@ -52,21 +61,19 @@
 ; SHAPES
 
 
-(defun -add-if (a xy)
-  (if xy (vec:add a xy) a))
+(defun on-circ (rad &key (xy vec:*zero*))
+  (declare (double-float rad))
+  (declare (vec:vec xy))
+  (vec:add-scaled xy (vec:cos-sin (random PII)) rad))
 
 
-(defun on-circ (rad &key xy)
-  (-add-if (vec:scale (vec:cos-sin (random PII)) rad) xy))
-
-
-(defun non-circ (n rad &key xy)
+(defun non-circ (n rad &key (xy vec:*zero*))
   (declare (integer n))
   (declare (double-float rad))
   (loop repeat n collect (on-circ rad :xy xy)))
 
 
-(defun in-circ (rad &key (xy (vec:zero)))
+(defun in-circ (rad &key (xy vec:*zero*))
   (declare (double-float rad))
   (let ((a (random 1d0))
         (b (random 1d0)))
@@ -75,20 +82,22 @@
                 (vec:add-scaled xy (vec:cos-sin (* PII (/ b a))) (* a rad)))))
 
 
-(defun nin-circ (n rad &key xy)
+(defun nin-circ (n rad &key (xy vec:*zero*))
   (declare (integer n))
   (declare (double-float rad))
   (loop repeat n collect (in-circ rad :xy xy)))
 
 
-(defun in-box (sx sy &key xy)
+(defun in-box (sx sy &key (xy vec:*zero*))
   (declare (double-float sx sy))
-  (-add-if (vec:vec (rnd* sx) (rnd* sy)) xy))
+  (declare (vec:vec xy))
+  (vec:add xy (vec:vec (rnd* sx) (rnd* sy))))
 
 
-(defun nin-box (n sx sy &key xy)
+(defun nin-box (n sx sy &key (xy vec:*zero*))
   (declare (integer n))
   (declare (double-float sx sy))
+  (declare (vec:vec xy))
   (loop repeat n collect (in-box sx sy :xy xy)))
 
 
@@ -107,7 +116,9 @@
 (defun non-line (n a b)
   (declare (integer n))
   (declare (vec:vec a b))
-  (loop repeat n collect (on-line a b)))
+  (loop with ba = (vec:sub b a)
+        repeat n
+        collect (vec:add-scaled a ba (random 1d0))))
 
 
 (defun non-line* (n ab)
@@ -124,44 +135,56 @@
   "
   random linear walker limited to (0 1)
   "
-  (let ((x (coerce init 'double-float)))
-    (lambda (stp) (setf x (-inc x (rnd* stp))))))
+  (declare (double-float init))
+  (let ((x init))
+    (lambda (stp) (declare (double-float stp))
+      (setf x (-inc x (rnd* stp))))))
 
 
 (defun get-lin-stp* (&optional (init 0d0))
   "
   random linear walker
   "
-  (let ((x (coerce init 'double-float)))
-    (lambda (stp) (incf x (rnd* stp)))))
+  (declare (double-float init))
+  (let ((x init))
+    (lambda (stp) (declare (double-float stp))
+      (incf x (rnd* stp)))))
 
 
 (defun get-acc-lin-stp (&optional (init-x 0d0) (init-a 0d0))
   "
   random accelerated linear walker limited to (0 1)
   "
-  (let ((a (coerce init-a 'double-float))
-        (x (coerce init-x 'double-float)))
-    (lambda (s) (setf x (-inc x (incf a (rnd* s)))))))
+  (declare (double-float init-x init-a))
+  (let ((a init-a)
+        (x init-x))
+    (lambda (stp) (declare (double-float stp))
+      (setf x (-inc x (incf a (rnd* stp)))))))
 
 
 (defun get-acc-lin-stp* (&optional (init-x 0d0) (init-a 0d0))
   "
   random accelerated linear walker
   "
-  (let ((a (coerce init-a 'double-float))
-        (x (coerce init-x 'double-float)))
-    (lambda (s) (incf x (incf a (rnd* s))))))
+  (declare (double-float init-x init-a))
+  (let ((a init-a)
+        (x init-x))
+    (lambda (stp) (declare (double-float stp))
+      (incf x (incf a (rnd* stp))))))
 
 
-(defun get-circ-stp* (&optional (init (vec:zero)))
+(defun get-circ-stp* (&optional (init vec:*zero*))
+  (declare (vec:vec init))
   (let ((xy (vec:copy init)))
-    (lambda (stp) (setf xy (vec:add xy (in-circ stp))))))
+    (lambda (stp) (declare (double-float stp))
+      (setf xy (vec:add xy (in-circ stp))))))
 
 
-(defun get-acc-circ-stp* (&optional (init (vec:zero))
-                                    (init-a (vec:zero)))
+(defun get-acc-circ-stp* (&optional (init vec:*zero*)
+                                    (init-a vec:*zero*))
+  (declare (vec:vec init init-a))
   (let ((a (vec:copy init-a))
         (xy (vec:copy init)))
-    (lambda (stp) (setf xy (vec:add xy (setf a (vec:add a (in-circ stp))))))))
+    (lambda (stp) (declare (double-float stp))
+      (setf xy (vec:add xy (setf a (vec:add a (in-circ stp))))))))
 

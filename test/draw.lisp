@@ -38,14 +38,14 @@
 
 
 (defun get-sample-pix (sand)
-  (let ((vals (sandpaint::sandpaint-vals sand)))
+  (let ((vals (sandpaint::sandpaint-vals sand))
+        (indfx (sandpaint::sandpaint-indfx sand)))
     (flatten (loop for i in (list 10 45 45 92 23)
-          and j in (list 39 78 49 92 89) collect
-          (list
-            (aref vals i j 0)
-            (aref vals i j 1)
-            (aref vals i j 2)
-            (aref vals i j 3))))))
+                   and j in (list 39 78 49 92 89)
+                   collect (list (aref vals (funcall indfx i j 0))
+                                 (aref vals (funcall indfx i j 1))
+                                 (aref vals (funcall indfx i j 2))
+                                 (aref vals (funcall indfx i j 3)))))))
 
 
 (defun test-sandpaint ()
@@ -64,9 +64,8 @@
             0.9617585443476347d0 0.9684279445612141d0 0.9686700238368381d0 1.0d0
             0.9829785654522593d0 0.9840476095774362d0 0.9852693651002268d0 1.0d0)))
 
-  (let ((sand (sandpaint:make 100
-                              :fg (color:black)
-                              :bg (color:transparent))))
+  (let ((sand (sandpaint:make 100 :fg (color:black)
+                                  :bg (color:transparent))))
 
    (sandpaint:set-fg-color sand (color:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 0.3d0))
    (sandpaint:pix sand (rnd:nin-box 100000 40d0 50d0 :xy (vec:vec 50d0 50d0)))

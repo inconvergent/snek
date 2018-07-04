@@ -1,11 +1,17 @@
 
 (in-package :rnd)
 
+(defconstant PII  (* PI 2d0))
+(declaim (type double-float PII))
+
+(declaim (optimize (speed 3)))
+;(declaim (optimize (safety 0)))
+
 ; MACROS
 
 
 (defmacro -nrep (n &body body)
-  (with-gensyms (i nname)
+  (with-gensyms (nname)
     `(let ((,nname ,n))
       (loop repeat ,nname collect (progn ,@body)))))
 
@@ -46,7 +52,15 @@
       (let ((,d (- ,b* ,a*)))
         (loop repeat ,n ,(if collect 'collect 'do)
           (let ((,rn (+ ,a* (random ,d))))
+            (declare (double-float ,rn))
             (progn ,@body)))))))
+
+
+(declaim (ftype (function (&optional double-float) double-float) rnd rnd*))
+
+(declaim (ftype (function (double-float double-float) double-float) rndbtwn))
+
+(declaim (ftype (function (integer &optional integer) integer) rndi))
 
 
 (defun set-rnd-state (i)
@@ -104,6 +118,7 @@
   (loop repeat n collect (rndi ab)))
 
 
+
 (defun rnd (&optional (x 1d0))
   (declare (double-float x))
   (random x))
@@ -123,6 +138,7 @@
   (declare (double-float mu sigma))
   (let ((s (* sigma (sqrt (* -2d0 (log (rnd))))))
         (u (* PII (rnd))))
+    (declare (double-float s u))
     (values (+ mu (* s (cos u)))
             (+ mu (* s (sin u))))))
 
@@ -156,6 +172,7 @@
     (sort (list a b) #'<)
     (declare (double-float a b))
     (let ((d (- b a)))
+      (declare (double-float d))
       (let ((res (-nrep n (+ a (random d)))))
         (if order (sort res #'<) res)))))
 
@@ -166,6 +183,7 @@
     (sort (list a b) #'<)
     (declare (integer a b))
     (let ((d (- b a)))
+      (declare (integer d))
       (let ((res (-nrep n (+ a (random d)))))
         (if order (sort res #'<) res)))))
 

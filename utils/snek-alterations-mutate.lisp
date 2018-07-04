@@ -11,7 +11,7 @@
 
 (defun make-mutate (&key (prob 0.1d0)
                          (noise 100.0d0)
-                         (xy (vec:zero))
+                         (xy vec:*zero*)
                          (ind 0))
   (let ((rules (make-hash-table :test #'equal)))
     (setf (gethash 'append-edge-alt rules) #'mutate-append-edge-alt)
