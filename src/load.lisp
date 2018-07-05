@@ -1,5 +1,5 @@
 
-(setf *efficiency-note-cost-threshold* 25)
+(setf *efficiency-note-cost-threshold* 15)
 
 
 (declaim (optimize (speed 3)))
@@ -18,7 +18,7 @@
 
 (asdf:defsystem "snek"
   :description "A System for Making Generative Systems"
-  :version "2.31.0"
+  :version "2.31.1"
   :author "inconvergent"
   :licence "MIT"
   :serial t

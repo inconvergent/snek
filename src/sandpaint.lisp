@@ -4,18 +4,6 @@
 (declaim (optimize (speed 3)))
 
 
-(defmacro -inside-floor ((size xy x y) &body body)
-  (declare (symbol x y))
-  (with-gensyms (sname)
-    `(let ((,sname ,size))
-      (declare (fixnum ,sname))
-      (multiple-value-bind (,x ,y) (vec::-vfloor* ,xy)
-        (declare (fixnum ,x ,y))
-        (when (and (>= ,x 0) (< ,x ,sname)
-                   (>= ,y 0) (< ,y ,sname))
-              (progn ,@body))))))
-
-
 (defmacro -inside-round ((size xy x y) &body body)
   (declare (symbol x y))
   (with-gensyms (sname)
@@ -23,8 +11,7 @@
       (declare (fixnum ,sname))
       (multiple-value-bind (,x ,y) (vec::-vround* ,xy)
         (declare (fixnum ,x ,y))
-        (when (and (>= ,x 0) (< ,x ,sname)
-                   (>= ,y 0) (< ,y ,sname))
+        (when (and (< -1 ,x ,sname) (< -1 ,y ,sname))
               (progn ,@body))))))
 
 
@@ -262,29 +249,24 @@
            (vec:vec pt)
            (color:rgba fg))
   (color:with (fg r g b a)
-    (multiple-value-bind (ix iy fx fy) (-floor-fract pt)
-      (multiple-value-bind (s1 s2 s3 s4) (-fract-overlap fx fy)
-        (declare (double-float s1 s2 s3 s4))
+    (labels
 
-        (when (and (< -1 ix size)
-                   (< -1 iy size))
+      ((-operator-over-overlap (ix iy s)
+        (declare (optimize (safety 0) speed (debug 0))
+                 (fixnum ix iy)
+                 (double-float s))
+        (when (and (< -1 ix size) (< -1 iy size))
           (-operator-over indfx vals ix iy
-            (color::-make-rgba :r (* s1 r) :g (* s1 g) :b (* s1 b) :a (* s1 a))))
+                          (color::-make-rgba :r (* s r) :g (* s g)
+                                             :b (* s b) :a (* s a))))))
 
-        (when (and (< -1 #1=(the fixnum (+ ix 1)) size)
-                   (< -1 iy size))
-          (-operator-over indfx vals #1# iy
-            (color::-make-rgba :r (* s2 r) :g (* s2 g) :b (* s2 b) :a (* s2 a))))
-
-        (when (and (< -1 ix size)
-                   (< -1 #2=(the fixnum (+ iy 1)) size))
-          (-operator-over indfx vals ix #2#
-            (color::-make-rgba :r (* s3 r) :g (* s3 g) :b (* s3 b) :a (* s3 a))))
-
-        (when (and (< -1 #3=(the fixnum (+ ix 1)) size)
-                   (< -1 #4=(the fixnum (+ iy 1)) size))
-          (-operator-over indfx vals #3# #4#
-            (color::-make-rgba :r (* s4 r) :g (* s4 g) :b (* s4 b) :a (* s4 a))))))))
+        (multiple-value-bind (ix iy fx fy) (-floor-fract pt)
+          (multiple-value-bind (s1 s2 s3 s4) (-fract-overlap fx fy)
+            (declare (double-float s1 s2 s3 s4))
+            (-operator-over-overlap ix iy s1)
+            (-operator-over-overlap #1=(+ ix 1) iy s2)
+            (-operator-over-overlap ix #2=(+ iy 1) s3)
+            (-operator-over-overlap #1# #2# s4))))))
 
 (defun pix-overlap (sand pts)
   (declare (sandpaint sand)
