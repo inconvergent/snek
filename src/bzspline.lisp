@@ -23,9 +23,11 @@
 ;            (3d0 -6d0 3d0 0d0)
 ;            (-1d0 3d0 -3d0 1d0)))
 
-(defparameter *m* '((1d0 0d0 0d0 )
-                    (-2d0 2d0 0d0)
-                    (1d0 -2d0 1d0)))
+;NOTE: this is the transposed matrix compared to the above link
+(defparameter *m* '((1d0 -2d0 1d0)
+                    (0d0 2d0 -2d0)
+                    (0d0 0d0 1d0)))
+
 (declaim (type list *m*))
 
 ;(setf *m* '((1d0 1d0 0d0 )
@@ -40,33 +42,28 @@
   (vpts nil))
 
 
-(defun do-m (pts)
-  (declare (list pts))
-  (loop for mrow of-type list in *m*
-        collect (loop with s = (vec:vec 0d0 0d0)
-                      for p of-type vec:vec in pts
-                      and mr of-type double-float in mrow
-                      do (setf s (vec:add s (vec:scale p mr)))
-                      finally (return s))))
-
-
-(defun do-t (x pk)
+(defun do-calc (x pts)
   (declare (optimize (safety 0) speed (debug 0))
            (double-float x)
-           (list pk))
-  (loop with s = (vec:vec 0d0 0d0)
-        for p of-type vec:vec in pk
-        and xi of-type double-float in (list 1d0 x (* x x))
-        do (setf s (vec:add s (vec:scale p xi)))
-        finally (return s)))
+           (list pts))
+  (the vec:vec
+    (loop with ttt of-type list = (list 1d0 x (expt x 2d0))
+          for pt of-type vec:vec in pts
+          and tm of-type double-float in
+            (loop for mcol of-type list in *m*
+                  collect (loop for mi of-type double-float in mcol
+                                and tt of-type double-float in ttt
+                                summing (* mi tt) of-type double-float))
+          summing (* tm (vec::vec-x pt)) into sx of-type double-float
+          summing (* tm (vec::vec-y pt)) into sy of-type double-float
+          finally (return (the vec:vec (vec:vec sx sy))))))
 
 
 (defun -get-seg (ns x &aux (s (/ 1d0 (math:dfloat ns))))
   (declare (optimize (safety 0) speed (debug 0))
-           (fixnum ns)
-           (double-float x))
-  (if (>= x 1d0) (values 1d0 (- (floor (/ x s)) 1))
-                 (values (/ (mod x s) s) (floor (/ x s)))))
+           (fixnum ns) (double-float x s))
+  (if (>= x 1d0) (values 1d0 (- (truncate (/ x s)) 1))
+                 (values (/ (mod x s) s) (truncate (/ x s)))))
 
 
 (defun -select-pts (vpts seg)
@@ -74,9 +71,8 @@
            (type vector vpts)
            (fixnum seg))
   (let ((i (* 2 seg)))
-    (list (aref vpts i)
-          (aref vpts (+ i 1))
-          (aref vpts (+ i 2)))))
+    (declare (fixnum i))
+    (list (aref vpts i) (aref vpts (+ i 1)) (aref vpts (+ i 2)))))
 
 
 (defun -x-to-pt (vpts ns x)
@@ -84,9 +80,9 @@
            (type vector vpts)
            (fixnum ns)
            (double-float x))
-  (multiple-value-bind (xloc seg)
-    (-get-seg ns x)
-    (do-t xloc (do-m (-select-pts vpts seg)))))
+  (multiple-value-bind (xloc seg) (-get-seg ns x)
+    (declare (fixnum seg) (double-float xloc))
+    (do-calc xloc (-select-pts vpts seg))))
 
 
 (defun pos (b x)
@@ -94,15 +90,14 @@
            (bzspl b)
            (double-float x))
   (with-struct (bzspl- ns vpts) b
-    (declare (fixnum ns)
-             (type vector vpts))
+    (declare (fixnum ns) (type vector vpts))
     (-x-to-pt vpts ns x)))
 
 
 (defun pos* (b xx)
-  (declare (bzspl b)
-           (list xx))
+  (declare (bzspl b) (list xx))
   (with-struct (bzspl- ns vpts) b
+    (declare (fixnum ns) (type vector vpts))
     (loop for x of-type double-float in xx
           collect (-x-to-pt vpts ns x))))
 
@@ -110,6 +105,7 @@
 (defun len (b)
   (declare (bzspl b))
   (with-struct (bzspl- ns vpts) b
+    (declare (fixnum ns) (type vector vpts))
     (loop for seg of-type fixnum from 0 below ns
           summing (-get-segment-length vpts seg))))
 
@@ -119,15 +115,14 @@
                  0d0 1d0 :end end))
 
 (defun adaptive-pos (b &key (dens 1d0) (end t))
-  (declare (bzspl b)
-           (double-float dens)
-           (boolean end))
+  (declare (bzspl b) (double-float dens) (boolean end))
   (with-struct (bzspl- ns vpts) b
+    (declare (fixnum ns) (type vector vpts))
     (apply #'append
       (loop for seg of-type fixnum from 0 below ns collect
         (loop for xloc of-type double-float
               in (-get-linspace vpts seg dens (and end (>= seg (1- ns))))
-              collect (do-t xloc (do-m (-select-pts vpts seg))))))))
+              collect (do-calc xloc (-select-pts vpts seg)))))))
 
 
 (defmacro with-rndpos ((b n rn) &body body)
@@ -140,8 +135,8 @@
                (type vector ,vpts))
       (loop repeat ,n
             do (multiple-value-bind (,xloc ,seg) (-get-seg ,bns (rnd:rnd))
-                 (declare (double-float ,xloc ,seg))
-                 (let ((,rn (do-t ,xloc (do-m (-select-pts ,vpts ,seg)))))
+                 (declare (double-float ,xloc) (fixnum ,seg))
+                 (let ((,rn (do-calc ,xloc (-select-pts ,vpts ,seg))))
                    (progn ,@body)))))))
 
 
@@ -152,13 +147,15 @@
 
 (defun -set-v (vpts opts a b)
   (declare (type vector vpts opts) (fixnum a b))
-  (setf (aref vpts b)
-        (aref opts a)))
+  (setf (aref vpts b) (aref opts a)))
 
 
 (defun -set-v-mean (vpts opts a b c)
   (declare (type vector vpts opts) (fixnum a b c))
-  (setf (aref vpts c) (vec:mid (aref opts a) (aref opts b))))
+  (vec:with-xy ((aref opts a) ax ay)
+    (vec:with-xy ((aref opts b) bx by)
+      (setf (aref vpts c) (vec:vec (/ (+ ax bx) 2d0)
+                                   (/ (+ ay by) 2d0))))))
 
 
 (defun -set-vpts-open (vpts pts n &aux (n* (- (* (the fixnum 2) n) 3)))
@@ -190,7 +187,7 @@
 (defun -get-samples (vpts seg c)
   (declare (fixnum seg c))
   (loop for xi of-type double-float in (math:linspace (expt 2 c) 0d0 1d0)
-        collect (do-t xi (do-m (-select-pts vpts seg)))))
+        collect (do-calc xi (-select-pts vpts seg))))
 
 (defun -get-segment-length (vpts seg &key (lim 1d-7))
   (loop with curr
@@ -201,7 +198,7 @@
                             for sa of-type vec:vec in samples
                             and sb of-type vec:vec in (cdr samples)
                             summing (vec:dst sa sb)))
-           (setf err (abs (- prev curr))
+           (setf err (the double-float (abs (- prev curr)))
                  prev curr)
            (when (< err lim) (return curr))))
 
