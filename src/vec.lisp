@@ -153,21 +153,6 @@
     (vec x y)))
 
 
-(defun arr-get (a i)
-  (declare (integer i))
-  (declare (type (array double-float) a))
-  (vec (aref a i 0) (aref a i 1)))
-
-
-(defun arr-set (a i v)
-  (declare (vec v))
-  (declare (integer i))
-  (declare (type (array double-float) a))
-  (setf (aref a i 0) (the double-float (vec-x v))
-        (aref a i 1) (the double-float (vec-y v))))
-
-
-; tODO: replace arr-get arr-set with this everywhere
 (defun sarr-get (a i &aux (ii (* 2 i)))
   (declare (fixnum i ii)
            (type (simple-array double-float) a))
@@ -560,7 +545,7 @@
 
 
 (defun polygon (n rad &key (xy *zero*) (rot 0d0))
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float rad rot))
   (declare (vec xy))
   (loop for i from 0 below n

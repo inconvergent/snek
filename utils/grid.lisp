@@ -33,9 +33,9 @@
         (all (make-generic-array)))
     (vec:with-xy (xy x y)
       (loop for b of-type double-float in (math:linspace (first nums) (- y height) (+ y height))
-            and bi of-type integer from 0 do
+            and bi of-type fixnum from 0 do
         (loop for a of-type double-float in (math:linspace (second nums) (- x width) (+ x width))
-              and ai of-type integer from 0 do
+              and ai of-type fixnum from 0 do
           (vector-push-extend (vec:vec a b) all)
           (if (or (< ai 1) (> ai (- (second nums) 2)))
             (vector-push-extend (vec:vec a b) outside)

@@ -46,7 +46,7 @@
     (:constructor move-vert? (v xy &key (rel t))))
   (rel t :type boolean :read-only t)
   (xy nil :type vec:vec :read-only t)
-  (v nil :type integer :read-only t))
+  (v nil :type fixnum :read-only t))
 
 
 (defun do-move-vert-alt (snk a)
@@ -58,12 +58,12 @@
   (declare (snek snk))
   (declare (move-vert-alt a))
   (with-struct (snek- verts num-verts) snk
-    (declare (type (array double-float) verts))
+    (declare (type (simple-array double-float) verts))
     (with-struct (move-vert-alt- v xy rel) a
       (-valid-vert (num-verts v :err nil)
-        (let ((fxy (if rel (vec:add (vec:arr-get verts v) xy) xy)))
-          (setf (aref verts v 0) (vec::vec-x fxy)
-                (aref verts v 1) (vec::vec-y fxy))
+        (let ((fxy (if rel (vec:add (vec:sarr-get verts v) xy) xy)))
+          (setf (aref verts (* v 2)) (vec::vec-x fxy)
+                (aref verts (1+ (* v 2))) (vec::vec-y fxy))
           fxy)))))
 
 
@@ -72,7 +72,7 @@
 (defstruct (append-edge-alt
     (:constructor append-edge? (v xy &key (rel t) g)))
   (xy nil :type vec:vec :read-only t)
-  (v nil :type integer :read-only t)
+  (v nil :type fixnum :read-only t)
   (g nil :type symbol :read-only t)
   (rel t :type boolean :read-only t))
 
@@ -88,7 +88,7 @@
       (-valid-vert (num-verts v :err nil)
         (let ((w (if rel (add-vert! snk (vec:add (get-vert snk v) xy))
                          (add-vert! snk xy))))
-          (declare (integer w))
+          (declare (fixnum w))
           (add-edge! snk (list v w) :g g)
           w)))))
 
@@ -96,7 +96,7 @@
 (defstruct (append-edge-segx-alt
     (:constructor append-edge-segx? (v xy &key (rel t) x g)))
   (xy nil :type vec:vec :read-only t)
-  (v nil :type integer :read-only t)
+  (v nil :type fixnum :read-only t)
   (g nil :type symbol :read-only t)
   (x nil :type symbol :read-only t)
   (rel t :type boolean :read-only t))
@@ -134,8 +134,8 @@
 
 (defstruct (join-verts-alt
     (:constructor join-verts? (v w &key g)))
-  (v nil :type integer :read-only t)
-  (w nil :type integer :read-only t)
+  (v nil :type fixnum :read-only t)
+  (w nil :type fixnum :read-only t)
   (g nil :type symbol :read-only t))
 
 
@@ -190,12 +190,12 @@
   (with-struct (split-edge-alt- e g) a
     (let ((res (del-edge! snk e :g g))
           (verts (snek-verts snk)))
-      (declare (type (array double-float) verts))
+      (declare (type (simple-array double-float) verts))
       (destructuring-bind (a b) e
-        (declare (integer a b))
+        (declare (fixnum a b))
         (if res
-          (let ((c (add-vert! snk (vec:mid (vec:arr-get verts a)
-                                           (vec:arr-get verts b)))))
+          (let ((c (add-vert! snk (vec:mid (vec:sarr-get verts a)
+                                           (vec:sarr-get verts b)))))
             (add-edge! snk (list a c) :g g)
             (add-edge! snk (list c b) :g g)))))))
 

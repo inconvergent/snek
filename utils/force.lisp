@@ -15,7 +15,7 @@
            (,rname (math:dfloat ,r)))
       (-get-force-alterations
         ,v1name ,v2name
-        (vec:scale (vec:nsub (vec:arr-get ,vname ,v1name)
-                             (vec:arr-get ,vname ,v2name))
+        (vec:scale (vec:nsub (vec:sarr-get ,vname ,v1name)
+                             (vec:sarr-get ,vname ,v2name))
           ,rname)))))
 

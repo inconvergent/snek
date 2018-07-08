@@ -7,9 +7,9 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defstruct (graph (:constructor -make-graph))
-  (size 0 :type integer :read-only t)
+  (size 0 :type fixnum :read-only t)
   (inc 0 :type float :read-only t)
-  (num-edges 0 :type integer)
+  (num-edges 0 :type fixnum)
   (adj nil :type hash-table)
   (verts nil :type hash-table)
   (make-hset nil :read-only t))
@@ -25,7 +25,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun -add (make adj a b)
-  (declare (integer a b))
+  (declare (fixnum a b))
   (multiple-value-bind (val exists)
     (gethash a adj)
     (if (not exists)
@@ -37,7 +37,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 (defun add (grph a b)
   (declare (graph grph))
-  (declare (integer a b))
+  (declare (fixnum a b))
   (with-struct (graph- adj make-hset verts) grph
     (if (progn (hset:add* verts (list a b))
                (reduce (lambda (x y) (or x y))
@@ -48,13 +48,13 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun -del (adj a b)
-  (declare (integer a b))
+  (declare (fixnum a b))
   (multiple-value-bind (val exists) (gethash a adj)
     (when exists (hset:del val b))))
 
 
 (defun -prune (adj verts a)
-  (declare (integer a))
+  (declare (fixnum a))
   (multiple-value-bind (val exists) (gethash a adj)
     (if (not exists)
         (hset:del verts a)
@@ -65,7 +65,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 (defun del (grph a b)
   (declare (graph grph))
-  (declare (integer a b))
+  (declare (fixnum a b))
   (with-struct (graph- adj verts) grph
     (if (reduce (lambda (x y) (or x y))
                 (list (-del adj a b) (-del adj b a)))
@@ -87,7 +87,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 (defun mem (grph a b)
   (declare (graph grph))
-  (declare (integer a b))
+  (declare (fixnum a b))
   (with-struct (graph- adj) grph
     (multiple-value-bind (val exists) (gethash a adj)
       (when exists (hset:mem val b)))))
@@ -99,8 +99,8 @@ a simple (undirected) graph structure based on adjacency lists.
         (adj (graph-adj grph)))
     (declare (type (array list) res))
     (declare (hash-table adj))
-    (loop for a of-type integer being the hash-keys of adj do
-      (loop for b of-type integer in (hset:to-list (gethash a adj))
+    (loop for a of-type fixnum being the hash-keys of adj do
+      (loop for b of-type fixnum in (hset:to-list (gethash a adj))
         if (<= a b)
         do (vector-push-extend (list a b) res)))
     res))
@@ -108,10 +108,10 @@ a simple (undirected) graph structure based on adjacency lists.
 
 (defun get-incident-edges (grph v)
   (declare (graph grph))
-  (declare (integer v))
+  (declare (fixnum v))
   (with-struct (graph- adj) grph
     (let ((a (gethash v adj)))
-      (when a (loop for w of-type integer being the hash-keys of a
+      (when a (loop for w of-type fixnum being the hash-keys of a
                     collect (sort (list v w) #'<))))))
 
 
@@ -122,15 +122,15 @@ a simple (undirected) graph structure based on adjacency lists.
 
 (defun vmem (grph v)
   (declare (graph grph))
-  (declare (integer v))
+  (declare (fixnum v))
   (hset:mem (graph-verts grph) v))
 
 
 (defmacro with-graph-edges ((grph e) &body body)
   (with-gensyms (adj a b)
     `(let ((,adj (graph-adj ,grph)))
-      (loop for ,a of-type integer being the hash-keys of ,adj collect
-        (loop for ,b of-type integer in (hset:to-list (gethash ,a ,adj))
+      (loop for ,a of-type fixnum being the hash-keys of ,adj collect
+        (loop for ,b of-type fixnum in (hset:to-list (gethash ,a ,adj))
               do (setf ,e (list ,a ,b))
               collect (list ,@body))))))
 

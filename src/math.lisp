@@ -4,24 +4,23 @@
 (defvar dotlim 0.95d0)
 
 (declaim (ftype (function (number) double-float) dfloat))
-(declaim (ftype (function (number) integer) int))
+(declaim (ftype (function (number) fixnum) int))
 (declaim (ftype (function (number) float) sfloat))
 
 
 ; TYPES
 
 (defun int (x)
-  (the integer
-    (coerce (floor x) 'integer)))
+  (the fixnum
+    (coerce (floor x) 'fixnum)))
 
 
 (defun int* (xx)
-  (mapcar (lambda (x) (int (floor x))) xx))
+  (mapcar (lambda (x) (int (the fixnum (floor x)))) xx))
 
 
 (defun sfloat (x)
-  (the float
-    (coerce x 'float)))
+  (the float (coerce x 'float)))
 
 
 (defun sfloat* (xx)
@@ -29,8 +28,7 @@
 
 
 (defun dfloat (x)
-  (the double-float
-    (coerce x 'double-float)))
+  (the double-float (coerce x 'double-float)))
 
 
 (defun dfloat* (xx)
@@ -51,11 +49,10 @@
 
 
 (defun range (a &optional (b nil))
-  ; TODO
-  ; (declare (integer a))
+  (declare (fixnum a))
   (if (not b)
-      (loop for x of-type integer from 0 below a collect x)
-      (loop for x of-type integer from a below b collect x)))
+      (loop for x of-type fixnum from 0 below a collect x)
+      (loop for x of-type fixnum from a below (the fixnum b) collect x)))
 
 
 (defun lget (l ii)
@@ -64,7 +61,7 @@
   "
   (declare (list l ii))
   (loop with arr = (to-array l)
-        for i of-type integer in ii collect (aref arr i)))
+        for i of-type fixnum in ii collect (aref arr i)))
 
 
 (defun inc (x stp)
@@ -72,17 +69,17 @@
 
 
 (defun mod- (i n)
-  (declare (integer i n))
+  (declare (fixnum i n))
   (mod (+ n i -1) n))
 
 
 (defun mod+ (i n)
-  (declare (integer i n))
+  (declare (fixnum i n))
   (mod (+ n i 1) n))
 
 
 (defun mod2 (i)
-  (declare (integer i))
+  (declare (fixnum i))
   (mod i 2))
 
 
@@ -101,7 +98,7 @@
 
 
 (defun linspace (n a b &key (end t))
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float a b))
   (declare (boolean end))
   (if (> n 1)

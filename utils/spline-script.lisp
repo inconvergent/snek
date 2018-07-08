@@ -2,8 +2,8 @@
 (defstruct spline-glyph
   (name nil :type character :read-only t)
   (area 0d0 :type double-float :read-only t)
-  (nc 4 :type integer :read-only t)
-  (ncn 1 :type integer :read-only t)
+  (nc 4 :type fixnum :read-only t)
+  (ncn 1 :type fixnum :read-only t)
   (min-dst 0d0 :type double-float :read-only t)
   (centroids nil :type list)
   (bbox-fxn nil :type function)

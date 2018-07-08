@@ -70,7 +70,7 @@
 (defmacro -valid-vert ((num vv &key (err t)) &body body)
   (with-gensyms (v)
     `(let ((,v ,vv))
-      (declare (integer ,v))
+      (declare (fixnum ,v))
       (if (and (> ,v -1) (< ,v ,num))
         (progn ,@body)
         (when ,err (error "vert does not exist: ~a" ,v))))))
@@ -79,7 +79,7 @@
 (defmacro -valid-verts ((num vv v) &body body)
   (with-gensyms (vv*)
     `(let ((,vv* ,vv))
-      (loop for ,v of-type integer in ,vv*
+      (loop for ,v of-type fixnum in ,vv*
             if (and (> ,v -1) (< ,v ,num))
             collect (progn ,@body)))))
 
@@ -93,9 +93,9 @@
   (declare (snek snk))
   (declare (vec:vec xy))
   (with-struct (snek- verts num-verts) snk
-    (declare (type (array double-float) verts))
-    (setf (aref verts num-verts 0) (vec::vec-x xy)
-          (aref verts num-verts 1) (vec::vec-y xy)))
+    (declare (type (simple-array double-float) verts))
+    (setf (aref verts (* 2 num-verts)) (vec::vec-x xy)
+          (aref verts (1+ (* 2 num-verts))) (vec::vec-y xy)))
 
   (let ((i (1- (incf (snek-num-verts snk)))))
     (when name
@@ -158,11 +158,11 @@
   get the coordinate (vec) of vertex (id) v
   "
   (declare (snek snk))
-  (declare (integer v))
+  (declare (fixnum v))
   (with-struct (snek- verts num-verts) snk
-    (declare (type (array double-float) verts))
+    (declare (type (simple-array double-float) verts))
     (-valid-vert (num-verts v)
-      (vec:arr-get verts v))))
+      (vec:sarr-get verts v))))
 
 
 (defun get-verts (snk vv &aux (vv* (if (equal (type-of vv) 'cons)
@@ -172,9 +172,9 @@
   "
   (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
-    (declare (type (array double-float) verts))
+    (declare (type (simple-array double-float) verts))
     (-valid-verts (num-verts vv* v)
-      (vec:arr-get verts v))))
+      (vec:sarr-get verts v))))
 
 
 (defun get-all-verts (snk)
@@ -183,9 +183,9 @@
   "
   (declare (snek snk))
   (with-struct (snek- verts num-verts) snk
-    (declare (type (array double-float) verts))
-    (loop for v of-type integer from 0 below num-verts
-          collect (vec:arr-get verts v))))
+    (declare (type (simple-array double-float) verts))
+    (loop for v of-type fixnum from 0 below num-verts
+          collect (vec:sarr-get verts v))))
 
 
 (defun get-all-grps (snk &key main)
@@ -272,7 +272,7 @@
   tests whether v is in grp g
   "
   (declare (snek snk))
-  (declare (integer v))
+  (declare (fixnum v))
   (with-struct (snek- grps) snk
     (multiple-value-bind (grp exists)
       (gethash g grps)
@@ -339,7 +339,7 @@
 ; TODO: get-all-incident-edges?
 (defun get-incident-edges (snk v &key g)
   (declare (snek snk))
-  (declare (integer v))
+  (declare (fixnum v))
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
       (graph:get-incident-edges grph v))))
@@ -358,7 +358,7 @@
     (with-struct (snek- num-verts) snk
       (with-struct (grp- grph) grp
         (destructuring-bind (a b) ee
-          (declare (integer a b))
+          (declare (fixnum a b))
           (when (and (< a num-verts)
                      (< b num-verts)
                      (not (eql a b)))
@@ -382,7 +382,7 @@
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
       (destructuring-bind (a b) ee
-        (declare (integer a b))
+        (declare (fixnum a b))
         (graph:del grph a b)))))
 
 
@@ -391,6 +391,6 @@
   (declare (vec:vec xy))
   (declare (double-float rad))
   (with-struct (snek- verts zmap) snk
-    (declare (type (array double-float) verts))
+    (declare (type (simple-array double-float) verts))
     (zmap:verts-in-rad zmap verts xy rad)))
 

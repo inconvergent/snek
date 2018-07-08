@@ -4,17 +4,17 @@
 
 (defstruct (snek (:constructor -make-snek))
   (name nil :type symbol :read-only t)
-  (wc 0 :type integer)
-  (verts nil :type array)
-  (num-verts 0 :type integer)
+  (wc 0 :type fixnum)
+  (verts nil :type simple-array)
+  (num-verts 0 :type fixnum)
   (zmap nil)
   (prm-names nil :read-only t)
   (alt-names nil :read-only t)
   (grps (make-hash-table :test #'equal))
   (prms (make-hash-table :test #'equal))
   (vert-names (make-hash-table :test #'equal))
-  (max-verts nil :type integer :read-only t)
-  (grp-size nil :type integer :read-only t))
+  (max-verts nil :type fixnum :read-only t)
+  (grp-size nil :type fixnum :read-only t))
 
 
 ; ----- GROUPS AND PRIMITIVES -----
@@ -29,8 +29,8 @@
 (defstruct (prm (:constructor -make-prm))
   (name nil :type symbol :read-only t)
   (type nil :type symbol :read-only t)
-  (verts (make-generic-array :type 'integer) :read-only nil)
-  (num-verts 0 :type integer)
+  (verts (make-generic-array :type 'fixnum) :read-only nil)
+  (num-verts 0 :type fixnum)
   (args nil :type list :read-only nil)
   (props nil))
 
@@ -59,8 +59,8 @@
     with prm types and corresponding rfxns used to render that prm type.
   "
   (-make-snek :name name
-              :verts (make-array (list max-verts 2) :initial-element 0d0
-                                                    :element-type 'double-float)
+              :verts (make-array (* max-verts 2) :initial-element 0d0
+                                                 :element-type 'double-float)
               :max-verts max-verts
               :grp-size grp-size
               :alt-names (-make-fxns (list '(add-edge-alt do-add-edge-alt)

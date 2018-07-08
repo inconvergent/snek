@@ -98,22 +98,22 @@
 
 
 (defun -draw-dens-stroke (indfx vals size dens v1 v2 fg)
-  (declare (function indfx))
-  (declare (type (simple-array double-float) vals))
-  (declare (fixnum size))
-  (declare (double-float dens))
-  (declare (color:rgba fg))
+  (declare (function indfx)
+           (type (simple-array double-float) vals)
+           (fixnum size)
+           (double-float dens)
+           (color:rgba fg))
   (rnd:with-on-line ((ceiling (* dens (vec:dst v1 v2))) v1 v2 rn)
     (-inside-round (size rn x y)
       (-operator-over indfx vals x y fg))))
 
 
 (defun -draw-circ (indfx vals size xy rad grains fg)
-  (declare (function indfx))
-  (declare (type (simple-array double-float) vals))
-  (declare (fixnum size grains))
-  (declare (double-float rad))
-  (declare (color:rgba fg))
+  (declare (function indfx)
+           (type (simple-array double-float) vals)
+           (fixnum size grains)
+           (double-float rad)
+           (color:rgba fg))
   (rnd:with-in-circ (grains rad p :xy xy)
     (-inside-round (size p x y)
       (-operator-over indfx vals x y fg))))
@@ -146,8 +146,7 @@
            (double-float g))
   (let* ((ind (funcall indfx x y))
          (a (aref vals (+ 3 ind))))
-    (declare (double-float a))
-    (declare (fixnum ind))
+    (declare (double-float a) (fixnum ind))
     (if (> a 0.0d0)
       (values (funcall bitfx (-scale-convert (aref vals (+ ind 0)) :s a :gamma g))
               (funcall bitfx (-scale-convert (aref vals (+ ind 1)) :s a :gamma g))
@@ -160,8 +159,7 @@
   (declare (sandpaint sand))
   (color:with ((if c c (sandpaint-bg sand)) r g b a)
     (with-struct (sandpaint- size vals indfx) sand
-      (declare (function indfx))
-      (declare (fixnum size))
+      (declare (function indfx) (fixnum size))
       (-square-loop (x y size)
         (let ((ind (funcall indfx x y)))
           (declare (fixnum ind))
@@ -199,8 +197,7 @@
 (defun pix (sand vv)
   (declare (list vv))
   (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx))
-    (declare (fixnum size))
+    (declare (function indfx) (fixnum size))
     (loop for v of-type vec:vec in vv do
       (-inside-round (size v x y)
         (-operator-over indfx vals x y fg)))))
@@ -209,10 +206,9 @@
 (defun arr-pix (sand vv n)
   (declare (fixnum n))
   (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx))
-    (declare (fixnum size))
+    (declare (function indfx) (fixnum size))
     (loop for i of-type fixnum from 0 below n do
-      (-inside-round (size (vec:arr-get vv i) x y)
+      (-inside-round (size (vec:sarr-get vv i) x y)
         (-operator-over indfx vals x y fg)))))
 
 
@@ -320,7 +316,7 @@
              (fixnum size)
              (type (simple-array double-float) vals))
     (loop for i of-type fixnum from 0 below num do
-      (-draw-circ indfx vals size (vec:arr-get vv i) rad grains fg))))
+      (-draw-circ indfx vals size (vec:sarr-get vv i) rad grains fg))))
 
 
 (defun strokes (sand lines grains)
@@ -335,12 +331,11 @@
 
 
 (defun stroke (sand line grains &key overlap)
-  (declare (fixnum grains))
-  (declare (list line))
+  (declare (fixnum grains) (list line))
   (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx))
-    (declare (fixnum size))
-    (declare (type (simple-array double-float) vals))
+    (declare (function indfx)
+             (fixnum size)
+             (type (simple-array double-float) vals))
     (destructuring-bind (u v) line
       (if overlap
         (-draw-stroke-overlap indfx vals size grains u v fg)
@@ -348,23 +343,21 @@
 
 
 (defun dens-stroke (sand line &optional (dens 1d0))
-  (declare (double-float dens))
-  (declare (list line))
+  (declare (double-float dens) (list line))
   (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx))
-    (declare (fixnum size))
-    (declare (type (simple-array double-float) vals))
+    (declare (function indfx)
+             (fixnum size)
+             (type (simple-array double-float) vals))
     (destructuring-bind (u v) line
       (-draw-dens-stroke indfx vals size dens u v fg))))
 
 
 (defun lin-path (sand path rad grains &key (dens 1d0))
-  (declare (double-float rad dens))
-  (declare (fixnum grains))
+  (declare (double-float rad dens) (fixnum grains))
   (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx))
-    (declare (fixnum size))
-    (declare (type (simple-array double-float) vals))
+    (declare (function indfx)
+             (fixnum size)
+             (type (simple-array double-float) vals))
     (loop for u of-type vec:vec in path
           and w of-type vec:vec in (cdr path)
           do (math:with-linspace ((* (vec:dst u w) dens) 0d0 1d0 p :end nil)
@@ -376,9 +369,9 @@
   save as 8 bits. supports alpha.
   "
   (with-struct (sandpaint- size vals indfx) sand
-    (declare (function indfx))
-    (declare (fixnum size))
-    (declare (type (simple-array double-float) vals))
+    (declare (function indfx)
+             (fixnum size)
+             (type (simple-array double-float) vals))
     (let ((png (make-instance 'zpng::pixel-streamed-png
                               :color-type :truecolor-alpha
                               :width size
@@ -400,9 +393,9 @@
   save as 16 bits. does not support alpha.
   "
   (with-struct (sandpaint- size vals indfx) sand
-    (declare (function indfx))
-    (declare (fixnum size))
-    (declare (type (simple-array double-float) vals))
+    (declare (function indfx)
+             (fixnum size)
+             (type (simple-array double-float) vals))
     (let ((img (png:make-image size ;width
                                size ;height
                                3 16)))

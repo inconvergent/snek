@@ -6,7 +6,7 @@
   (xy nil :type vec:vec)
   (prob 0.0d0 :type double-float)
   (noise 0.0d0 :type double-float)
-  (ind nil :type integer))
+  (ind nil :type fixnum))
 
 
 (defun make-mutate (&key (prob 0.1d0)

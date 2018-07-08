@@ -7,27 +7,27 @@ this is a naive wrapper around hash-map. not sure how efficient it will be?
 
 
 (defun add (s e)
-  (declare (integer e))
+  (declare (fixnum e))
   (multiple-value-bind (val exists) (gethash e s)
     (declare (ignore val))
     (if exists nil (setf (gethash e s) t))))
 
 
 (defun add* (s ee)
-  (loop for e of-type integer in ee collect (add s e)))
+  (loop for e of-type fixnum in ee collect (add s e)))
 
 
 (defun del (s e)
-  (declare (integer e))
+  (declare (fixnum e))
   (remhash e s))
 
 
 (defun del* (s ee)
-  (loop for e of-type integer in ee collect (remhash e s)))
+  (loop for e of-type fixnum in ee collect (remhash e s)))
 
 
 (defun mem (s e)
-  (declare (integer e))
+  (declare (fixnum e))
   (multiple-value-bind (v exists) (gethash e s)
     (declare (ignore v))
     exists))
@@ -45,7 +45,7 @@ this is a naive wrapper around hash-map. not sure how efficient it will be?
 
 
 (defun to-list (s)
-  (loop for e of-type integer being the hash-keys of s collect e))
+  (loop for e of-type fixnum being the hash-keys of s collect e))
 
 
 (defun make (&key init (size 1000) (inc 1.5))

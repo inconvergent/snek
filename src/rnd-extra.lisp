@@ -68,7 +68,7 @@
 
 
 (defun non-circ (n rad &key (xy vec:*zero*))
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float rad))
   (loop repeat n collect (on-circ rad :xy xy)))
 
@@ -83,7 +83,7 @@
 
 
 (defun nin-circ (n rad &key (xy vec:*zero*))
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float rad))
   (loop repeat n collect (in-circ rad :xy xy)))
 
@@ -95,7 +95,7 @@
 
 
 (defun nin-box (n sx sy &key (xy vec:*zero*))
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float sx sy))
   (declare (vec:vec xy))
   (loop repeat n collect (in-box sx sy :xy xy)))
@@ -114,7 +114,7 @@
 
 
 (defun non-line (n a b)
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (vec:vec a b))
   (loop with ba = (vec:sub b a)
         repeat n
@@ -122,7 +122,7 @@
 
 
 (defun non-line* (n ab)
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (list ab))
   (destructuring-bind (a b) ab
     (declare (vec:vec a b))

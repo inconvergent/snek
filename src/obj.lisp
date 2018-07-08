@@ -5,8 +5,8 @@
 (defstruct obj
   (verts nil :read-only nil)
   (faces nil :read-only nil)
-  (num-verts 0 :type integer :read-only nil)
-  (num-faces 0 :type integer :read-only nil))
+  (num-verts 0 :type fixnum :read-only nil)
+  (num-faces 0 :type fixnum :read-only nil))
 
 
 (defun make ()

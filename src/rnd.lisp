@@ -60,11 +60,11 @@
 
 (declaim (ftype (function (double-float double-float) double-float) rndbtwn))
 
-(declaim (ftype (function (integer &optional integer) integer) rndi))
+(declaim (ftype (function (fixnum &optional fixnum) fixnum) rndi))
 
 
 (defun set-rnd-state (i)
-  (declare (integer i))
+  (declare (fixnum i))
   (if (or #+SBCL t nil)
       (setf *random-state* (sb-ext:seed-random-state i))
       (warn "rnd:state is only implemented for SBCL. see src/rnd.lisp
@@ -95,28 +95,28 @@
 
 ; NUMBERS AND RANGES
 
-
-(defun rndi (a &optional b)
-  (declare (integer a))
-  ;(declare (type (or integer nil) b))
+; TODO: deprecate optional arg
+(defun rndi (a &optional b &aux (b* (if b (the fixnum b) 0)))
+  (declare (fixnum a b*))
   (if (not b) (random a)
-              (+ a (random (- (coerce b 'integer) a)))))
+      (+ a (the fixnum (random (the fixnum (- b* a)))))))
 
 
 (defun nrndi (n a &optional b)
+  (declare (fixnum n a))
   (loop repeat n collect (rndi a b)))
 
 
 (defun rndi* (ab)
   (declare (list ab))
   (destructuring-bind (a b) ab
-    (declare (integer a b))
+    (declare (fixnum a b))
     (+ a (random (- b a)))))
 
 
-(defun nrndi* (n ab)
-  (loop repeat n collect (rndi ab)))
-
+(defun nrndi* (n a)
+  (declare (fixnum n a))
+  (loop repeat n collect (rndi a)))
 
 
 (defun rnd (&optional (x 1d0))
@@ -125,7 +125,7 @@
 
 
 (defun nrnd (n &optional (x 1d0))
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float x))
   (loop repeat n collect (rnd x)))
 
@@ -149,7 +149,7 @@
 
 
 (defun nrndbtwn (n a b)
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float a b))
   (loop for i from 0 below n collect (rndbtwn a b)))
 
@@ -160,13 +160,13 @@
 
 
 (defun nrnd* (n &optional (x 1d0))
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float x))
   (loop repeat n collect (rnd* x)))
 
 
 (defun rndspace (n a b &key order)
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float a b))
   (destructuring-bind (a b)
     (sort (list a b) #'<)
@@ -178,18 +178,18 @@
 
 
 (defun rndspacei (n a b &key order)
-  (declare (integer n a b))
+  (declare (fixnum n a b))
   (destructuring-bind (a b)
     (sort (list a b) #'<)
-    (declare (integer a b))
+    (declare (fixnum a b))
     (let ((d (- b a)))
-      (declare (integer d))
+      (declare (fixnum d))
       (let ((res (-nrep n (+ a (random d)))))
         (if order (sort res #'<) res)))))
 
 
 (defun bernoulli (n p)
-  (declare (integer n))
+  (declare (fixnum n))
   (declare (double-float p))
   (loop repeat n collect (if (< (rnd:rnd) p) 1d0 0d0)))
 

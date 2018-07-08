@@ -9,8 +9,6 @@
     :add-scaled
     :all-inside
     :angle
-    :arr-get
-    :arr-set
     :copy
     :cos-sin
     :cross

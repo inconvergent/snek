@@ -18,9 +18,9 @@
   (declare (list e))
   (with-struct (snek- verts) snk
     (destructuring-bind (a b) e
-      (declare (type integer a b))
-      (vec:dst (vec:arr-get verts a)
-               (vec:arr-get verts b)))))
+      (declare (type fixnum a b))
+      (vec:dst (vec:sarr-get verts a)
+               (vec:sarr-get verts b)))))
 
 
 (defun prune-edges-by-len (snk lim &optional (fx #'>))
@@ -36,7 +36,7 @@
 (defun add-circ! (snk num rad &key (xy vec:*zero*) g)
   (let ((vv (loop for p of-type double-float in (math:linspace num 0.0d0 1.0d0)
                   collect (add-vert! snk (vec:on-circ p rad :xy xy)))))
-    (loop for a of-type integer in vv and b of-type integer in (-roll-once vv)
+    (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)
           collect (add-edge! snk (list a b) :g g))))
 
 
@@ -45,7 +45,7 @@
                                     (rot (* 0.25d0 PI)) g)
   (let ((vv (loop for v of-type vec:vec in (vec:polygon n rad :xy xy :rot rot)
                   collect (add-vert! snk v))))
-    (loop for a of-type integer in vv and b of-type integer in (-roll-once vv)
+    (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)
           collect (add-edge! snk (list a b) :g g))))
 
 
@@ -53,18 +53,18 @@
 (defun add-path! (snk points &key g closed)
   (let ((vv (add-verts! snk points)))
     (if closed
-      (loop for a of-type integer in vv and b of-type integer in (-roll-once vv)
+      (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)
             collect (add-edge! snk (list a b) :g g))
-      (loop for a of-type integer in vv and b of-type integer in (cdr vv)
+      (loop for a of-type fixnum in vv and b of-type fixnum in (cdr vv)
             collect (add-edge! snk (list a b) :g g)))))
 
 
 ; primitives?
 (defun add-path*! (snk vv &key g closed)
   (if closed
-    (loop for a of-type integer in vv and b of-type integer in (-roll-once vv)
+    (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)
           collect (add-edge! snk (list a b) :g g))
-    (loop for a of-type integer in vv and b of-type integer in (cdr vv)
+    (loop for a of-type fixnum in vv and b of-type fixnum in (cdr vv)
           collect (add-edge! snk (list a b) :g g))))
 
 
@@ -100,7 +100,7 @@
   (with-struct (snek- verts) snk
     (sandpaint:strokes
       sand
-      (map 'list (lambda (ab) (mapcar (lambda (i) (vec:arr-get verts i)) ab))
+      (map 'list (lambda (ab) (mapcar (lambda (i) (vec:sarr-get verts i)) ab))
                  (get-edges snk :g g))
       grains)))
 

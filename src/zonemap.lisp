@@ -38,26 +38,26 @@
 
 (defstruct (zmap (:constructor -make-zmap))
   (zwidth nil :type double-float :read-only t)
-  (num-verts nil :type integer :read-only t)
+  (num-verts nil :type fixnum :read-only t)
   (zone-to-verts nil :type hash-table :read-only t))
 
 
 (defmacro -add-v-to-zone (verts zone-to-verts v zwidth)
-  `(let ((z (list (floor (aref ,verts ,v 0) ,zwidth)
-                  (floor (aref ,verts ,v 1) ,zwidth))))
+  `(let ((z (list (floor (aref ,verts (* 2 ,v)) ,zwidth)
+                  (floor (aref ,verts (1+ (* 2 ,v))) ,zwidth))))
     (multiple-value-bind (vals exists) (gethash z ,zone-to-verts)
       (when (not exists)
-        (setf vals (make-generic-array :type 'integer)
+        (setf vals (make-generic-array :type 'fixnum)
               (gethash z ,zone-to-verts) vals))
       (vector-push-extend ,v vals))))
 
 
 (defun make (verts num-verts zwidth)
   (declare (double-float zwidth))
-  (declare (integer num-verts))
-  (declare (type (array double-float) verts))
+  (declare (fixnum num-verts))
+  (declare (type (simple-array double-float) verts))
   (let ((zone-to-verts (make-hash-table :test #'equal)))
-    (loop for v of-type integer from 0 below num-verts do
+    (loop for v of-type fixnum from 0 below num-verts do
       (-add-v-to-zone verts zone-to-verts v zwidth))
     (-make-zmap :zwidth zwidth
                 :num-verts num-verts
@@ -76,8 +76,8 @@
         (loop for ,z in (npairs ,za ,zb)
               do (multiple-value-bind (,vals ,exists) (gethash ,z ,zone-to-verts)
                    (when ,exists
-                     (map nil (lambda (,v) (declare (integer ,v))
-                                (when (< (vec:dst2 ,xy* (vec:arr-get ,verts* ,v))
+                     (map nil (lambda (,v) (declare (fixnum ,v))
+                                (when (< (vec:dst2 ,xy* (vec:sarr-get ,verts* ,v))
                                          ,rad2)
                                       (progn ,@body)))
                               ,vals))))))))
@@ -85,21 +85,21 @@
 
 (defun verts-in-rad (zm verts xy rad &aux
                            (rad2 (expt (math:dfloat rad) 2)))
-  (declare (type (array double-float) verts))
+  (declare (type (simple-array double-float) verts))
   (declare (zmap zm))
   (declare (vec:vec xy))
   (declare (double-float rad2))
   (with-struct (zmap- zwidth zone-to-verts) zm
-    (let ((inds (make-generic-array :type 'integer)))
-      (declare (type (array integer) inds))
+    (let ((inds (make-generic-array :type 'fixnum)))
+      (declare (type (array fixnum) inds))
       (multiple-value-bind (za zb)
         (-xy-to-zone xy zwidth)
-        (declare (integer za zb))
+        (declare (fixnum za zb))
         (loop for z in (npairs za zb) do
           (multiple-value-bind (vals exists)
             (gethash z zone-to-verts)
-            (when exists (map nil (lambda (zj) (declare (integer zj))
-                           (when (< (vec:dst2 xy (vec:arr-get verts zj)) rad2)
+            (when exists (map nil (lambda (zj) (declare (fixnum zj))
+                           (when (< (vec:dst2 xy (vec:sarr-get verts zj)) rad2)
                              (vector-push-extend zj inds)))
                            vals)))))
       inds)))

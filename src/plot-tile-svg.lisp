@@ -177,7 +177,7 @@
   "
   (declare (plot-tile-svg msvg))
   (declare (list pts))
-  (declare (integer n))
+  (declare (fixnum n))
   (loop with all = (to-array (lin-path:pos*
                                (lin-path:make pts :closed closed)
                                (sort (rnd:nrnd (* 2 n)) (rnd:either #'< #'>))))

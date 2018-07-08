@@ -107,7 +107,7 @@
       (let ((,grph (grp-grph ,grp)))
         (let* ((,edges (graph:get-edges ,grph))
                (,ln (length ,edges)))
-          (declare (integer ,ln))
+          (declare (fixnum ,ln))
           (when (> ,ln 0)
             (let ((,i (aref ,edges (rnd:rndi ,ln))))
               (declare (list ,i))
@@ -124,7 +124,7 @@
     `(let ((,num (snek-num-verts ,snk)))
        (when (> ,num 0)
          (let ((,i (rnd:rndi ,num)))
-           (declare (integer ,i))
+           (declare (fixnum ,i))
            (list ,@body))))))
 
 
@@ -142,7 +142,7 @@
     `(let ((,sname ,snk))
       (with-grp (,sname ,grp ,g)
         (map ',(if collect 'list 'nil)
-          (lambda (,i) (declare (integer ,i)) (list ,@body))
+          (lambda (,i) (declare (fixnum ,i)) (list ,@body))
           (graph:get-verts (grp-grph ,grp)))))))
 
 
@@ -155,7 +155,7 @@
   (with-gensyms (sname)
     `(let* ((,sname ,snk))
       (map ',(if collect 'list 'nil)
-          (lambda (,i) (declare (integer ,i)) (list ,@body))
+          (lambda (,i) (declare (fixnum ,i)) (list ,@body))
           (get-prm-vert-inds ,sname :p ,p)))))
 
 
@@ -167,7 +167,7 @@
   (declare (type boolean collect))
   (with-gensyms (sname)
     `(let ((,sname ,snk))
-      (loop for ,i of-type integer from 0 below (snek-num-verts ,sname)
+      (loop for ,i of-type fixnum from 0 below (snek-num-verts ,sname)
         ,(if collect 'collect 'do) (list ,@body)))))
 
 

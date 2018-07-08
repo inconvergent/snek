@@ -5,9 +5,9 @@
 
 (defun sum-alter-velocity (velocities a num)
   (loop for i from 1 to (1- num) do
-    (vec:arr-set velocities i
-                 (vec:add (rnd:in-circ a)
-                          (vec:arr-get velocities (1- i))))))
+    (vec:sarr-set velocities i
+                  (vec:add (rnd:in-circ a)
+                           (vec:sarr-get velocities (1- i))))))
 
 
 (defun make-lattice (n a b)
@@ -22,8 +22,8 @@
   (let ((snk (snek:make))
         (verts nil)
         (grains 4)
-        (velocities (make-array (list 100 2) :initial-element 0d0
-                                             :element-type 'double-float))
+        (velocities (make-array 200 :initial-element 0d0
+                                    :element-type 'double-float))
         (lattice (make-lattice 50 100d0 900d0))
         (noise 1.5d0)
         (itt 8000)
@@ -44,7 +44,7 @@
                    ; TODO mutate was used here. implement later.
                    (snek:join-verts? p1 p2)
                    (snek:itr-verts (snk v)
-                     (snek:move-vert? v (vec:arr-get velocities v)))))))
+                     (snek:move-vert? v (vec:sarr-get velocities v)))))))
 
         (snek:draw-edges snk sand grains))
 
