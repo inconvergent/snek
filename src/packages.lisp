@@ -58,6 +58,8 @@
     :rect
     :rep
     :rot
+    :sarr-get
+    :sarr-set
     :scale
     :segdst
     :segx

@@ -167,8 +167,23 @@
         (aref a i 1) (the double-float (vec-y v))))
 
 
-; MATHS
+; tODO: replace arr-get arr-set with this everywhere
+(defun sarr-get (a i &aux (ii (* 2 i)))
+  (declare (fixnum i ii)
+           (type (simple-array double-float) a))
+  (vec (aref a ii) (aref a (1+ ii))))
 
+
+(defun sarr-set (a i v &aux (ii (* 2 i)))
+  (declare (vec v)
+           (fixnum i ii)
+           (type (simple-array double-float) a))
+  (setf (aref a ii) (the double-float (vec-x v))
+        (aref a (1+ ii)) (the double-float (vec-y v))))
+
+
+
+; MATHS
 
 
 (defun cos-sin (a)
