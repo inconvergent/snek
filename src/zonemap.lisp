@@ -11,6 +11,8 @@
       (when ,zw*
         (let ((,verts* ,verts)
               (,num-verts* ,num-verts))
+          (declare (type (simple-array double-float) ,verts*)
+                   (fixnum ,num-verts*))
           (funcall ,context-fxn (make ,verts* ,num-verts* ,zw*))))
       (progn ,@body))))
 
@@ -32,8 +34,8 @@
   (declare (vec:vec xy))
   (declare (double-float zwidth))
   (vec:with-xy (xy x y)
-    (values (floor x zwidth)
-            (floor y zwidth))))
+    (values (the fixnum (floor x zwidth))
+            (the fixnum (floor y zwidth)))))
 
 
 (defstruct (zmap (:constructor -make-zmap))
@@ -66,7 +68,7 @@
 
 (defmacro with-verts-in-rad ((zm verts xy rad v) &body body)
   (with-gensyms (rad2 zm* zwidth zone-to-verts xy* za zb vals verts* exists z)
-    `(let* ((,rad2 (expt ,rad 2))
+    `(let* ((,rad2 (expt ,rad 2d0))
             (,verts* ,verts)
             (,zm* ,zm)
             (,xy* ,xy)
@@ -82,7 +84,7 @@
                                       (progn ,@body)))
                               ,vals))))))))
 
-
+; TODO: rad must be double-float
 (defun verts-in-rad (zm verts xy rad &aux
                            (rad2 (expt (math:dfloat rad) 2)))
   (declare (type (simple-array double-float) verts))

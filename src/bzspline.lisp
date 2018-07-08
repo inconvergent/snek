@@ -186,20 +186,21 @@
 
 (defun -get-samples (vpts seg c)
   (declare (fixnum seg c))
-  (loop for xi of-type double-float in (math:linspace (expt 2 c) 0d0 1d0)
+  (loop for xi of-type double-float in
+          (math:linspace (the fixnum (expt 2 (the fixnum c))) 0d0 1d0)
         collect (do-calc xi (-select-pts vpts seg))))
 
 (defun -get-segment-length (vpts seg &key (lim 1d-7))
-  (loop with curr
-        with prev = 0d0
-        with err = 10d0
+  (loop with curr of-type double-float = 0d0
+        with prev of-type double-float = 0d0
+        with err of-type double-float = 10d0
         for c of-type fixnum from 3
         do (setf curr (loop with samples = (-get-samples vpts seg c)
                             for sa of-type vec:vec in samples
                             and sb of-type vec:vec in (cdr samples)
                             summing (vec:dst sa sb)))
            (setf err (the double-float (abs (- prev curr)))
-                 prev curr)
+                 prev (the double-float curr))
            (when (< err lim) (return curr))))
 
 
