@@ -13,8 +13,8 @@
   "
   add vert at xy.
   "
-  (declare (snek snk))
-  (declare (add-vert-alt a))
+  (declare (snek snk)
+           (add-vert-alt a))
   (with-struct (add-vert-alt- xy p) a
     (add-vert! snk xy :p p)))
 
@@ -32,8 +32,8 @@
   "
   add verts xya and xyb, and create an edge between them.
   "
-  (declare (snek snk))
-  (declare (add-edge*-alt a))
+  (declare (snek snk)
+           (add-edge*-alt a))
   (with-struct (add-edge*-alt- xya xyb g) a
     (add-edge! snk (list (add-vert! snk xya)
                          (add-vert! snk xyb))
@@ -55,16 +55,23 @@
   if rel: move relative to original position.
   else: move to xy.
   "
-  (declare (snek snk))
-  (declare (move-vert-alt a))
+  (declare (snek snk) (move-vert-alt a))
   (with-struct (snek- verts num-verts) snk
     (declare (type (simple-array double-float) verts))
     (with-struct (move-vert-alt- v xy rel) a
+      (declare (fixnum v) (vec:vec xy) (boolean rel))
       (-valid-vert (num-verts v :err nil)
-        (let ((fxy (if rel (vec:add (vec:sarr-get verts v) xy) xy)))
-          (setf (aref verts (* v 2)) (vec::vec-x fxy)
-                (aref verts (1+ (* v 2))) (vec::vec-y fxy))
-          fxy)))))
+        (let ((x (vec::vec-x xy))
+              (y (vec::vec-y xy))
+              (i (* 2 v))
+              (ii (1+ (* 2 v))))
+          (declare (double-float x y)
+                   (fixnum i ii))
+          (if rel (setf (aref verts i) (+ (aref verts i) x)
+                        (aref verts ii) (+ (aref verts ii) y))
+                  (setf (aref verts i) x
+                        (aref verts ii) y))
+          (vec:vec (aref verts i) (aref verts ii)))))))
 
 
 ; APPEND EDGE
@@ -81,8 +88,8 @@
   "
   add edge between vert v and new vert xy
   "
-  (declare (snek snk))
-  (declare (append-edge-alt a))
+  (declare (snek snk)
+           (append-edge-alt a))
   (with-struct (snek- num-verts) snk
     (with-struct (append-edge-alt- v xy rel g) a
       (-valid-vert (num-verts v :err nil)
@@ -103,8 +110,8 @@
 
 
 (defun -line-segx-edges (snk line &key g)
-  (declare (snek snk))
-  (declare (list line))
+  (declare (snek snk)
+           (list line))
   (loop for e of-type list across (get-edges snk :g g)
         if (multiple-value-bind (x p)
              (vec:segx line (get-verts snk e))
@@ -119,8 +126,8 @@
 
   if x, the new edge is only added if it intersects.
   "
-  (declare (snek snk))
-  (declare (append-edge-segx-alt a))
+  (declare (snek snk)
+           (append-edge-segx-alt a))
   (with-struct (append-edge-segx-alt- v xy rel x g) a
     (let* ((p1 (get-vert snk v))
            (p2 (if rel (vec:add p1 xy) xy))
@@ -143,8 +150,8 @@
   "
   create edge between valid verts v and w.
   "
-  (declare (snek snk))
-  (declare (join-verts-alt a))
+  (declare (snek snk)
+           (join-verts-alt a))
   (with-struct (snek- num-verts) snk
     (with-struct (join-verts-alt- v w g) a
       (-valid-vert (num-verts v :err nil)
@@ -165,8 +172,8 @@
   "
   del edge v and w.
   "
-  (declare (snek snk))
-  (declare (del-edge-alt a))
+  (declare (snek snk)
+           (del-edge-alt a))
   (with-struct (snek- num-verts) snk
     (with-struct (del-edge-alt- e g) a
       (del-edge! snk e :g g))))
@@ -185,8 +192,8 @@
   insert a vert, v, at the middle of edge e = (a b)
   such that we get edges (a v) and (v b).
   "
-  (declare (snek snk))
-  (declare (split-edge-alt a))
+  (declare (snek snk)
+           (split-edge-alt a))
   (with-struct (split-edge-alt- e g) a
     (let ((res (del-edge! snk e :g g))
           (verts (snek-verts snk)))
@@ -216,8 +223,8 @@
     then gets the alteration and its result as arguments.
     else gets the alteration as its argument.
   "
-  (declare (snek snk))
-  (declare (alt-then a))
+  (declare (snek snk)
+           (alt-then a))
   (with-struct (alt-then- alt then else) a
     (let ((res (funcall (gethash (type-of alt)
                                  (snek-alt-names snk)) snk alt)))

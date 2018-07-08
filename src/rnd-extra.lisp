@@ -61,6 +61,7 @@
 ; SHAPES
 
 
+; TODO: this can be optimized
 (defun on-circ (rad &key (xy vec:*zero*))
   (declare (double-float rad))
   (declare (vec:vec xy))
@@ -78,8 +79,12 @@
   (let ((a (random 1d0))
         (b (random 1d0)))
     (declare (double-float a b))
-    (if (< a b) (vec:add-scaled xy (vec:cos-sin (* PII (/ a b))) (* b rad))
-                (vec:add-scaled xy (vec:cos-sin (* PII (/ b a))) (* a rad)))))
+    (vec:with-xy (xy x y)
+      (if (< a b)
+        (vec:vec (+ x (* (cos #1=(* PII (/ a b))) #3=(* b rad)))
+                 (+ y (* (sin #1#) #3#)))
+        (vec:vec (+ x (* (cos #2=(* PII (/ b a))) #4=(* a rad)))
+                 (+ y (* (sin #2#) #4#)))))))
 
 
 (defun nin-circ (n rad &key (xy vec:*zero*))

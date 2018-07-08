@@ -17,28 +17,35 @@
 
 
 (defun append-postfix (fn postfix)
+  (declare (string fn postfix))
   (concatenate 'string fn postfix))
 
 
 (defun append-number (fn i)
+  (declare (string fn)
+           (fixnum i))
   (format nil "~a-~8,'0d" fn i))
 
 
 (defun ensure-filename (fn &optional (postfix "") (silent nil))
   (let ((fn* (append-postfix (if fn fn "tmp") postfix)))
+    (declare (string fn*))
     (format (not silent) "~%file: ~a~%~%" fn*)
     fn*))
 
 
 (defun print-every (i n)
+  (declare (fixnum i n))
   (when (= 0 (mod i n)) (format t "~%itt: ~a~%" i)))
 
 
 (defun string-list-concat (l)
+  (declare (list l))
   (format nil "~{~a~}" l))
 
 (defun numshow (a)
-  (if (< 1d-6 (abs a) 1d6)
+  (declare (double-float a))
+  (if (< 1d-6 (the double-float (abs a)) 1d6)
     (format nil "~,6f " a)
     (format nil "~,1e " a)))
 
@@ -49,22 +56,26 @@
 
 (defun dhalf (l)
   (declare (double-float l))
-  (* l 0.5d0))
+  (coerce (* l 0.5d0) 'double-float))
 
 
 (defun half (l)
-  (/ l 2))
+  (declare (number l))
+  (coerce (/ (coerce l 'double-float) 2d0) 'double-float))
 
 
 (defun length-1 (a)
-  (1- (length a)))
+  (declare (sequence a))
+  (1- (the fixnum (length a))))
 
 
 (defun array-last (a)
-  (aref a (length-1 a)))
+  (declare (sequence a))
+  (aref a (the fixnum (length-1 a))))
 
 
 (defun array-add (a vv)
+  (declare (sequence vv))
   (if (eql (type-of vv) 'cons)
     (loop for v in vv do (array-push v a))
     (loop for v across vv do (array-push v a))))
@@ -88,6 +99,7 @@
 
 
 (defun ensure-array (o &key (fx #'to-array))
+  (declare (sequence o))
   (if (equal (type-of o) 'cons) (funcall fx o) o))
 
 
@@ -99,7 +111,7 @@
 
 
 (defun to-generic-array (init &key (type t))
-  (make-array (* (length init))
+  (make-array (length init)
               :fill-pointer (length init)
               :initial-contents init
               :element-type type
@@ -135,14 +147,17 @@
 
 
 (defun to-list (a)
+  (declare (sequence a))
   (coerce a 'list))
 
 
 (defun rep-list (colors &aux (n (length colors)))
+  (declare (fixnum n))
   (let ((i 0))
     (lambda () (nth (setf i (mod (+ 1 i) n)) colors))))
 
 
 (defun close-path (p)
+  (declare (list p))
   (append p (list (nth 0 p))))
 
