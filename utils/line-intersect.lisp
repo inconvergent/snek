@@ -11,7 +11,7 @@
 (defun make-dims (n left right)
   (let ((w (* 0.5d0 (- right left)))
         (mid (* 0.5d0 (+ right left))))
-    (to-array
+    (to-vector
       (loop for i from 0 below n
             collect (list (rnd:in-box w w :xy (vec:vec mid)) (rnd:on-circ 1d0))))))
 
@@ -20,13 +20,13 @@
   (let ((w (* 0.5d0 (- right left)))
         (mid (* 0.5d0 (+ right left))))
 
-    (to-array
+    (to-vector
       (loop for (xy dim) across dims collect
         (let ((offset (vec:scale dim len))
               (perp (vec:scale (vec:perp dim) len))
               (wa (rnd:get-acc-lin-stp* 0.5d0))
               (wb (rnd:get-acc-lin-stp* 0.5d0)))
-          (to-array
+          (to-vector
             (loop for d in xspace collect
               (let ((p (vec:on-line* d
                          (vec:ladd* (list (vec:neg offset) offset) xy))))
@@ -45,11 +45,11 @@
           do (multiple-value-bind (int us ws)
                (vec:segx u w)
                (when int
-                     (array-push (list ui wi us ws) res))))))
+                     (vextend (list ui wi us ws) res))))))
 
 
 (defun get-intersects (lines)
-  (let ((res (make-generic-array)))
+  (let ((res (make-adjustable-vector)))
 
     (loop for i from 0 below (length lines) do
       (loop for j from (1+ i) below (length lines) do
@@ -62,7 +62,7 @@
       (multiple-value-bind (val exists)
         (gethash k gm)
         (if exists
-          (array-push k near))))))
+          (vextend k near))))))
 
 (defun make-grid-map (lines intersects nearsel
                             &key distortfxn
@@ -77,7 +77,7 @@
         (multiple-value-bind (val exists)
           (gethash key gm)
           (if (not exists)
-            (setf (gethash key gm) (make-generic-array)
+            (setf (gethash key gm) (make-adjustable-vector)
                   (gethash key points)
                   (funcall distortfxn*
                     (vec:on-line* us (aref (aref lines 0) ui))))))))

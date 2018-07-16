@@ -477,61 +477,54 @@
 
 
 ; TODO: incomplete
-(defun lsegx* (lines line &key parallel)
-  (declare (list lines line))
-  (loop with res = (make-generic-array)
-        for l of-type list in lines
-        ; TODO: sort and rearrange
-        do (multiple-value-bind (x p q) (segx l line)
-             (when x (array-push (list x p q) res)))
-        finally (return res)))
+;(defun lsegx* (lines line &key parallel)
+;  (declare (list lines line))
+;  (loop with res = (make-adjustable-vector)
+;        for l of-type list in lines
+;        ; TODO: sort and rearrange
+;        do (multiple-value-bind (x p q) (segx l line)
+;             (when x (vextend (list x p q) res)))
+;        finally (return res)))
 
 
 (defun cross (a b)
-  (declare (vec a))
-  (declare (vec b))
+  (declare (vec a b))
   (- (* (vec-x a) (vec-y b)) (* (vec-y a) (vec-x b))))
 
 
 (defun ptinside (convex v)
-  (declare (list convex))
-  (declare (vec v))
-  (loop for a in (close-path convex)
-        and b in (cdr (close-path convex))
+  (declare (list convex) (vec v))
+  (loop for a of-type vec in (close-path convex)
+        and b of-type vec in (cdr (close-path convex))
         always (>= (cross (sub b a) (sub v b)) 0d0)))
 
 
 ; SHAPES
 
 (defun on-circ (p rad &key (xy *zero*))
-  (declare (double-float p rad))
-  (declare (vec xy))
+  (declare (double-float p rad) (vec xy))
   (add-scaled xy (cos-sin (* p PII)) rad))
 
 
 (defun on-line (p a b)
-  (declare (double-float p))
-  (declare (vec a b))
+  (declare (double-float p) (vec a b))
   (add-scaled a (sub b a) p))
 
 
 (defun on-line* (p ab)
-  (declare (double-float p))
-  (declare (list ab))
+  (declare (double-float p) (list ab))
   (destructuring-bind (a b) ab
     (on-line p a b)))
 
 
 (defun on-spiral (p rad &key (xy *zero*) (rot 0d0))
-  (declare (double-float p rad rot))
-  (declare (vec xy))
+  (declare (double-float p rad rot) (vec xy))
   (add xy (scale (cos-sin (+ rot (* p PII)))
                  (* p rad))))
 
 
 (defun rect (w h &key (xy *zero*))
-  (declare (double-float w h))
-  (declare (vec xy))
+  (declare (double-float w h) (vec xy))
   (list (add xy (vec w (- h)))
         (add xy (vec w h))
         (add xy (vec (- w) h))
@@ -539,16 +532,12 @@
 
 
 (defun square (bs &key xy)
-  (declare (double-float bs))
-  (declare (vec xy))
+  (declare (double-float bs) (vec xy))
   (rect bs bs :xy xy))
 
 
 (defun polygon (n rad &key (xy *zero*) (rot 0d0))
-  (declare (fixnum n))
-  (declare (double-float rad rot))
-  (declare (vec xy))
+  (declare (fixnum n) (double-float rad rot) (vec xy))
   (loop for i from 0 below n
-        collect (add (scale (cos-sin (+ rot (* (/ i n) PII))) rad)
-                     xy)))
+        collect (add-scaled xy (cos-sin (+ rot (* (/ (math:dfloat i) n) PII))) rad)))
 

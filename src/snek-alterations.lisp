@@ -4,7 +4,8 @@
 ; ADD VERT
 
 (defstruct (add-vert-alt
-    (:constructor add-vert? (xy &key p)))
+    (:constructor add-vert? (xy &key p))
+    (:predicate add-vert-alt-p*))
   (xy nil :type vec:vec :read-only t)
   (p nil :type symbol :read-only t))
 
@@ -113,9 +114,9 @@
   (declare (snek snk)
            (list line))
   (loop for e of-type list across (get-edges snk :g g)
-        if (multiple-value-bind (x p)
+        if (multiple-value-bind (x s)
              (vec:segx line (get-verts snk e))
-             (and x (> p 1d-7)))
+             (and x (> s 1d-7)))
         do (return t)))
 
 
@@ -172,11 +173,9 @@
   "
   del edge v and w.
   "
-  (declare (snek snk)
-           (del-edge-alt a))
-  (with-struct (snek- num-verts) snk
-    (with-struct (del-edge-alt- e g) a
-      (del-edge! snk e :g g))))
+  (declare (snek snk) (del-edge-alt a))
+  (with-struct (del-edge-alt- e g) a
+    (del-edge! snk e :g g)))
 
 
 ; SPLIT EDGE
@@ -192,8 +191,7 @@
   insert a vert, v, at the middle of edge e = (a b)
   such that we get edges (a v) and (v b).
   "
-  (declare (snek snk)
-           (split-edge-alt a))
+  (declare (snek snk) (split-edge-alt a))
   (with-struct (split-edge-alt- e g) a
     (let ((res (del-edge! snk e :g g))
           (verts (snek-verts snk)))
@@ -210,8 +208,8 @@
 ; ALT THEN
 
 (defstruct (alt-then
-    (:constructor alt-then? (alt &key (then (lambda (a r) nil))
-                                      (else (lambda (a) nil)))))
+    (:constructor alt-then? (alt &key (then (lambda (a r) (declare (ignore a r)) nil))
+                                      (else (lambda (a) (declare (ignore a)) nil)))))
   (alt nil :read-only t)
   (then nil :type function :read-only t)
   (else nil :type function :read-only t))
@@ -223,11 +221,11 @@
     then gets the alteration and its result as arguments.
     else gets the alteration as its argument.
   "
-  (declare (snek snk)
-           (alt-then a))
+  (declare (snek snk) (alt-then a))
   (with-struct (alt-then- alt then else) a
-    (let ((res (funcall (gethash (type-of alt)
-                                 (snek-alt-names snk)) snk alt)))
+    (declare (function then else))
+    (let ((res (funcall (gethash (type-of alt) (snek-alt-names snk))
+                        snk alt)))
       (if res (funcall then alt res)
               (funcall else alt)))))
 

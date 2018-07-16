@@ -5,34 +5,34 @@
 
 (defun path-tangents (aa &key closed (default (vec:vec 0d0))
                          &aux (aa* (if (equal (type-of aa) 'cons)
-                                       (make-generic-array :init aa :type 'vec)
+                                       (make-adjustable-vector :init aa :type 'vec)
                                        aa)))
-  (when closed (array-push (aref aa* 0) aa*))
-  (loop with res = (make-generic-array :type 'vec)
-        for i from 0 below (1- (length aa*))
-        do (array-push (vec:nsub (aref aa* (1+ i)) (aref aa* i)
+  (when closed (vextend (aref aa* 0) aa*))
+  (loop with res = (make-adjustable-vector :type 'vec)
+        for i from 0 below (length-1 aa*)
+        do (vextend (vec:nsub (aref aa* (1+ i)) (aref aa* i)
                                  :default default)
                        res)
         finally (return res)))
 
 
 (defun path-angles (pts)
-  (let ((res (make-generic-array)))
-    (loop for i from 0 below (1- (length pts))
-          do (array-push (vec:norm (vec:sub (aref pts (1+ i))
+  (let ((res (make-adjustable-vector)))
+    (loop for i from 0 below (length-1 pts)
+          do (vextend (vec:norm (vec:sub (aref pts (1+ i))
                                             (aref pts i))) res))
-    (array-push (aref res (1- (length res))) res)
+    (vextend (aref res (length-1 res)) res)
     res))
 
 
 (defun -path-simplify (pts lim &optional left right)
   (declare (double-float lim))
-  (let ((res (make-generic-array))
+  (let ((res (make-adjustable-vector))
         (dmax -1d0)
         (index 0))
 
     (let* ((l (if (not left) 0 left))
-           (r (if (not right) (1- (length pts)) right))
+           (r (if (not right) (length-1 pts) right))
            (seg (list (aref pts l) (aref pts r))))
 
       (loop for i from (1+ l) below r do
@@ -44,30 +44,30 @@
       (if (> dmax lim)
         (progn
           (loop with ps = (-path-simplify pts lim l index)
-                for i from 0 below (1- (length ps))
-                do (array-push (aref ps i) res))
+                for i from 0 below (length-1 ps)
+                do (vextend (aref ps i) res))
           (loop for i across (-path-simplify pts lim index r)
-                do (array-push i res)))
-        (progn (array-push l res)
-               (array-push r res))))
+                do (vextend i res)))
+        (progn (vextend l res)
+               (vextend r res))))
     (sort res #'<)))
 
 
 (defun path-simplify (pts lim)
   ;https://hydra.hull.ac.uk/resources/hull:8338
-  (let ((pts* (ensure-array pts)))
+  (let ((pts* (ensure-vector pts)))
     (loop for i across (-path-simplify pts* lim)
           collect (aref pts* i))))
 
 
 (defun -scale-offset (w a b &key (fxn #'sin))
-  (let ((s (abs (funcall fxn (abs (- (vec:angle a)
-                                     (vec:angle b)))))))
+  (declare (double-float w) (vec:vec a b) (function fxn))
+  (let ((s (abs (funcall fxn (abs (- (vec:angle a) (vec:angle b)))))))
+    (declare (double-float s))
     (if (< s 0.05d0) w (/ w s))))
 
 (defun -offset (v o)
   (list (vec:add v o) (vec:sub v o)))
-
 
 (defun -chamfer (width diag pa na aa aa-)
   (let* ((x (< (vec:cross aa aa-) 0d0))
@@ -76,77 +76,67 @@
     (loop for v in (-offset pa (vec:scale (vec:perp na) s))
           collect (if x (list v corner) (list corner v)))))
 
-
 (defun -regular-perp (a b)
-    (vec:perp (vec:norm (vec:add a b))))
+  (declare (vec:vec a b))
+  (vec:perp (vec:norm (vec:add a b))))
 
 (defun -sharp-perp (a)
+  (declare (vec:vec a))
   (vec:perp a))
 
-(defun -fv (i n- sel)
-  (if (< i n-) sel :regular))
-
 (defun -make-test-fxn-closed (angles clim slim)
-  (let ((n- (1- (length angles))))
+  (declare (vector angles) (double-float clim slim))
+  (let ((n- (length-1 angles)))
     (lambda (i)
       (let ((a (aref angles i))
             (a- (aref angles (if (< i 1) n- (1- i)))))
         (let ((dt (vec:dot a- a)))
-          (cond
-            ((<= dt slim) (list :sharp (-sharp-perp a-)))
-            ((<  dt clim) (list :chamfer (-regular-perp a- a)))
-            (t (list :regular (-regular-perp a- a)))))))))
-
+          (cond ((<= dt slim) (list :sharp (-sharp-perp a-)))
+                ((<  dt clim) (list :chamfer (-regular-perp a- a)))
+                (t (list :regular (-regular-perp a- a)))))))))
 
 (defun -make-test-fxn-open (angles clim slim)
-  (let ((n- (1- (length angles))))
+  (declare (vector angles) (double-float clim slim))
+  (let ((n- (length-1 angles)))
     (lambda (i)
       (let ((a (aref angles i)))
         (if (> n- i 0)
           (let ((dt (vec:dot (aref angles (1- i)) a)))
-            (cond
-              ((<= dt slim) (list :sharp (-sharp-perp (aref angles (1- i)))))
-              ((<  dt clim) (list :chamfer (-regular-perp
-                                             (aref angles (1- i)) a)))
-              (t (list :regular (-regular-perp (aref angles (1- i)) a)))))
-          (cond
-            ((< i 1) (list :regular (vec:perp a)))
-            (t (list :regular (vec:perp a)))))))))
-
+            (cond ((<= dt slim) (list :sharp (-sharp-perp (aref angles (1- i)))))
+                  ((< dt clim) (list :chamfer (-regular-perp
+                                                (aref angles (1- i)) a)))
+                  (t (list :regular (-regular-perp (aref angles (1- i)) a)))))
+          (cond ((< i 1) (list :regular (vec:perp a)))
+                (t (list :regular (vec:perp a)))))))))
 
 (defun -get-diagonals (pts width clim slim closed )
-  (let* ((res (make-generic-array))
+  (let* ((res (make-adjustable-vector))
          (n (length pts))
          (angles (math:path-angles pts))
-         (corner-test (if closed
-                        (-make-test-fxn-closed angles clim slim)
-                        (-make-test-fxn-open angles clim slim))))
+         (corner-test (if closed (-make-test-fxn-closed angles clim slim)
+                                 (-make-test-fxn-open angles clim slim))))
 
     (loop for i from 0 below (if closed (1- n) n) do
-      (destructuring-bind (corner na)
-        (funcall corner-test i)
-
+      (destructuring-bind (corner na) (funcall corner-test i)
         (let ((diag (-offset (aref pts i)
                              (vec:scale na (-scale-offset width
-                                                          (aref angles i) na)))))
-          (mapcar (lambda (d) (array-push d res))
+                                             (aref angles i) na)))))
+          (mapcar (lambda (d) (vextend d res))
                   (case corner
                     (:chamfer (-chamfer width diag (aref pts i) na (aref angles i)
                                         (aref angles (math:mod- i n))))
                     (:regular (list diag))
-                    (:sharp (list
-                              (progn diag)
-                              (reverse diag))))))))
+                    (:sharp (list (progn diag)
+                                  (reverse diag))))))))
 
-    (if closed
-      ; hack to handle closed path chamfering
-      (array-push (aref res 0) res))
+    ; hack to handle closed path chamfering
+    (when closed (vextend (aref res 0) res))
     res))
 
 (defun path-offset (pts width &key (s 1d0) closed
                                    (clim -0.5) (slim -0.95)
                                    (simplify 1d0))
-  (let ((diag (-get-diagonals (to-array (path-simplify pts simplify))
+  (let ((diag (-get-diagonals (to-vector (path-simplify pts simplify))
                 width clim slim closed)))
     (loop for d across diag collect (vec:on-line* s d))))
 
@@ -159,23 +149,23 @@
   randomly mix the hatches in lines according to where the lines intersect.
   this is somewhat inefficient
   "
-  (let ((res (make-generic-array)))
+  (let ((res (make-adjustable-vector)))
     (loop for i from 0 below (length lines) do
-      (let ((ss (make-generic-array))
+      (let ((ss (make-adjustable-vector))
             (curr (aref lines i)))
 
-        (array-push 0d0 ss)
-        (array-push 1d0 ss)
+        (vextend 0d0 ss)
+        (vextend 1d0 ss)
 
         (loop for j from 0 below (length lines) do
           (multiple-value-bind (x s)
             (vec:segx curr (aref lines j))
-            (if x (array-push s ss))))
+            (if x (vextend s ss))))
 
         (setf ss (sort ss (if (< (rnd:rnd) 0.5d0) #'< #'>)))
 
-        (loop for k from (rnd:rndi 2) below (1- (length ss)) by 2 do
-          (array-push (list (vec:on-line* (aref ss k) curr)
+        (loop for k from (rnd:rndi 2) below (length-1 ss) by 2 do
+          (vextend (list (vec:on-line* (aref ss k) curr)
                             (vec:on-line* (aref ss (1+ k)) curr))
                       res))))
     res))
@@ -189,31 +179,31 @@
 ; ----- HATCH -----
 
 (defun -get-lines (n mid dst angle steps rnd)
-  (let ((lines (make-generic-array))
+  (let ((lines (make-adjustable-vector))
         (slide (vec:scale (vec:cos-sin (- angle (* 0.5 PI))) dst))
         (offset (vec:scale (vec:cos-sin angle) dst)))
     (loop for s in (funcall steps n) do
       (let ((xy (vec:on-line s (vec:add mid offset)
                                (vec:sub mid offset))))
-        (array-push (funcall rnd (list (vec:add xy slide)
+        (vextend (funcall rnd (list (vec:add xy slide)
                                        (vec:sub xy slide)))
                       lines)))
     lines))
 
 
 (defun -line-hatch (line pts)
-  (let ((ixs (make-generic-array))
-        (res (make-generic-array)))
+  (let ((ixs (make-adjustable-vector))
+        (res (make-adjustable-vector)))
 
-    (loop for i from 0 below (1- (length pts)) do
+    (loop for i from 0 below (length-1 pts) do
       (multiple-value-bind (x s)
         (vec:segx line (list (aref pts i) (aref pts (1+ i))))
-        (if x (array-push s ixs))))
+        (if x (vextend s ixs))))
 
     (setf ixs (sort ixs #'<))
 
-    (loop for i from 0 below (1- (length ixs)) by 2 do
-      (array-push (list (vec:on-line* (aref ixs i) line)
+    (loop for i from 0 below (length-1 ixs) by 2 do
+      (vextend (list (vec:on-line* (aref ixs i) line)
                         (vec:on-line* (aref ixs (1+ i)) line)) res))
 
     res))
@@ -227,7 +217,7 @@
   "
   (multiple-value-bind (mid dst)
     (mid-rad pts)
-    (let ((res (make-generic-array)))
+    (let ((res (make-adjustable-vector)))
       (loop for a in angles do
         (loop for line across
               (-get-lines (math:int (ceiling (* 2.40 rs dst)))
@@ -236,7 +226,7 @@
             (if (> (length hh) 0)
               (loop for h across (remove-if-not (lambda (h) (every #'identity h))
                                                 hh)
-                    do (array-push h res))))))
+                    do (vextend h res))))))
       res)))
 
 
@@ -257,49 +247,48 @@
 
 
 (defun -split-get-left (a b n)
-  (let ((res (make-generic-array)))
+  (let ((res (make-adjustable-vector)))
     (loop for i from 0
           while (<= i a)
-          do (array-push i res))
-    (array-push (list a (1+ a)) res)
-    (array-push (list b (1+ b)) res)
+          do (vextend i res))
+    (vextend (list a (1+ a)) res)
+    (vextend (list b (1+ b)) res)
     (loop for i from (1+ b)
           while (< i n)
-          do (array-push (mod i (1- n)) res))
+          do (vextend (mod i (1- n)) res))
     res))
 
 
 (defun -split-get-right (a b n)
-  (let ((res (make-generic-array)))
+  (let ((res (make-adjustable-vector)))
     (loop for i from (1+ a)
           while (<= i b)
-          do (array-push i res))
-    (array-push (list b (1+ b)) res)
-    (array-push (list a (1+ a)) res)
+          do (vextend i res))
+    (vextend (list b (1+ b)) res)
+    (vextend (list a (1+ a)) res)
     (loop for i from (1+ a)
           while (<= (mod i n) (1+ a))
-          do (array-push i res))
+          do (vextend i res))
     res))
 
 
 (defun -split-ind-to-pts (pts inds s)
-  (to-array
-    (loop for i across inds collect
-      (if (eql (type-of i) 'cons)
-        (destructuring-bind (a b)
-          (mapcar (lambda (i*) (aref pts i*)) i)
-          (vec:add a (vec:scale (vec:sub b a) s)))
-        (aref pts i)))))
+  (to-vector
+    (loop for i across inds
+          collect (if (eql (type-of i) 'cons)
+                    (destructuring-bind (a b)
+                      (mapcar (lambda (i*) (aref pts i*)) i)
+                      (vec:add a (vec:scale (vec:sub b a) s)))
+                    (aref pts i)))))
 
 
 (defun convex-split (pts &key (s 0.5d0) (lim 0d0)
                          &aux (n (length pts)))
-  (if (< (loop for i from 0 below (1- n) minimizing
-           (vec:dst (aref pts i) (aref pts (1+ i)))) lim)
+  (if (< (loop for i from 0 below (1- n)
+               minimizing (vec:dst (aref pts i) (aref pts (1+ i)))) lim)
     (return-from convex-split (list pts nil)))
 
-  (destructuring-bind (a b)
-    (-get-splits n pts)
+  (destructuring-bind (a b) (-get-splits n pts)
     (list (-split-ind-to-pts pts (-split-get-left a b n) s)
           (-split-ind-to-pts pts (-split-get-right a b n) s))))
 
@@ -323,10 +312,10 @@
   (let ((lengths (-stipple-get-lengths num-lines len))
         (gaps (-stipple-get-lengths (1- num-lines) (- 1d0 len))))
     (loop with curr = (first lengths)
-          with res = (to-generic-array (list (list 0d0 curr)) :type 'vec:vec)
+          with res = (to-adjustable-vector (list (list 0d0 curr)) :type 'vec:vec)
           for l of-type double-float in (cdr lengths)
           and g of-type double-float in gaps
-          do (array-push (list curr (+ curr l)) res)
+          do (vextend (list curr (+ curr l)) res)
              (incf curr (+ l g))
           finally (return res))))
 

@@ -108,11 +108,12 @@ Here are some plotted examples:
 
 ## Dependencies
 
-This code requires `Quicklisp` and `zpng`. The path to quicklisp must be set in
-`src/load`. `zpng` is automatically installed via `quicklisp`.
+This code requires `libpng-dev`, `Quicklisp`, `zpng`, `cl-svg` and `cl-png`.
+The path to quicklisp must be set in `src/load`. `zpng`, `cl-svg` and `cl-png`
+are automatically installed via `quicklisp`.
 
- - http://www.xach.com/lisp/zpng/
  - https://www.quicklisp.org/beta/
+ - http://www.xach.com/lisp/zpng/
 
 
 ## Tests
@@ -125,14 +126,6 @@ There are some tests included, see the `test` folder.
 This code is highly experimental on my part. It is likely to change with no
 warning or explanation. I will keep a note of the version number in
 `src/load.lisp`.
-
-
-## On Use and Contributions
-
-This code is a tool that I have written for my own use. I release it publicly
-in case people find it useful. It is not however intended as a
-collaboration/Open Source project. As such I am unlikely to accept PRs, reply
-to issues, or take requests.
 
 
 ## Bugs

@@ -9,28 +9,28 @@
 
 
 (defun get-left (a b n)
-  (let ((res (make-generic-array)))
+  (let ((res (make-adjustable-vector)))
     (loop for i from 0
           while (<= i a)
-          do (array-push i res))
-    (array-push (list a (1+ a)) res)
-    (array-push (list b (1+ b)) res)
+          do (vextend i res))
+    (vextend (list a (1+ a)) res)
+    (vextend (list b (1+ b)) res)
     (loop for i from (1+ b)
           while (< i n)
-          do (array-push (mod i (1- n)) res))
+          do (vextend (mod i (1- n)) res))
     res))
 
 
 (defun get-right (a b n)
-  (let ((res (make-generic-array)))
+  (let ((res (make-adjustable-vector)))
     (loop for i from (1+ a)
           while (<= i b)
-          do (array-push i res))
-    (array-push (list b (1+ b)) res)
-    (array-push (list a (1+ a)) res)
+          do (vextend i res))
+    (vextend (list b (1+ b)) res)
+    (vextend (list a (1+ a)) res)
     (loop for i from (1+ a)
           while (<= (mod i n) (1+ a))
-          do (array-push i res))
+          do (vextend i res))
     res))
 
 
@@ -39,7 +39,7 @@
 
 
 (defun ind-to-pts (pts inds s)
-  (to-array
+  (to-vector
     (loop for i across inds collect
       (if (eql (type-of i) 'cons)
         (do-mid (aref pts (first i)) (aref pts (second i)) s)

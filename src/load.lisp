@@ -1,5 +1,5 @@
 
-(setf *efficiency-note-cost-threshold* 15)
+(setf *efficiency-note-cost-threshold* 14)
 
 
 (declaim (optimize (speed 3)))
@@ -18,11 +18,11 @@
 
 (asdf:defsystem "snek"
   :description "A System for Making Generative Systems"
-  :version "2.32.1"
+  :version "2.41.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t
-  :depends-on ("zpng" "cl-svg" "png" "zpng")
+  :depends-on ("zpng" "cl-svg" "png")
   :components ((:file "pg-utils")
                (:file "various")
                (:file "packages")
@@ -38,6 +38,7 @@
                (:file "bzspline")
                (:file "linear-path")
                (:file "sandpaint")
+               (:file "sandpaint-flip-reflect")
                (:file "sandpaint-extra")
                (:file "plot-svg")
                (:file "plot-tile-svg")

@@ -1,4 +1,3 @@
-
 (in-package :sandpaint)
 
 
@@ -40,8 +39,7 @@
 ;TODO something ...?
 (defun nvecstep (n v &key (end t))
   (if (> n 1)
-    (let ((len (vec:len v))
-          (nn (if end (1- n) n)))
+    (let ((nn (if end (1- n) n)))
       (loop for i from 0 below n
             collect (vec:scale v (math:dfloat (expt (* i (/ 1d0 nn)) 3d0)))))
     (if end (list v)
@@ -49,11 +47,11 @@
 
 
 ; TODO there is a bug here. good luck.
-(defun chromatic-aberration (sand &key mid (s 1d0) (noise 1.1442d0))
+(defun chromatic-aberration (sand &key mid (s 1d0))
   (declare (optimize (safety 0) speed (debug 0))
-           (double-float s noise))
-  (print "WARN: CA is currently not working and will prduce strange results.")
-  (format t "applying CA ...~%")
+           (double-float s))
+  (print "WARN: CA is currently not working and will produce strange results.")
+  (format t "applying filter:chromatic-aberration...~%")
   (with-struct (sandpaint- size vals indfx) sand
     (declare (fixnum size))
     (declare (function indfx))
@@ -81,7 +79,7 @@
                   (fixnum channel)
                   (vec:vec pt dx))
 
-         (loop with len = (vec:len dx)
+         (loop ;with len = (vec:len dx)
                ;for dpt in (nvecstep (ceiling (* 3d0 len)) dx)
                for dpt in (nvecstep 1 dx :end t)
                do (multiple-value-bind (ix iy fx fy) (-floor-fract
@@ -105,9 +103,26 @@
                  (dx (vec:scale (vec:sub pt center) base-size)))
             (-point-sample-channel new-vals new-counts sx sy pt dx 0)
             ;(-point-sample-channel new-vals sx sy pt vec:*zero* 1)
-            (-point-sample-channel new-vals new-counts sx sy pt (vec:neg dx) 2)
-
-            ))
+            (-point-sample-channel new-vals new-counts sx sy pt (vec:neg dx) 2)))
         (copy-scale-rgba-array-to-from vals new-vals new-counts size))))
+  (format t "done.~%"))
+
+
+; TODO: incomplete
+(defun sandpaint:filter-walk (sand walker noise &key (alpha 0.5d0))
+  (declare (optimize (safety 0) speed (debug 0)))
+  (format t "applying filter:walk...~%")
+  (with-struct (sandpaint- size vals indfx) sand
+    (declare (fixnum size)
+             (type (simple-array double-float) vals)
+             (function indfx))
+  (loop for j from 0 below size
+        do (loop for i from 0 to (/ size 2)
+                 do (let ((v (funcall walker noise)))
+                      (vec:with-xy ((vec:add (vec:vec-coerce i j) v) x y)
+                        (-inside-round (size (vec:vec x y) xx yy)
+                         (-operator-over indfx vals xx yy
+                          (-rgb-from vals (funcall indfx i j) alpha))))))))
+
   (format t "done.~%"))
 

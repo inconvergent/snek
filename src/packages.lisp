@@ -78,9 +78,9 @@
     :with-xy-short
     :zero)
   (:import-from :common-lisp-user
-    :array-push
+    :vextend
     :close-path
-    :make-generic-array
+    :make-adjustable-vector
     :with-gensyms))
 
 
@@ -130,13 +130,14 @@
     :sum
     :with-linspace)
   (:import-from :common-lisp-user
-    :array-last
-    :array-push
-    :ensure-array
-    :make-generic-array
-    :to-array
-    :to-generic-array
+    :vector-last
+    :ensure-vector
+    :length-1
+    :make-adjustable-vector
+    :to-adjustable-vector
     :to-list
+    :to-vector
+    :vextend
     :with-gensyms))
 
 
@@ -188,10 +189,10 @@
     :with-prob
     :with-rndspace)
   (:import-from :common-lisp-user
-    :array-push
-    :make-generic-array
-    :ensure-array
-    :to-array
+    :vextend
+    :make-adjustable-vector
+    :ensure-vector
+    :to-vector
     :with-gensyms))
 
 
@@ -230,7 +231,7 @@
     :with
     :with*)
   (:import-from :common-lisp-user
-    :ensure-array
+    :ensure-vector
     :with-gensyms))
 
 
@@ -265,7 +266,8 @@
     :with-graph-edges)
   (:import-from :common-lisp-user
     :flatten
-    :make-generic-array
+    :make-adjustable-vector
+    :vextend
     :with-gensyms
     :with-struct))
 
@@ -284,8 +286,8 @@
     :tangent
     :with-rndpos)
   (:import-from :common-lisp-user
-    :array-push
-    :make-generic-array
+    :vextend
+    :make-adjustable-vector
     :to-list
     :with-gensyms
     :with-struct))
@@ -308,10 +310,10 @@
   (:export
     :make
     :verts-in-rad
-    :with*
     :with-verts-in-rad)
   (:import-from :common-lisp-user
-    :make-generic-array
+    :make-adjustable-vector
+    :vextend
     :with-gensyms
     :with-struct))
 
@@ -333,9 +335,16 @@
     :pix-overlap
     :pix-overlap*
     :pixel-hack
+    :png-open
+    :reflect-diag
+    :reflect-x
+    :reflect-y
+    :filter-walk
+    :flip-x
+    :flip-y
     :save
-    :set-fg-color
     :set-bg-color
+    :set-fg-color
     :stroke
     :strokes)
   (:import-from :common-lisp-user
@@ -372,11 +381,11 @@
     :wpath)
   (:import-from :common-lisp-user
     :aif
-    :array-push
+    :vextend
     :close-path
     :ensure-filename
-    :make-generic-array
-    :to-array
+    :make-adjustable-vector
+    :to-vector
     :to-list
     :with-struct))
 
@@ -392,14 +401,14 @@
     :save)
   (:import-from :common-lisp-user
     :append-postfix
-    :array-push
-    :array-push*
-    :ensure-array
+    :vextend
+    :vextend*
+    :ensure-vector
     :ensure-filename
     :length-1
-    :make-generic-array
-    :to-array
-    :to-generic-array
+    :make-adjustable-vector
+    :to-vector
+    :to-adjustable-vector
     :with-struct))
 
 
@@ -412,9 +421,9 @@
     :save)
   (:import-from :common-lisp-user
     :aif
-    :array-push
+    :vextend
     :ensure-filename
-    :make-generic-array
+    :make-adjustable-vector
     :with-struct))
 
 
@@ -441,7 +450,6 @@
     :draw-edges
     :draw-verts
     :edge-length
-    :export-2obj
     :get-all-grps
     :get-all-prms
     :get-all-verts
@@ -494,11 +502,11 @@
     :zwith)
   (:import-from :common-lisp-user
     :append-postfix
-    :array-push
+    :vextend
     :close-path
     :exec-with-args
     :flatten
-    :make-generic-array
+    :make-adjustable-vector
     :make-generic-hash-table
     :to-list
     :with-gensyms

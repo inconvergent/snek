@@ -95,14 +95,14 @@ a simple (undirected) graph structure based on adjacency lists.
 
 (defun get-edges (grph)
   (declare (graph grph))
-  (let ((res (make-generic-array :size (graph-size grph)))
+  (let ((res (make-adjustable-vector :size (graph-size grph)))
         (adj (graph-adj grph)))
     (declare (type (array list) res))
     (declare (hash-table adj))
     (loop for a of-type fixnum being the hash-keys of adj do
       (loop for b of-type fixnum in (hset:to-list (gethash a adj))
         if (<= a b)
-        do (vector-push-extend (list a b) res)))
+        do (vextend (list a b) res)))
     res))
 
 

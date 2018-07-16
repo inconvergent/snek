@@ -7,21 +7,19 @@
   all alterations created in this context will be flattened
   and applied to snk at the end of the context.
   "
-  (declare (symbol snk))
-  (declare (type boolean collect))
-  (declare (type boolean include-alts))
-  (with-gensyms (sname zw aname rec x y resalts do-funcall finally)
+  (declare (symbol snk)
+           (type boolean collect include-alts))
+  (with-gensyms (sname zw aname rec x y resalts)
     (let* ((do-funcall `(funcall (gethash (type-of ,x) ,aname) ,sname ,x))
            (wrap-funcall (cond ((and collect include-alts)
-                                  `(array-push (list ,do-funcall ,x) ,resalts))
-                               (collect `(array-push ,do-funcall ,resalts))
+                                  `(vextend (list ,do-funcall ,x) ,resalts))
+                               (collect `(vextend ,do-funcall ,resalts))
                                (t do-funcall)))
            (finally (if collect `(to-list ,resalts)
                                 nil)))
-
       `(let* ((,sname ,snk)
               (,zw ,zwidth)
-              (,resalts (make-generic-array))
+              (,resalts (make-adjustable-vector))
               (,aname (snek-alt-names ,sname)))
 
         (incf (snek-wc ,sname))
@@ -34,8 +32,9 @@
                   (t (,rec (car ,x))
                      (,rec (cdr ,x))))))
 
-          (zmap:with* (,zw (snek-verts ,sname) (snek-num-verts ,sname)
-                          (lambda (,y) (setf (snek-zmap ,sname) ,y)))
+          (zmap::with* (,zw (snek-verts ,sname)
+                            (snek-num-verts ,sname)
+                            (lambda (,y) (setf (snek-zmap ,sname) ,y)))
             ; this lets @body be executed in the context of zmap:with;
             ; useful if we want to have a parallel context inside zmap.
             (,rec (list ,@body))))
@@ -51,7 +50,8 @@
   (with-gensyms (sname zw y)
     `(let ((,sname ,snk)
            (,zw ,zwidth))
-      (zmap:with* (,zw (snek-verts ,sname) (snek-num-verts ,sname)
+      (zmap::with* (,zw (snek-verts ,sname)
+                        (snek-num-verts ,sname)
                         (lambda (,y) (setf (snek-zmap ,sname) ,y)))
           (progn ,@body)))))
 
@@ -70,8 +70,7 @@
     `(let ((,sname ,snk))
        (let* ((,dx (apply #'vec:isub (get-verts ,sname ,vv)))
               (,d (vec:len ,dx)))
-         (declare (double-float ,d))
-         (declare (vec:vec ,dx))
+         (declare (double-float ,d) (vec:vec ,dx))
          (when (> ,d 0d0)
            (list ,@body))))))
 
@@ -136,8 +135,8 @@
 
   if g is not provided, the main grp wil be used.
   "
-  (declare (symbol snk))
-  (declare (type boolean collect))
+  (declare (symbol snk)
+           (type boolean collect))
   (with-gensyms (grp sname)
     `(let ((,sname ,snk))
       (with-grp (,sname ,grp ,g)
@@ -150,8 +149,8 @@
   "
   iterates over all verts in prm p as i.
   "
-  (declare (symbol snk))
-  (declare (type boolean collect))
+  (declare (symbol snk)
+           (type boolean collect))
   (with-gensyms (sname)
     `(let* ((,sname ,snk))
       (map ',(if collect 'list 'nil)
@@ -163,8 +162,8 @@
   "
   iterates over all verts in snk as i.
   "
-  (declare (symbol snk))
-  (declare (type boolean collect))
+  (declare (symbol snk)
+           (type boolean collect))
   (with-gensyms (sname)
     `(let ((,sname ,snk))
       (loop for ,i of-type fixnum from 0 below (snek-num-verts ,sname)
@@ -177,8 +176,8 @@
 
   if g is not provided, the main grp will be used.
   "
-  (declare (symbol snk))
-  (declare (type boolean collect))
+  (declare (symbol snk)
+           (type boolean collect))
   (with-gensyms (grp grph)
     `(with-grp (,snk ,grp ,g)
       (let ((,grph (grp-grph ,grp)))
@@ -191,8 +190,8 @@
   "
   iterates over all grps of snk as g.
   "
-  (declare (symbol snk))
-  (declare (type boolean collect))
+  (declare (symbol snk)
+           (type boolean collect))
   (with-gensyms (grps sname main*)
     `(let ((,sname ,snk)
            (,main* ,main))
@@ -206,8 +205,8 @@
   "
   iterates over all prms of snk as p.
   "
-  (declare (symbol snk))
-  (declare (type boolean collect))
+  (declare (symbol snk)
+           (type boolean collect))
   (with-gensyms (prms sname)
     `(let ((,sname ,snk))
       (let ((,prms (snek-prms ,sname)))

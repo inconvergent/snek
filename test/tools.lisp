@@ -17,17 +17,13 @@
   (do-test (vec:nsub (vec:vec 1.0d0 2.0d0) (vec:vec 2.0d0 10.0d0))
            (vec:vec -0.12403473458920847d0 -0.9922778767136677d0))
 
-  (do-test (vec:len2 (vec:vec 1.0d0 2.0d0))
-           5)
+  (do-test (vec:len2 (vec:vec 1.0d0 2.0d0)) 5)
 
-  (do-test (vec:len (vec:vec 1.0d0 2.0d0))
-           2.23606797749979d0)
+  (do-test (vec:len (vec:vec 1.0d0 2.0d0)) 2.23606797749979d0)
 
-  (do-test (vec:len (vec:vec 1.0d0 2.0d0))
-           2.23606797749979d0)
+  (do-test (vec:len (vec:vec 1.0d0 2.0d0)) 2.23606797749979d0)
 
-  (do-test (vec:dst (vec:vec 1.0d0 2.0d0) (vec:vec 1.0d0 3.0d0))
-           1.0d0)
+  (do-test (vec:dst (vec:vec 1.0d0 2.0d0) (vec:vec 1.0d0 3.0d0)) 1.0d0)
 
   (do-test (vec:mid (vec:vec 1.0d0 2.0d0) (vec:vec 3.0d0 4.0d0))
            (vec:vec 2.0d0 3.0d0))
@@ -48,29 +44,21 @@
            (list (vec:vec 0d0)
                  (vec:vec -0.21050655592417808d0 0.977592445711883d0)))
 
-  (do-test (math:inc 0.1 0.4)
-           0.5)
+  (do-test (math:inc 0.1d0 0.4d0) 0.5d0)
 
-  (do-test (math:inc 0.1 -0.4)
-           0.7)
+  (do-test (math:inc 0.1d0 -0.4d0) 0.7d0)
 
-  (do-test (math:linspace 1 0d0 10d0)
-           (list 0.0))
+  (do-test (math:linspace 1 0d0 10d0) (list 0.0))
 
-  (do-test (math:linspace 3 0d0 10d0)
-           (list 0.0 5.0 10.0))
+  (do-test (math:linspace 3 0d0 10d0) (list 0.0 5.0 10.0))
 
-  (do-test (math:linspace 2 0d0 10d0 :end nil)
-           (list 0.0 5.0))
+  (do-test (math:linspace 2 0d0 10d0 :end nil) (list 0.0 5.0))
 
-  (do-test (math:linspace 2 0d0 10d0 :end t)
-           (list 0.0 10.0))
+  (do-test (math:linspace 2 0d0 10d0 :end t) (list 0.0 10.0))
 
-  (do-test (math:range 2 5)
-           (list 2 3 4))
+  (do-test (math:range 2 5) (list 2 3 4))
 
-  (do-test (math:range 5)
-           (list 0 1 2 3 4))
+  (do-test (math:range 5) (list 0 1 2 3 4))
 
   (do-test
     (let ((a (list)))
@@ -107,9 +95,7 @@
               (list (vec:vec 0d0 1d0) (vec:vec 1d0 0d0)) :parallel :par)
     t)
 
-  (do-test
-    (vec:cross (vec:vec 1d0 2d0) (vec:vec 3d0 -7.1d0))
-    -13.1d0))
+  (do-test (vec:cross (vec:vec 1d0 2d0) (vec:vec 3d0 -7.1d0)) -13.1d0))
 
 
 (defun test-rnd ()
@@ -134,26 +120,19 @@
        7.527788782312825d0 7.562853532104885d0 7.892139712781054d0
        9.365232493948968d0))
 
-  (do-test (rnd:rndspacei 10 0 10)
-           '(7 3 6 5 1 9 3 4 8 1))
+  (do-test (rnd:rndspacei 10 0 10) '(7 3 6 5 1 9 3 4 8 1))
 
-  (do-test (rnd:rndspacei 10 0 10 :order t)
-           '(0 0 2 2 3 4 4 7 9 9))
+  (do-test (rnd:rndspacei 10 0 10 :order t) '(0 0 2 2 3 4 4 7 9 9))
 
-  (do-test (length (rnd:nrndi 9 4))
-           9)
+  (do-test (length (rnd:nrndi 9 4)) 9)
 
-  (do-test (length (rnd:nrnd 11 4d0))
-           11)
+  (do-test (length (rnd:nrnd 11 4d0)) 11)
 
-  (do-test (length (rnd:nrnd 12 4d0))
-           12)
+  (do-test (length (rnd:nrnd 12 4d0)) 12)
 
-  (do-test (length (rnd:nrnd* 12 4d0))
-           12)
+  (do-test (length (rnd:nrnd* 12 4d0)) 12)
 
-  (do-test (rnd:bernoulli 4 0.5d0)
-           '(0.0d0 0.0d0 0.0d0 0.0d0))
+  (do-test (rnd:bernoulli 4 0.5d0) '(0.0d0 0.0d0 0.0d0 0.0d0))
 
   (do-test
     (let ((a (list)))
@@ -336,120 +315,86 @@
             (vec:vec -1.8055555555555551d0 4.027777777777777d0)
             (vec:vec -3.0d0 5.0d0)))
 
-    (do-test (bzspl:len (bzspl:make pts-a))
-             225.14997459916174d0)
+    (do-test (bzspl:len (bzspl:make pts-a)) 225.14997459916174d0)
 
-    (do-test (bzspl:len (bzspl:make pts-a :closed t))
-             275.1377195594309d0)))
+    (do-test (bzspl:len (bzspl:make pts-a :closed t)) 275.1377195594309d0)))
 
 
 (defun test-hset ()
 
   (let ((hs (hset:make)))
 
-    (do-test (hset:add hs 1)
-             t)
+    (do-test (hset:add hs 1) t)
 
-    (do-test (hset:add hs 1)
-             nil)
+    (do-test (hset:add hs 1) nil)
 
-    (do-test (hset:add hs 20)
-             t)
+    (do-test (hset:add hs 20) t)
 
-    (do-test (hset:add hs 40)
-             t)
+    (do-test (hset:add hs 40) t)
 
-    (do-test (hset:add hs 73)
-             t)
+    (do-test (hset:add hs 73) t)
 
-    (do-test (hset:num hs)
-             4)
+    (do-test (hset:num hs) 4)
 
-    (do-test (hset:del hs 1)
-             t)
+    (do-test (hset:del hs 1) t)
 
-    (do-test (hset:del hs 1)
-             nil)
+    (do-test (hset:del hs 1) nil)
 
-    (do-test (hset:mem hs 40)
-             t)
+    (do-test (hset:mem hs 40) t)
 
-    (do-test (hset:mem* hs (list 40 88))
-             (list t nil))
+    (do-test (hset:mem* hs (list 40 88)) (list t nil))
 
-    (do-test (sort (hset:to-list hs) #'<)
-             (list 20 40 73)))
+    (do-test (sort (hset:to-list hs) #'<) (list 20 40 73)))
 
 
   (let ((hs (hset:make :init (list 1 2 3))))
 
-    (do-test (hset:to-list hs)
-             (list 1 2 3))))
+    (do-test (hset:to-list hs) (list 1 2 3))))
 
 
 (defun test-graph ()
 
   (let ((grph (graph:make)))
 
-    (do-test (graph:add grph 1 1)
-             t)
+    (do-test (graph:add grph 1 1) t)
 
-    (do-test (graph:add grph 1 2)
-             t)
+    (do-test (graph:add grph 1 2) t)
 
-    (do-test (graph:add grph 1 2)
-             nil)
+    (do-test (graph:add grph 1 2) nil)
 
-    (do-test (graph:add grph 2 1)
-             nil)
+    (do-test (graph:add grph 2 1) nil)
 
-    (do-test (graph:get-num-edges grph)
-             4)
+    (do-test (graph:get-num-edges grph) 4)
 
-    (do-test (graph:get-edges grph)
-             '#((1 1) (1 2)))
+    (do-test (graph:get-edges grph) '#((1 1) (1 2)))
 
-    (do-test (graph:add grph 20 5)
-             t)
+    (do-test (graph:add grph 20 5) t)
 
-    (do-test (graph:get-edges grph)
-             '#((1 1) (1 2) (5 20)))
+    (do-test (graph:get-edges grph) '#((1 1) (1 2) (5 20)))
 
-    (do-test (graph:del grph 1 2)
-             t)
+    (do-test (graph:del grph 1 2) t)
 
-    (do-test (graph:del grph 1 2)
-             nil)
+    (do-test (graph:del grph 1 2) nil)
 
-    (do-test (graph:get-edges grph)
-             '#((1 1) (5 20)))
+    (do-test (graph:get-edges grph) '#((1 1) (5 20)))
 
-    (do-test (graph:get-num-edges grph)
-             4)
+    (do-test (graph:get-num-edges grph) 4)
 
-    (do-test (graph:mem grph 1 4)
-             nil)
+    (do-test (graph:mem grph 1 4) nil)
 
-    (do-test (graph:mem grph 1 1)
-             t)
+    (do-test (graph:mem grph 1 1) t)
 
-    (do-test (sort (graph:get-verts grph) #'<)
-             '(1 5 20))
+    (do-test (sort (graph:get-verts grph) #'<) '(1 5 20))
 
-    (do-test (graph:del grph 1 1)
-             t)
+    (do-test (graph:del grph 1 1) t)
 
-    (do-test (graph:get-edges grph)
-             '#((5 20)))
+    (do-test (graph:get-edges grph) '#((5 20)))
 
-    (do-test (sort (graph:get-verts grph) #'<)
-             '(5 20))
+    (do-test (sort (graph:get-verts grph) #'<) '(5 20))
 
-    (do-test (graph:del grph 5 20)
-             t)
+    (do-test (graph:del grph 5 20) t)
 
-    (do-test (sort (graph:get-verts grph) #'<)
-             nil)))
+    (do-test (sort (graph:get-verts grph) #'<) nil)))
 
 
 (defun test-linear-path ()

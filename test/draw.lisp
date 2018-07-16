@@ -8,33 +8,22 @@
 
 (defun test-color ()
 
-  (do-test
-    (color:rgb 0.1 1.0 0.5)
-    (color:rgb 0.1 1.0 0.5))
+  (do-test (color:rgb 0.1 1.0 0.5) (color:rgb 0.1 1.0 0.5))
 
-  (do-test
-    (color:to-list(color:rgb 0.1 1.0 0.5 0.2))
-    (list 0.10000000149011612d0 1.0d0 0.5d0 0.20000000298023224d0))
+  (do-test (color:to-list(color:rgb 0.1 1.0 0.5 0.2))
+           (list 0.10000000149011612d0 1.0d0 0.5d0 0.20000000298023224d0))
 
-  (do-test
-    (color:hsv 0.5 1.0 1.0)
-    (color:rgb 0 1.0 1.0))
+  (do-test (color:hsv 0.5 1.0 1.0) (color:rgb 0 1.0 1.0))
 
-  (do-test
-    (color:to-list (color:rgb 0 1.0 1.0 0.5))
-    (list 0.0d0 1.0d0 1.0d0 0.5d0))
+  (do-test (color:to-list (color:rgb 0 1.0 1.0 0.5))
+           (list 0.0d0 1.0d0 1.0d0 0.5d0))
 
-  (do-test
-    (color:to-list* (color:rgb 0 1.0 1.0 0.5))
-    (list 0.0d0 0.5d0 0.5d0 0.5d0))
+  (do-test (color:to-list* (color:rgb 0 1.0 1.0 0.5))
+           (list 0.0d0 0.5d0 0.5d0 0.5d0))
 
-  (do-test
-    (color:cmyk 1 0 0 0)
-    (color:rgb 0 1.0 1.0))
+  (do-test (color:cmyk 1 0 0 0) (color:rgb 0 1.0 1.0))
 
-  (do-test
-    (color:cmyk 0.5 0 0 0.5)
-    (color:rgb 0.25 0.5 0.5)))
+  (do-test (color:cmyk 0.5 0 0 0.5) (color:rgb 0.25 0.5 0.5)))
 
 
 (defun get-sample-pix (sand)

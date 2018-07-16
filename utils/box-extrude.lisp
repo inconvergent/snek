@@ -3,14 +3,14 @@
   (rnd:rndi n))
 
 (defun do-extrude (n a)
-  (let ((res (make-generic-array)))
+  (let ((res (make-adjustable-vector)))
     (loop for i from 0
           while (<= i a)
-          do (array-push i res))
-    (array-push (list a (mod (1+ a) n)) res)
+          do (vextend i res))
+    (vextend (list a (mod (1+ a) n)) res)
     (loop for i from (1+ a)
           while (<= i n)
-          do (array-push (mod i n) res))
+          do (vextend (mod i n) res))
     res))
 
 
@@ -48,7 +48,7 @@
 
 (defun -ind-to-pts (pts inds offset)
   (let ((offset* nil))
-    (values (to-array
+    (values (to-vector
       (flatten (loop for i across inds collect
         (if (eql (type-of i) 'cons)
           (setf offset* (get-offsets pts i offset))

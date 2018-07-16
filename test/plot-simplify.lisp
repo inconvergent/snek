@@ -16,7 +16,8 @@
       (loop for y in (math:linspace 7 80d0 920d0) do
         (let ((path (rnd:nin-box 5 40d0 40d0 :xy (vec:vec x y))))
           (plot-svg:path psvg (vec:ladd* path (vec:vec 20d0 0d0)))
-          (plot-svg:cpath psvg (vec:ladd* path (vec:vec -20d0 0d0)) :simplify 10d0
+          (plot-svg:cpath psvg (vec:ladd* path (vec:vec -20d0 0d0))
+                          :simplify 10d0
                           :width 10d0))))
 
     (plot-svg:save psvg "plot-simplify")))

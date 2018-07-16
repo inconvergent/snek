@@ -1,8 +1,9 @@
 
 (in-package :plot-svg)
 
-(defvar *short* 1000d0)
-(defvar *long* 1414.285d0)
+(defparameter *short* 1000d0)
+(defparameter *long* 1414.285d0)
+(declaim (type double-float *short* *long*))
 
 
 (defstruct plot-svg
@@ -95,15 +96,14 @@
 
 
 (defun accumulate-path (pth a &optional b (offset (vec:zero)))
-  (array-push
-    (vec:with-xy-short ((vec:add a offset) x y)
-      (if (> (length pth) 0) (cl-svg:line-to x y)
-                             (cl-svg:move-to x y)))
+  (declare (vector pth) (vec:vec a))
+  (vextend (vec:with-xy-short ((vec:add a offset) x y)
+             (if (> (length pth) 0) (cl-svg:line-to x y)
+                                    (cl-svg:move-to x y)))
     pth)
-  (when b (array-push
-            (vec:with-xy-short ((vec:add b offset) x y)
-              (cl-svg:line-to x y))
-            pth)))
+  (when b (vextend (vec:with-xy-short ((vec:add b offset) x y)
+                     (cl-svg:line-to x y))
+                   pth)))
 
 
 (defun finalize-path (pth)
@@ -114,15 +114,14 @@
 
 
 (defun path (psvg pts &key sw (fill "none") (stroke "black") closed)
-  (declare (plot-svg psvg))
-  (declare (list pts))
+  (declare (plot-svg psvg) (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
     (cl-svg:draw scene
       (:path :d (cl-svg:path (finalize-path
-                               (let ((pth (make-generic-array)))
+                               (let ((pth (make-adjustable-vector)))
                                  (loop for p in pts
                                        do (accumulate-path pth p))
-                                 (when closed (array-push "Z" pth))
+                                 (when closed (vextend "Z" pth))
                                  pth))))
       :fill fill
       :stroke stroke
@@ -130,25 +129,29 @@
 
 
 (defun -move-to (res p)
+  (declare (vector res))
   (vec:with-xy-short (p x y)
-    (array-push (format nil "M~a,~a " x y) res)))
+    (vextend (format nil "M~a,~a " x y) res)))
 
 
 (defun -quadratric (res p q)
+  (declare (vector res))
   (vec:with-xy-short (p ax ay)
     (vec:with-xy-short (q bx by)
-      (array-push (format nil "Q~a,~a ~a,~a " ax ay bx by) res))))
+      (vextend (format nil "Q~a,~a ~a,~a " ax ay bx by) res))))
 
 
 ; ----- HATCH -----
 
 
 (defun -get-pts (pts closed)
-  (let ((res (make-generic-array))
+  (declare (sequence pts))
+  (let ((res (make-adjustable-vector))
         (is-cons (equal (type-of pts) 'cons)))
-    (if is-cons (loop for p in pts do (array-push p res))
-                (loop for p across pts do (array-push p res)))
-    (when closed (array-push (if is-cons (first pts) (aref pts 0)) res))
+    (declare (vector res))
+    (if is-cons (loop for p in pts do (vextend p res))
+                (loop for p across pts do (vextend p res)))
+    (when closed (vextend (if is-cons (first pts) (aref pts 0)) res))
     res))
 
 (defun hatch (psvg pts &key (angles (list 0d0 (* 0.5d0 PI)))
@@ -158,6 +161,7 @@
                        &aux (draw (if drop
                                     (lambda (p) (rnd:prob drop nil (plot-svg:path psvg p :sw sw)))
                                     (lambda (p) (plot-svg:path psvg p :sw sw)))))
+  (declare (function draw))
   (with-struct (plot-svg- rep-scale) psvg
     (let ((res (math:hatch (-get-pts pts closed)
                            :angles angles
@@ -180,14 +184,14 @@
                            (lambda (p) (plot-svg:path psvg p :sw sw)))))
   (declare (plot-svg psvg))
   (with-struct (plot-svg- rep-scale) psvg
-    (let ((res (make-generic-array)))
+    (let ((res (make-adjustable-vector)))
       (loop for pts across mpts
             do (loop for h across (math:hatch (-get-pts pts closed)
                                               :angles angles
                                               :steps steps
                                               :rs (if rs rs rep-scale)
                                               :rnd rnd)
-                     do (array-push h res)))
+                     do (vextend h res)))
 
       (loop for h across (if stitch (math:stitch res) res) do
         (when (and (> (length h) 0) (every #'identity h))
@@ -197,11 +201,13 @@
 ; ----- BZSPL HELPERS -----
 
 (defun -fl (a)
+  (declare (list a))
   (first (last a)))
 
 
-(defun -roll-once (aa)
-  (append (subseq aa 1) (list (first aa))))
+(defun -roll-once (a)
+  (declare (list a))
+  (append (subseq a 1) (list (first a))))
 
 
 (defun -do-open (pts pth)
@@ -231,7 +237,7 @@
     (error "needs at least 3 pts."))
 
   (with-struct (plot-svg- scene stroke-width) psvg
-    (let ((pth (make-generic-array)))
+    (let ((pth (make-adjustable-vector)))
       (if closed (-do-closed pts pth) (-do-open pts pth))
       (cl-svg:draw scene
         (:path :d (cl-svg:path (finalize-path pth)))
@@ -263,7 +269,7 @@
       ; single path
       (path psvg pts :sw sw)
       ; multi path
-      (let ((pth (make-generic-array))
+      (let ((pth (make-adjustable-vector))
             (rep (math:int (ceiling (* (if rs rs rep-scale) width))))
             (rup (/ width 2d0))
             (rdown (- (/ width 2d0))))
@@ -288,12 +294,12 @@
 
 
 (defun -accumulate-cpath (diagonals rep closed &aux (n (length diagonals)))
-  (loop with res = (make-generic-array)
+  (loop with res = (make-adjustable-vector)
           for s in (math:linspace rep 0d0 1d0)
           and k from 0 do
       (loop for i from 0 below n
             and i- downfrom (1- n)
-            do (array-push
+            do (vextend
                  (vec:on-line* s
                    (aref diagonals (if closed i (if (= (math:mod2 k) 0) i i-))))
                  res))
@@ -306,14 +312,13 @@
                             (slim -0.95d0)
                             (simplify 1d0)
                             sw rs
-                       &aux (pts* (to-array (if closed (close-path pts) pts)))
+                       &aux (pts* (to-vector (if closed (close-path pts) pts)))
                             (width* (* width 0.5d0)))
-  (declare (plot-svg psvg))
-  (declare (list pts))
+  (declare (plot-svg psvg) (list pts))
   (with-struct (plot-svg- rep-scale) psvg
     (let ((rep (math:int (ceiling (* (if rs rs rep-scale) width))))
           (diagonals (math::-get-diagonals
-                       (to-array (math:path-simplify pts* simplify))
+                       (to-vector (math:path-simplify pts* simplify))
                        width* clim slim closed)))
       (path psvg (-accumulate-cpath diagonals rep closed) :sw sw))))
 
@@ -322,17 +327,15 @@
 (defun -arccirc (x y r*)
   (let* ((r (math:sfloat r*))
          (r2 (* 2 r)))
+    (declare (float r r2))
     (format nil "M~a,~a m -~a,0 a ~a,~a 0 1,0 ~a 0 a ~a,~a 0 1,0 -~a 0"
             x y r r r r2 r r r2)))
 
 
 (defun circ (psvg xy rad &key (fill "none") sw aspath)
-  (declare (plot-svg psvg))
-  (declare (vec:vec xy))
-  (declare (double-float rad))
+  (declare (plot-svg psvg) (vec:vec xy) (double-float rad))
   (with-struct (plot-svg- scene stroke-width) psvg
     (vec:with-xy-short (xy x y)
-      ; this seems unnecessary?
       (let ((sw* (if sw sw stroke-width)))
         (if aspath
           (cl-svg:draw scene (:path :d (-arccirc x y rad))
@@ -344,9 +347,7 @@
 ; TODO: create path with multiple circs
 ; TODO: multiple rads
 (defun circs (psvg vv rad &key (fill "none") sw aspath)
-  (declare (plot-svg psvg))
-  (declare (list vv))
-  (declare (double-float rad))
+  (declare (plot-svg psvg) (list vv) (double-float rad))
   (loop for xy of-type vec:vec in vv
         do (circ psvg xy rad :fill fill :sw sw :aspath aspath)))
 

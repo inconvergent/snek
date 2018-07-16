@@ -85,11 +85,11 @@
   (if (eql (type-of l) 'cons) (nth (random (length l)) l)
                               (aref l (random (length l)))))
 
-(defun probsel (p a &aux (a* (ensure-array a)))
+(defun probsel (p a &aux (a* (ensure-vector a)))
   (declare (double-float p))
-  (loop with res = (make-generic-array)
+  (loop with res = (make-adjustable-vector)
         for i across a*
-        do (prob p (array-push i res))
+        do (prob p (vextend i res))
         finally (return res)))
 
 

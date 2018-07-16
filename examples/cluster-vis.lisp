@@ -15,7 +15,7 @@
 
 
 (defun get-distributed-pts (centroids size w n)
-  (let ((res (make-generic-array))
+  (let ((res (make-adjustable-vector))
         (scale (sqrt (* 2d0 (expt size 2d0)))))
     (loop for k from 0 below n do
       (let ((pt (get-pt w size)))

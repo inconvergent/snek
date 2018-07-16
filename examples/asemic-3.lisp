@@ -86,8 +86,6 @@
         (line-chars 20)
         (line-num 10)
         (grains 95)
-        (r (rep-list (list (color:hsv 0.51 1 1 0.01)
-                           (color:hsv 0.91 1 1 0.01))))
         (sand (sandpaint:make size
                               :fg (color:white 0.009)
                               :bg (color:white))))
@@ -111,7 +109,6 @@
               (snek:move-vert? v (rnd:in-circ 0.1d0))
               (snek:move-vert? v (funcall state-gen v 0.00001d0))))
           (snek:itr-grps (snk g :collect nil)
-            ;(sandpaint:set-fg-color sand (funcall r))
             (sandpaint:bzspl-stroke sand (snek:get-grp-as-bzspl snk g) grains)))))
 
     ;(draw-grid size border line-chars line-num 18d0 33d0 0.8d0 60 sand)

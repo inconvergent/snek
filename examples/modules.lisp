@@ -31,7 +31,6 @@
             do (print-every i 1000)
                (funcall (rnd:rndget fns) snk)))
 
-    ;(snek-export-2obj snk (append-postfix fn ".2obj"))
     (snek:draw-edges snk sand 1000)
 
     (sandpaint:pixel-hack sand)

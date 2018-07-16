@@ -28,17 +28,17 @@
 
 
 (defun get-v-grid (xy width height nums)
-  (let ((inside (make-generic-array))
-        (outside (make-generic-array))
-        (all (make-generic-array)))
+  (let ((inside (make-adjustable-vector))
+        (outside (make-adjustable-vector))
+        (all (make-adjustable-vector)))
     (vec:with-xy (xy x y)
       (loop for b of-type double-float in (math:linspace (first nums) (- y height) (+ y height))
             and bi of-type fixnum from 0 do
         (loop for a of-type double-float in (math:linspace (second nums) (- x width) (+ x width))
               and ai of-type fixnum from 0 do
-          (vector-push-extend (vec:vec a b) all)
+          (vextend (vec:vec a b) all)
           (if (or (< ai 1) (> ai (- (second nums) 2)))
-            (vector-push-extend (vec:vec a b) outside)
-            (vector-push-extend (vec:vec a b) inside)))))
+            (vextend (vec:vec a b) outside)
+            (vextend (vec:vec a b) inside)))))
     (values all inside outside)))
 

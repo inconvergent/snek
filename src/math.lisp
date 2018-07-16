@@ -11,27 +11,32 @@
 ; TYPES
 
 (defun int (x)
-  (the fixnum
-    (coerce (floor x) 'fixnum)))
+  (declare (number x))
+  (the fixnum (coerce (floor x) 'fixnum)))
 
 
 (defun int* (xx)
+  (declare (list xx))
   (mapcar (lambda (x) (int (the fixnum (floor x)))) xx))
 
 
 (defun sfloat (x)
+  (declare (number x))
   (the float (coerce x 'float)))
 
 
 (defun sfloat* (xx)
+  (declare (list xx))
   (mapcar (lambda (x) (sfloat x)) xx))
 
 
 (defun dfloat (x)
+  (declare (number x))
   (the double-float (coerce x 'double-float)))
 
 
 (defun dfloat* (xx)
+  (declare (list xx))
   (mapcar (lambda (x) (dfloat x)) xx))
 
 
@@ -60,11 +65,12 @@
   get indices ii from l
   "
   (declare (list l ii))
-  (loop with arr = (to-array l)
+  (loop with arr = (to-vector l)
         for i of-type fixnum in ii collect (aref arr i)))
 
 
 (defun inc (x stp)
+  (declare (double-float x stp))
   (mod (+ x stp) 1d0))
 
 
@@ -98,9 +104,7 @@
 
 
 (defun linspace (n a b &key (end t))
-  (declare (fixnum n))
-  (declare (double-float a b))
-  (declare (boolean end))
+  (declare (fixnum n) (double-float a b) (boolean end))
   (if (> n 1)
     (let ((ban (dfloat (/ (- b a) (if end (1- n) n)))))
       (declare (double-float ban))
@@ -143,8 +147,7 @@
 
 
 (defun scale* (aa s)
-  (declare (list aa))
-  (declare (double-float s))
+  (declare (list aa) (double-float s))
   (mapcar (lambda (a) (* a s)) aa))
 
 
@@ -154,8 +157,7 @@
 
 
 (defun iscale* (aa s)
-  (declare (list aa))
-  (declare (double-float s))
+  (declare (list aa) (double-float s))
   (mapcar (lambda (a) (/ a s)) aa))
 
 
@@ -179,18 +181,18 @@
   (declare (list aa))
   (let ((n (length aa))
         (percentiles (list 0.05d0 0.1d0 0.5d0 0.9d0 0.95d0))
-        (srt (make-generic-array :init (copy-sort aa #'>))))
-    (to-array (append
+        (srt (make-adjustable-vector :init (copy-sort aa #'>))))
+    (to-vector (append
       (list (aref srt 0))
       (loop for m in percentiles
-          collect (aref srt (floor (* n m))))
-      (list (array-last srt))))))
+            collect (aref srt (floor (* n m))))
+      (list (vector-last srt))))))
 
 ; TODO: expt, sqrt, ...
 
 
 (defun range-search (ranges f &aux (n (1- (length ranges)))
-                                   (ranges* (ensure-array ranges)))
+                                   (ranges* (ensure-vector ranges)))
   "
   binary range search.
 
@@ -200,9 +202,9 @@
   (if (or (< f (aref ranges* 0)) (> f (aref ranges* n)))
     (error "querying position outside range: ~a" f))
 
-  (loop with l = 0
-        with r = n
-        with mid = 0
+  (loop with l of-type fixnum = 0
+        with r of-type fixnum = n
+        with mid of-type fixnum = 0
         until (<= (aref ranges* mid) f
                   (aref ranges* (1+ mid)))
         do (setf mid (floor (+ l r) 2))

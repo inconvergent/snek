@@ -25,8 +25,8 @@
 
   (declare (snek snk))
   (with-struct (snek- grps grp-size) snk
-    (multiple-value-bind (v exists)
-      (gethash name* grps)
+    (multiple-value-bind (v exists) (gethash name* grps)
+      (declare (ignore v) (boolean exists))
       (when exists (error "grp name already exists: ~a" name*)))
     (setf (gethash name* grps) (-make-grp :name name*
                                           :type type
@@ -57,8 +57,8 @@
 
   (declare (snek snk))
   (with-struct (snek- prms) snk
-    (multiple-value-bind (v exists)
-      (gethash name* prms)
+    (multiple-value-bind (v exists) (gethash name* prms)
+      (declare (ignore v) (boolean exists))
       (when exists (error "prm name already exists: ~a" name*)))
     (setf (gethash name* prms) (-make-prm :name name*
                                           :type type
@@ -99,13 +99,13 @@
 
   (let ((i (1- (incf (snek-num-verts snk)))))
     (when name
-      (multiple-value-bind (val exists)
-        (gethash name (snek-vert-names snk))
+      (multiple-value-bind (v exists) (gethash name (snek-vert-names snk))
+        (declare (ignore v) (boolean exists))
         (when exists (error "vert name already exists: ~a" name))
         (setf (gethash name (snek-vert-names snk)) i)))
     (when p
       (with-struct (prm- verts) (gethash p (snek-prms snk))
-        (array-push i verts)
+        (vextend i verts)
         (incf (prm-num-verts (gethash p (snek-prms snk))))))
     i))
 
@@ -116,8 +116,7 @@
 
   returns the ids of the new vertices
   "
-  (declare (snek snk))
-  (declare (list vv))
+  (declare (snek snk) (list vv names))
   (if names
     (progn
       (if (not (= (length names) (length vv)))
@@ -157,10 +156,9 @@
   "
   get the coordinate (vec) of vertex (id) v
   "
-  (declare (snek snk))
-  (declare (fixnum v))
+  (declare (snek snk) (fixnum v))
   (with-struct (snek- verts num-verts) snk
-    (declare (type (simple-array double-float) verts))
+    (declare (type (simple-array double-float) verts) (fixnum num-verts))
     (-valid-vert (num-verts v)
       (vec:sarr-get verts v))))
 
@@ -170,7 +168,7 @@
   "
   get the coordinates (vec) of vert indices in vv
   "
-  (declare (snek snk))
+  (declare (snek snk) (sequence vv))
   (with-struct (snek- verts num-verts) snk
     (declare (type (simple-array double-float) verts))
     (-valid-verts (num-verts vv* v)
@@ -192,8 +190,7 @@
   "
   returns all grps.
   "
-  (declare (snek snk))
-  (declare (boolean main))
+  (declare (snek snk) (boolean main))
   (loop for g being the hash-keys of (snek-grps snk)
         ; ignores nil (main) grp unless overridden
         if (or g main) collect g))
@@ -251,17 +248,15 @@
   (let* ((pr (gethash p (snek-prms snk)))
          (type* (if type type (prm-type pr))))
     (when pr
-      (multiple-value-bind (fxn exists)
-        (gethash type* (snek-prm-names snk))
+      (multiple-value-bind (fxn exists) (gethash type* (snek-prm-names snk))
         (when (not exists) (error "trying to use undefined prm type: ~a" type*))
-        (funcall fxn snk p  (snek:sel-args snk p args))))))
+        (funcall (the function fxn) snk p  (snek:sel-args snk p args))))))
 
 
 (defun get-prm-vert-inds (snk &key p)
   (declare (snek snk))
   (when (not p) (error "must provide a prm name."))
-  (multiple-value-bind (pr exists)
-    (gethash p (snek-prms snk))
+  (multiple-value-bind (pr exists) (gethash p (snek-prms snk))
     (when (not exists) (error "prm does not exist: ~a" p))
     (with-struct (prm- verts) pr
       verts)))
@@ -274,8 +269,7 @@
   (declare (snek snk))
   (declare (fixnum v))
   (with-struct (snek- grps) snk
-    (multiple-value-bind (grp exists)
-      (gethash g grps)
+    (multiple-value-bind (grp exists) (gethash g grps)
       (if exists
         (graph:vmem (grp-grph grp) v)
         (error "grp does not exist: ~a" grp)))))
@@ -287,8 +281,7 @@
   "
   (declare (snek snk))
   (with-struct (snek- grps) snk
-    (multiple-value-bind (grp exists)
-      (gethash g grps)
+    (multiple-value-bind (grp exists) (gethash g grps)
       (if exists
         (graph:get-verts (grp-grph grp))
         (error "grp does not exist: ~a" grp)))))
@@ -296,30 +289,26 @@
 
 (defun get-vert-ind-by-name (snk &key name)
   (declare (snek snk))
-  (multiple-value-bind (i exists)
-    (gethash name (snek-vert-names snk))
+  (multiple-value-bind (i exists) (gethash name (snek-vert-names snk))
     (when exists i)))
 
 
 (defun get-vert-by-name (snk &key name)
   (declare (snek snk))
-  (multiple-value-bind (i exists)
-    (gethash name (snek-vert-names snk))
+  (multiple-value-bind (i exists) (gethash name (snek-vert-names snk))
     (when exists (get-vert snk i))))
 
 
 (defun get-verts-by-name (snk &key names)
   (declare (snek snk))
   (declare (list names))
-  (loop for name in names
-        collect (get-vert-by-name snk :name name)))
+  (loop for name in names collect (get-vert-by-name snk :name name)))
 
 
 (defun get-vert-inds-by-name (snk &key names)
   (declare (snek snk))
   (declare (list names))
-  (loop for name in names
-        collect (get-vert-ind-by-name snk :name name)))
+  (loop for name in names collect (get-vert-ind-by-name snk :name name)))
 
 
 (defun get-num-edges (snk &key g)
@@ -352,10 +341,10 @@
 
   returns nil if the edge exists already.
   "
-  (declare (snek snk))
-  (declare (list ee))
+  (declare (snek snk) (list ee))
   (with-grp (snk grp g)
     (with-struct (snek- num-verts) snk
+      (declare (fixnum num-verts))
       (with-struct (grp- grph) grp
         (destructuring-bind (a b) ee
           (declare (fixnum a b))
@@ -370,10 +359,8 @@
   "
   adds multiple edges (see above). returns a list of the results.
   "
-  (declare (snek snk))
-  (declare (list ee))
-  (loop for e of-type list in ee
-        collect (add-edge! snk e)))
+  (declare (snek snk) (list ee))
+  (loop for e of-type list in ee collect (add-edge! snk e)))
 
 
 (defun del-edge! (snk ee &key g)

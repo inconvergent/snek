@@ -33,7 +33,7 @@
 
 
 (defun nrnd-u-from (n a)
-  (let* ((a* (ensure-array a))
+  (let* ((a* (ensure-vector a))
          (resind nil)
          (anum (length a*)))
     (when (> n anum) (error "not enough distinct elements in a."))
@@ -47,14 +47,14 @@
 
 
 (defun array-split (arr p)
-  (let ((res (make-generic-array)))
+  (let ((res (make-adjustable-vector)))
 
-    (array-push (make-generic-array :init (list (aref arr 0))) res)
+    (vextend (make-adjustable-vector :init (list (aref arr 0))) res)
 
     (loop for i from 1 below (length arr) do
       (prob p
-        (array-push (make-generic-array :init (list (aref arr i))) res)
-        (array-push (aref arr i) (aref res (1- (length res))))))
+        (vextend (make-adjustable-vector :init (list (aref arr i))) res)
+        (vextend (aref arr i) (aref res (1- (length res))))))
     res))
 
 

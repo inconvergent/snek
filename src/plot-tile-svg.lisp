@@ -30,10 +30,10 @@
 
 (defun -make-grid (nxny dw dh)
   (destructuring-bind (nx ny) nxny
-    (let ((res (make-generic-array)))
-      (array-push* (loop for x in (math:linspace (1+ nx) 0d0 dw)
+    (let ((res (make-adjustable-vector)))
+      (vextend* (loop for x in (math:linspace (1+ nx) 0d0 dw)
                          collect (list (vec:vec x 0d0) (vec:vec x dh))) res)
-      (array-push* (loop for y in (math:linspace (1+ ny) 0d0 dh)
+      (vextend* (loop for y in (math:linspace (1+ ny) 0d0 dh)
                          collect (list (vec:vec 0d0 y) (vec:vec dw y))) res )
       res)))
 
@@ -73,31 +73,31 @@
 
 
 (defun -path-segments (pts)
-  (loop with res = (make-generic-array)
+  (loop with res = (make-adjustable-vector)
         for i from 0 below (length-1 pts) collect
-        (array-push (list (aref pts i) (aref pts (1+ i))) res)
+        (vextend (list (aref pts i) (aref pts (1+ i))) res)
         finally (return res)))
 
 (defun -make-linear-ratios (segment grid)
-  (let ((res (make-generic-array)))
-    (array-push* (list 0d0 1d0) res)
+  (let ((res (make-adjustable-vector)))
+    (vextend* (list 0d0 1d0) res)
     (loop for g across grid
           do (multiple-value-bind (x p) (vec:segx segment g)
-               (when x (array-push p res))))
+               (when x (vextend p res))))
     (sort res #'<)))
 
 (defun -split-segment (segment grid)
-  (loop with res = (make-generic-array)
+  (loop with res = (make-adjustable-vector)
         for s across (-make-linear-ratios segment grid)
-        do (array-push (vec:on-line* s segment) res)
+        do (vextend (vec:on-line* s segment) res)
         finally (return res)))
 
 (defun -split-path-segments-on-grid (grid pts)
-  (loop with res = (make-generic-array)
+  (loop with res = (make-adjustable-vector)
         for segment across pts do
         (loop with subseg = (-split-segment segment grid)
               for i from 0 below (1- (length subseg))
-              do (array-push (list (aref subseg i) (aref subseg (1+ i))) res))
+              do (vextend (list (aref subseg i) (aref subseg (1+ i))) res))
         finally (return res)))
 
 
@@ -113,7 +113,7 @@
 
 
 (defun path (msvg pts &key sw (stroke "black") closed
-                      &aux (pts* (ensure-array pts :fx #'to-generic-array)))
+                      &aux (pts* (ensure-vector pts :fx #'to-adjustable-vector)))
   "
   draw path
   "
@@ -123,7 +123,7 @@
                                papers overview nxny) msvg
     (plot-svg:path overview pts :sw sw :stroke stroke :closed closed)
 
-    (when closed (array-push (aref pts* 0) pts*))
+    (when closed (vextend (aref pts* 0) pts*))
     (loop for (segment paperid)
           in (-append-paper-id paper-id-fx (-split-path-segments-on-grid
                                              grid (-path-segments pts*)))
@@ -178,7 +178,7 @@
   (declare (plot-tile-svg msvg))
   (declare (list pts))
   (declare (fixnum n))
-  (loop with all = (to-array (lin-path:pos*
+  (loop with all = (to-vector (lin-path:pos*
                                (lin-path:make pts :closed closed)
                                (sort (rnd:nrnd (* 2 n)) (rnd:either #'< #'>))))
         for i from 0 below (* 2 n) by 2
@@ -188,7 +188,8 @@
 
 (defun bzspl (msvg pts &key sw (stroke "black") closed (dens 1d0))
   (declare (plot-tile-svg msvg))
-  (path msvg (bzspl:adaptive-pos (bzspl:make pts :closed closed) :dens dens)))
+  (path msvg (bzspl:adaptive-pos (bzspl:make pts :closed closed) :dens dens)
+        :sw sw :stroke stroke))
 
 
 (defun save (msvg fn)

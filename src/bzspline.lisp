@@ -39,7 +39,7 @@
   (n nil :type fixnum :read-only t)
   (ns nil :type fixnum :read-only t)
   (closed nil :type boolean)
-  (vpts nil))
+  (vpts nil :type simple-array))
 
 
 (defun do-calc (x pts)

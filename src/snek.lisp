@@ -29,7 +29,7 @@
 (defstruct (prm (:constructor -make-prm))
   (name nil :type symbol :read-only t)
   (type nil :type symbol :read-only t)
-  (verts (make-generic-array :type 'fixnum) :read-only nil)
+  (verts (make-adjustable-vector :type 'fixnum) :read-only nil)
   (num-verts 0 :type fixnum)
   (args nil :type list :read-only nil)
   (props nil))
@@ -58,6 +58,8 @@
   - prms is a list of touples: (('type1 #'type1-rfx) ('type2 #'type2-rfx))
     with prm types and corresponding rfxns used to render that prm type.
   "
+  (declare (fixnum max-verts grp-size)
+           (list prms alts) (symbol name))
   (-make-snek :name name
               :verts (make-array (* max-verts 2) :initial-element 0d0
                                                  :element-type 'double-float)
@@ -77,12 +79,12 @@
                                      alts)
               :prm-names (-make-fxns
                            (list
-                             (list nil (lambda (snk p &optional extra-args)
-                                               (get-prm-vert-inds snk :p p)))
-                             (list :v (lambda (snk p &optional extra-args)
-                                              (get-prm-vert-inds snk :p p)))
-                             (list :vv (lambda (snk p &optional extra-args)
-                                               (get-prm-verts snk :p p))))
+                             (list nil (lambda (snk p &optional ea) (declare (ignore ea))
+                                         (get-prm-vert-inds snk :p p)))
+                             (list :v (lambda (snk p &optional ea) (declare (ignore ea))
+                                        (get-prm-vert-inds snk :p p)))
+                             (list :vv (lambda (snk p &optional ea) (declare (ignore ea))
+                                         (get-prm-verts snk :p p))))
                            prms)
               :grps (make-generic-hash-table :init (list
                       (list nil (-make-grp :name :main :type :main
