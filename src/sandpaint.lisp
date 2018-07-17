@@ -24,10 +24,24 @@
                      do (progn ,@body))))))
 
 
+(defmacro -do-op ((sand size vals indfx &key name) &body body)
+  (declare (symbol sand size vals indfx))
+  (with-gensyms (sname)
+    `(let* ((,sname ,sand)
+            (,size (sandpaint-size ,sname))
+            (,vals (sandpaint-vals ,sname))
+            (,indfx (sandpaint-indfx ,sname)))
+      (declare (type (simple-array double-float) ,vals)
+               (function ,indfx) (fixnum ,size))
+      ,(when name `(format t "applying:~a...~%" ,name))
+      (progn ,@body)
+      ,(when name `(format t "done.~%")))))
+
+
 (defun get-ind-fx (size)
   (declare (fixnum size))
-  (lambda (x y &optional (c 0)) (declare (optimize (safety 0) speed (debug 0))
-                                         (fixnum x y c))
+  (lambda (x y &optional (c 0))
+    (declare (optimize (safety 0) speed (debug 0)) (fixnum x y c))
     (+ c (the fixnum (* 4 (the fixnum (+ x (the fixnum (* size y)))))))))
 
 
@@ -118,16 +132,14 @@
       (-operator-over indfx vals x y fg))))
 
 
-(declaim (inline -u8)
-         (ftype (function (double-float) fixnum) -u8))
+(declaim (inline -u8) (ftype (function (double-float) fixnum) -u8))
 (defun -u8 (v)
   (declare (optimize (safety 0) speed (debug 0)) (double-float v))
   (cond ((> v 1d0) 255)
         ((< v 0d0) 0)
         (t (floor (the float (* 255 v))))))
 
-(declaim (inline -ui8)
-         (ftype (function (fixnum) double-float) -ui8))
+(declaim (inline -ui8) (ftype (function (fixnum) double-float) -ui8))
 (defun -ui8 (v)
   (declare (optimize (safety 0) speed (debug 0)) (fixnum v))
   (cond ((>= v 255) 1d0)
@@ -135,8 +147,7 @@
         (t (/ (math:dfloat v) 255d0))))
 
 
-(declaim (inline -u16)
-         (ftype (function (double-float) fixnum) -u16))
+(declaim (inline -u16) (ftype (function (double-float) fixnum) -u16))
 (defun -u16 (v)
   (declare (optimize (safety 0) speed (debug 0)) (double-float v))
   (cond ((> v 1d0) 65535)
@@ -148,8 +159,7 @@
 (defun -png-vals (indfx vals x y g bitfx)
   (declare (function indfx bitfx)
            (type (simple-array double-float) vals)
-           (fixnum x y)
-           (double-float g))
+           (fixnum x y) (double-float g))
   (let* ((ind (funcall indfx x y))
          (a (aref vals (+ 3 ind))))
     (declare (double-float a) (fixnum ind))
@@ -164,8 +174,7 @@
 (defun clear (sand &optional c)
   (declare (sandpaint sand))
   (color:with ((if c c (sandpaint-bg sand)) r g b a)
-    (with-struct (sandpaint- size vals indfx) sand
-      (declare (function indfx) (fixnum size))
+    (-do-op (sand size vals indfx)
       (-square-loop (x y size)
         (let ((ind (funcall indfx x y)))
           (declare (fixnum ind))
@@ -203,20 +212,20 @@
 
 (defun pix (sand vv)
   (declare (list vv))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size))
-    (loop for v of-type vec:vec in vv do
-      (-inside-round (size v x y)
-        (-operator-over indfx vals x y fg)))))
+  (-do-op (sand size vals indfx)
+    (loop with fg = (sandpaint-fg sand)
+          for v of-type vec:vec in vv
+          do (-inside-round (size v x y)
+               (-operator-over indfx vals x y fg)))))
 
 
 (defun arr-pix (sand vv n)
   (declare (fixnum n))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size))
-    (loop for i of-type fixnum from 0 below n do
-      (-inside-round (size (vec:sarr-get vv i) x y)
-        (-operator-over indfx vals x y fg)))))
+  (-do-op (sand size vals indfx)
+    (loop with fg = (sandpaint-fg sand)
+          for i of-type fixnum from 0 below n
+          do (-inside-round (size (vec:sarr-get vv i) x y)
+               (-operator-over indfx vals x y fg)))))
 
 
 (declaim (inline -floor-fract)
@@ -269,87 +278,75 @@
             (-operator-over-overlap #1# #2# s4))))))
 
 (defun pix-overlap (sand pts)
-  (declare (sandpaint sand)
-           (list pts))
-  (with-struct (sandpaint- size vals indfx fg) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
-    (loop for pt of-type vec:vec in pts
+  (declare (sandpaint sand) (list pts))
+  (-do-op (sand size vals indfx)
+    (loop with fg = (sandpaint-fg sand)
+          for pt of-type vec:vec in pts
           do (-pix-overlap indfx vals size pt fg))))
 
 
 (defun pix-overlap* (sand pt)
-  (declare (sandpaint sand)
-           (vec:vec pt))
-  (with-struct (sandpaint- size vals indfx fg) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
-    (-pix-overlap indfx vals size pt fg)))
+  (declare (sandpaint sand) (vec:vec pt))
+  (-do-op (sand size vals indfx)
+    (-pix-overlap indfx vals size pt (sandpaint-fg sand))))
 
 
 (defun circ (sand vv rad n)
   (declare (list vv) (double-float rad) (fixnum n))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
-    (loop for v of-type vec:vec in vv do
+  (-do-op (sand size vals indfx)
+    (loop with fg = (sandpaint-fg sand)
+          for v of-type vec:vec in vv do
       (-draw-circ indfx vals size v rad n fg))))
 
 
 (defun bzspl-stroke (sand bz n)
   (declare (fixnum n))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size))
-    (bzspl:with-rndpos (bz n v)
-      (-inside-round (size v x y)
-        (-operator-over indfx vals x y fg)))))
+  (-do-op (sand size vals indfx)
+    (let ((fg (sandpaint-fg sand)))
+      (bzspl:with-rndpos (bz n v)
+        (-inside-round (size v x y)
+          (-operator-over indfx vals x y fg))))))
 
 
 (defun arr-circ (sand vv num rad grains)
   (declare (type (simple-array double-float) vv)
            (fixnum grains num) (double-float rad))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
-    (loop for i of-type fixnum from 0 below num do
-      (-draw-circ indfx vals size (vec:sarr-get vv i) rad grains fg))))
+  (-do-op (sand size vals indfx)
+    (loop with fg = (sandpaint-fg sand)
+          for i of-type fixnum from 0 below num
+          do (-draw-circ indfx vals size (vec:sarr-get vv i)
+                         rad grains fg))))
 
 
 (defun strokes (sand lines grains)
   (declare (fixnum grains) (list lines))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
-    (loop for (u v) in lines do
-      (-draw-stroke indfx vals size grains u v fg))))
+  (-do-op (sand size vals indfx)
+    (loop with fg = (sandpaint-fg sand)
+          for (u v) in lines
+          do (-draw-stroke indfx vals size grains u v fg))))
 
 
 (defun stroke (sand line grains &key overlap)
   (declare (fixnum grains) (list line))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
+  (-do-op (sand size vals indfx)
     (destructuring-bind (u v) line
       (if overlap
-        (-draw-stroke-overlap indfx vals size grains u v fg)
-        (-draw-stroke indfx vals size grains u v fg)))))
+        (-draw-stroke-overlap indfx vals size grains u v (sandpaint-fg sand))
+        (-draw-stroke indfx vals size grains u v (sandpaint-fg sand))))))
 
 
 (defun dens-stroke (sand line &optional (dens 1d0))
   (declare (double-float dens) (list line))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
+  (-do-op (sand size vals indfx)
     (destructuring-bind (u v) line
-      (-draw-dens-stroke indfx vals size dens u v fg))))
+      (-draw-dens-stroke indfx vals size dens u v (sandpaint-fg sand)))))
 
 
 (defun lin-path (sand path rad grains &key (dens 1d0))
   (declare (double-float rad dens) (fixnum grains))
-  (with-struct (sandpaint- size vals fg indfx) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
-    (loop for u of-type vec:vec in path
+  (-do-op (sand size vals indfx)
+    (loop with fg = (sandpaint-fg sand)
+          for u of-type vec:vec in path
           and w of-type vec:vec in (cdr path)
           do (math:with-linspace ((* (vec:dst u w) dens) 0d0 1d0 p :end nil)
                (-draw-circ indfx vals size (vec:on-line p u w) rad grains fg)))))
@@ -359,9 +356,7 @@
   "
   save as 8 bits. supports alpha.
   "
-  (with-struct (sandpaint- size vals indfx) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
+  (-do-op (sand size vals indfx)
     (let ((png (make-instance 'zpng::pixel-streamed-png
                               :color-type :truecolor-alpha
                               :width size
@@ -382,9 +377,7 @@
   "
   save as 16 bits. does not support alpha.
   "
-  (with-struct (sandpaint- size vals indfx) sand
-    (declare (function indfx) (fixnum size)
-             (type (simple-array double-float) vals))
+  (-do-op (sand size vals indfx)
     (let ((img (png:make-image size ;width
                                size ;height
                                3 16)))
@@ -416,7 +409,7 @@
                     (aref vals (funcall indfx j i 2)) (-ui8 (aref img i j 2))
                     (aref vals (funcall indfx j i 3)) 1d0))))
 
-
+; TODO: indexed/grayscale channel only
 (defun png-open (fn)
   "read a png image."
   (let ((img (with-open-file (input fn :element-type '(unsigned-byte 8))
@@ -425,7 +418,6 @@
       (declare (ignore c))
       (when (not (= h w)) (error "can only load square images"))
       (let ((sand (make h)))
-        (-init-rgb-from-png (sandpaint-indfx sand)
-                            (sandpaint-vals sand) img h)
+        (-init-rgb-from-png (sandpaint-indfx sand) (sandpaint-vals sand) img h)
         sand))))
 

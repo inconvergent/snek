@@ -46,16 +46,12 @@
             (list vec:*zero*))))
 
 
+; experimental CA
 ; TODO there is a bug here. good luck.
 (defun chromatic-aberration (sand &key mid (s 1d0))
-  (declare (optimize (safety 0) speed (debug 0))
-           (double-float s))
-  (print "WARN: CA is currently not working and will produce strange results.")
-  (format t "applying filter:chromatic-aberration...~%")
-  (with-struct (sandpaint- size vals indfx) sand
-    (declare (fixnum size))
-    (declare (function indfx))
-
+  (declare (optimize (safety 0) speed (debug 0)))
+  (format t "WARN: CA is currently not working and will produce strange results.~%")
+  (-do-op (sand size vals indfx :name "chromatic-aberration")
     (labels
       ((-channel-operator-over (new-vals new-counts sx sy ix iy w channel)
         (when (and (< -1 sx size) (< -1 sy size) (< -1 ix size) (< -1 iy size))
@@ -104,25 +100,18 @@
             (-point-sample-channel new-vals new-counts sx sy pt dx 0)
             ;(-point-sample-channel new-vals sx sy pt vec:*zero* 1)
             (-point-sample-channel new-vals new-counts sx sy pt (vec:neg dx) 2)))
-        (copy-scale-rgba-array-to-from vals new-vals new-counts size))))
-  (format t "done.~%"))
+        (copy-scale-rgba-array-to-from vals new-vals new-counts size)))))
 
 
 ; TODO: incomplete
-(defun sandpaint:filter-walk (sand walker noise &key (alpha 0.5d0))
+(defun filter-walk (sand walker noise &key (alpha 0.5d0))
   (declare (optimize (safety 0) speed (debug 0)))
-  (format t "applying filter:walk...~%")
-  (with-struct (sandpaint- size vals indfx) sand
-    (declare (fixnum size)
-             (type (simple-array double-float) vals)
-             (function indfx))
-  (loop for j from 0 below size
-        do (loop for i from 0 to (/ size 2)
-                 do (let ((v (funcall walker noise)))
-                      (vec:with-xy ((vec:add (vec:vec-coerce i j) v) x y)
-                        (-inside-round (size (vec:vec x y) xx yy)
-                         (-operator-over indfx vals xx yy
-                          (-rgb-from vals (funcall indfx i j) alpha))))))))
-
-  (format t "done.~%"))
+  (-do-op (sand size vals indfx :name "rot-cw")
+    (loop for j from 0 below size
+          do (loop for i from 0 to (/ size 2)
+                   do (let ((v (funcall walker noise)))
+                        (vec:with-xy ((vec:add (vec:vec-coerce i j) v) x y)
+                          (-inside-round (size (vec:vec x y) xx yy)
+                           (-operator-over indfx vals xx yy
+                            (-rgb-from vals (funcall indfx i j) alpha)))))))))
 

@@ -342,6 +342,7 @@
     :filter-walk
     :flip-x
     :flip-y
+    :rot
     :save
     :set-bg-color
     :set-fg-color

@@ -41,8 +41,8 @@
                     :height "420mm"
                     :width "297mm"
                     :view-box (-view-box *short* *long*)))
-    (otherwise (error "invalid layout. use: 'plot-svg:a4-portrait,
-      'plot-svg:a4-landscape, plot-svg:a3-landscape or plot-svg:a3-portrait."))))
+    (otherwise (error "invalid layout. use: plot-svg:a4-portrait,
+      plot-svg:a4-landscape, plot-svg:a3-landscape or plot-svg:a3-portrait."))))
 
 
 (defun -get-width-height (layout)
