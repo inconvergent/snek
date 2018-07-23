@@ -37,7 +37,7 @@
 
       (loop for i from (1+ l) below r do
         (let ((d (vec:segdst seg (aref pts i))))
-          (if (> d dmax)
+          (when (> d dmax)
             (setf dmax d
                   index i))))
 

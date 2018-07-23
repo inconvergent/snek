@@ -184,6 +184,7 @@
     :rndspace
     :rndspacei
     :set-rnd-state
+    :shuffle
     :with-in-circ
     :with-on-line
     :with-prob
@@ -418,6 +419,7 @@
   (:export
     :add-face
     :add-verts-from-vec
+    :add-line
     :make
     :save)
   (:import-from :common-lisp-user

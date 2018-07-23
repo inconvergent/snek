@@ -79,10 +79,8 @@
   (with-struct (plot-svg- width height) psvg
     (let ((mw (* 0.5d0 width))
           (mh (* 0.5d0 height)))
-      (path psvg (vec:rect mw mh :xy (vec:vec mw mh))
-                                 :closed t
-                                 :sw sw
-                                 :stroke stroke))))
+      (path psvg (vec:rect mw mh :xy (vec:vec mw mh)) :closed t
+                                 :sw sw :stroke stroke))))
 
 
 (defun show-crop (psvg &key (len 3d0) sw (stroke "red"))
@@ -91,7 +89,8 @@
     (loop for m in (list (list (vec:vec 0d0 0d0) (vec:vec len 0d0))
                          (list (vec:vec width 0d0) (vec:vec (- width len) 0d0))
                          (list (vec:vec 0d0 height) (vec:vec len height))
-                         (list (vec:vec width height) (vec:vec (- width len) height)))
+                         (list (vec:vec width height)
+                               (vec:vec (- width len) height)))
           do (path psvg m :closed t :sw sw :stroke stroke))))
 
 
@@ -100,7 +99,7 @@
   (vextend (vec:with-xy-short ((vec:add a offset) x y)
              (if (> (length pth) 0) (cl-svg:line-to x y)
                                     (cl-svg:move-to x y)))
-    pth)
+           pth)
   (when b (vextend (vec:with-xy-short ((vec:add b offset) x y)
                      (cl-svg:line-to x y))
                    pth)))
@@ -113,16 +112,20 @@
         finally (return res)))
 
 
-(defun path (psvg pts &key sw (fill "none") (stroke "black") closed)
+(defun path (psvg pts &key sw (fill "none") (stroke "black")
+                           closed (simplify nil))
   (declare (plot-svg psvg) (list pts))
   (with-struct (plot-svg- scene stroke-width) psvg
     (cl-svg:draw scene
-      (:path :d (cl-svg:path (finalize-path
-                               (let ((pth (make-adjustable-vector)))
-                                 (loop for p in pts
-                                       do (accumulate-path pth p))
-                                 (when closed (vextend "Z" pth))
-                                 pth))))
+      (:path
+        :d (cl-svg:path
+             (finalize-path
+               (loop with pth = (make-adjustable-vector)
+                     for p in
+                       (if simplify (math:path-simplify pts simplify) pts)
+                     do (accumulate-path pth p)
+                     finally (progn (when closed (vextend "Z" pth))
+                                    (return pth))))))
       :fill fill
       :stroke stroke
       :stroke-width (if sw sw stroke-width))))
@@ -262,8 +265,7 @@
 
 
 (defun wpath (psvg pts &key width sw rs)
-  (declare (plot-svg psvg))
-  (declare (list pts))
+  (declare (plot-svg psvg) (list pts))
   (with-struct (plot-svg- scene stroke-width rep-scale) psvg
     (if (not width)
       ; single path
@@ -295,23 +297,20 @@
 
 (defun -accumulate-cpath (diagonals rep closed &aux (n (length diagonals)))
   (loop with res = (make-adjustable-vector)
-          for s in (math:linspace rep 0d0 1d0)
-          and k from 0 do
-      (loop for i from 0 below n
-            and i- downfrom (1- n)
-            do (vextend
-                 (vec:on-line* s
-                   (aref diagonals (if closed i (if (= (math:mod2 k) 0) i i-))))
-                 res))
+        for s in (math:linspace rep 0d0 1d0)
+        and k from 0
+        do (loop for i from 0 below n
+                 and i- downfrom (1- n)
+                 do (vextend
+                      (vec:on-line* s
+                        (aref diagonals (if closed i
+                                          (if (= (math:mod2 k) 0) i i-))))
+                      res))
     finally (return (to-list res))))
 
 
-(defun cpath (psvg pts &key (width 1d0)
-                            closed
-                            (clim -0.5d0)
-                            (slim -0.95d0)
-                            (simplify 1d0)
-                            sw rs
+(defun cpath (psvg pts &key (width 1d0) closed (clim -0.5d0)
+                            (slim -0.95d0) (simplify 1d0) sw rs
                        &aux (pts* (to-vector (if closed (close-path pts) pts)))
                             (width* (* width 0.5d0)))
   (declare (plot-svg psvg) (list pts))

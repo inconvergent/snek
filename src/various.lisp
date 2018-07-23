@@ -75,6 +75,10 @@
   (declare (vector a))
   (aref a (the fixnum (length-1 a))))
 
+(defun vector-first (a)
+  (declare (vector a))
+  (aref a 0))
+
 
 (defun -vector-add (a vv)
   (declare (vector a) (sequence vv))

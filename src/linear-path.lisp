@@ -68,15 +68,13 @@
 
 
 (defun pos (pth f)
-  (declare (path pth)
-           (double-float f))
+  (declare (path pth) (double-float f))
   (with-struct (path- lens pts n) pth
     (-calc-pos pts lens n (mod f 1d0))))
 
 
 (defun pos* (pth ff)
-  (declare (path pth)
-           (list ff))
+  (declare (path pth) (list ff))
   (with-struct (path- lens pts n) pth
     (mapcar (lambda (f) (declare (double-float f))
               (-calc-pos pts lens n (mod f 1d0)))

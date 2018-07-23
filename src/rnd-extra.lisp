@@ -32,6 +32,23 @@
                 in-circ on-circ))
 
 
+
+; TODO: move to math?
+(defun -swap (a i j)
+  (declare (vector a) (fixnum i j))
+  (let ((tmp (aref a i)))
+    (setf (aref a i) (aref a j)
+          (aref a j) tmp)))
+
+
+; https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+(defun shuffle (a &aux (a* (ensure-vector a)) (n (length a)))
+  (declare (sequence a))
+  (loop for i of-type fixnum from 0 to (- n 2)
+        do (-swap a* i (rndi i n)))
+  a*)
+
+
 (defun nrnd-u-from (n a)
   (let* ((a* (ensure-vector a))
          (resind nil)
