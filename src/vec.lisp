@@ -62,7 +62,7 @@
 (declaim (ftype (function (double-float) vec) cos-sin sin-cos))
 
 (declaim (ftype (function (vec double-float) vec) scale iscale))
-(declaim (ftype (function (vec vec double-float) vec) add-scaled))
+(declaim (ftype (function (vec vec double-float) vec) from))
 
 (declaim (ftype (function (vec vec) double-float) dot cross dst dst2))
 
@@ -187,9 +187,8 @@
     (atan y x)))
 
 
-(defun add-scaled (a b s)
-  (declare (double-float s))
-  (declare (vec a b))
+(defun from (a b s)
+  (declare (double-float s) (vec a b))
   (vec (+ (vec-x a) (* s (vec-x b)))
        (+ (vec-y a) (* s (vec-y b)))))
 
@@ -208,8 +207,7 @@
 
 
 (defun iscale (a s)
-  (declare (vec a))
-  (declare (double-float s))
+  (declare (vec a) (double-float s))
   (vec (/ (vec-x a) s)
        (/ (vec-y a) s)))
 
@@ -228,8 +226,7 @@
 
 
 (defun lsub* (aa b)
-  (declare (list aa))
-  (declare (vec b))
+  (declare (list aa) (vec b))
   (mapcar (lambda (a) (declare (type vec a)) (sub a b)) aa))
 
 
@@ -263,14 +260,12 @@
 
 
 (defun ladd* (aa b)
-  (declare (list aa))
-  (declare (vec b))
+  (declare (list aa) (vec b))
   (mapcar (lambda (a) (declare (type vec a)) (add a b)) aa))
 
 
 (defun lscale* (aa s)
-  (declare (list aa))
-  (declare (double-float s))
+  (declare (list aa) (double-float s))
   (mapcar (lambda (a) (declare (type vec a)) (scale a s)) aa))
 
 
@@ -286,8 +281,7 @@
 
 
 (defun lmult* (aa b)
-  (declare (list aa))
-  (declare (vec b))
+  (declare (list aa) (vec b))
   (mapcar (lambda (a) (declare (type vec a)) (mult a b)) aa))
 
 
@@ -314,8 +308,7 @@
 
 
 (defun ldiv* (aa b)
-  (declare (list aa))
-  (declare (vec b))
+  (declare (list aa) (vec b))
   (mapcar (lambda (a) (declare (type vec a)) (div a b)) aa))
 
 
@@ -367,14 +360,12 @@
 
 
 (defun ldst* (aa b)
-  (declare (list aa))
-  (declare (vec b))
+  (declare (list aa) (vec b))
   (loop for a in aa collect (dst a b)))
 
 
 (defun norm (a &key (s 1d0) (default *zero*))
-  (declare (vec a))
-  (declare (double-float s))
+  (declare (vec a) (double-float s))
   (let ((l (len a)))
     (if (> l 0d0) (scale a (/ s l)) default)))
 
@@ -390,8 +381,7 @@
 
 
 (defun rot (v a &key (xy *zero*))
-  (declare (vec v))
-  (declare (double-float a))
+  (declare (vec v) (double-float a))
   (let ((cosa (cos a))
         (sina (sin a)))
     (with-xy ((sub v xy) x y)
@@ -400,22 +390,18 @@
 
 
 (defun lrot (pts a &key (xy *zero*))
-  (declare (list pts))
-  (declare (double-float a))
+  (declare (list pts) (double-float a))
   (mapcar (lambda (p) (declare (vec p)) (rot p a :xy xy)) pts))
 
 
 (defun shift-scale (pt shift s &optional (unshift *zero*))
   "shift scale (unshift)"
-  (declare (vec pt shift))
-  (declare (double-float s))
+  (declare (vec pt shift) (double-float s))
   (add (scale (sub pt shift) s) unshift))
 
 
 (defun shift-scale* (pts shift s &optional unshift)
-  (declare (list pts))
-  (declare (vec shift))
-  (declare (double-float s))
+  (declare (list pts) (vec shift) (double-float s))
   (mapcar (lambda (pt) (declare (vec pt))
             (shift-scale pt shift s unshift)) pts))
 
@@ -430,8 +416,7 @@
 
 
 (defun segdst (aa v)
-  (declare (list aa))
-  (declare (vec v))
+  (declare (list aa) (vec v))
   (destructuring-bind (va vb)
     aa
     (let ((l2 (dst2 va vb)))
@@ -448,8 +433,7 @@
 
 
 (defun segx (aa bb &key parallel)
-  (declare (list aa))
-  (declare (list bb))
+  (declare (list aa bb))
   (destructuring-bind (a1 a2 b1 b2)
     (concatenate 'list aa bb)
     (let* ((sa (sub a2 a1))
@@ -503,12 +487,12 @@
 
 (defun on-circ (p rad &key (xy *zero*))
   (declare (double-float p rad) (vec xy))
-  (add-scaled xy (cos-sin (* p PII)) rad))
+  (from xy (cos-sin (* p PII)) rad))
 
 
 (defun on-line (p a b)
   (declare (double-float p) (vec a b))
-  (add-scaled a (sub b a) p))
+  (from a (sub b a) p))
 
 
 (defun on-line* (p ab)
@@ -539,5 +523,5 @@
 (defun polygon (n rad &key (xy *zero*) (rot 0d0))
   (declare (fixnum n) (double-float rad rot) (vec xy))
   (loop for i from 0 below n
-        collect (add-scaled xy (cos-sin (+ rot (* (/ (math:dfloat i) n) PII))) rad)))
+        collect (from xy (cos-sin (+ rot (* (/ (math:dfloat i) n) PII))) rad)))
 

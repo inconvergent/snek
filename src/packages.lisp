@@ -6,7 +6,7 @@
     :*half*
     :*zero*
     :add
-    :add-scaled
+    :from
     :all-inside
     :angle
     :copy
@@ -92,23 +92,28 @@
     :convex-split
     :copy-sort
     :cpath
+    :dadd
+    :daddmod*
+    :ddiv
+    :ddst
     :dfloat
     :dfloat*
-    :div
-    :dst
+    :dmult
+    :dscale
+    :dscale*
+    :dsub
+    :dsum
     :hatch
     :inc
     :int
     :int*
-    :iscale
-    :iscale*
     :lget
+    :line-from
     :linspace
     :mid-rad
     :mod+
     :mod-
     :mod2
-    :mult
     :nrep
     :path-angles
     :path-normals-closed
@@ -120,14 +125,11 @@
     :range
     :range-search
     :rep
-    :scale
-    :scale*
     :sfloat
     :sfloat*
     :stipple
     :stitch
     :sub
-    :sum
     :with-linspace)
   (:import-from :common-lisp-user
     :vector-last
@@ -518,7 +520,7 @@
 
 ;(declaim (inline rnd:rnd rnd:rndi rnd:rnd* rnd:rndbtwn rnd:on-line rnd:in-circ))
 ;(declaim (inline vec:zero vec:one vec:vec vec:cos-sin vec:sin-cos vec:scale
-;                 vec:iscale vec:add-scaled vec:dot vec:cross vec:dst vec:dst2
+;                 vec:iscale vec:from vec:dot vec:cross vec:dst vec:dst2
 ;                 vec:add vec:sub vec:mult vec:mid vec:div vec:perp vec:flip
 ;                 vec:copy vec:neg vec:on-line))
 

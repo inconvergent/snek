@@ -3,6 +3,12 @@
 
 (in-package :math)
 
+
+(defun line-from (a r &optional (s 1d0))
+  (declare (vec:vec a r) (double-float s))
+  (list a (vec:from a r s)))
+
+
 (defun path-tangents (aa &key closed (default (vec:vec 0d0))
                          &aux (aa* (if (equal (type-of aa) 'cons)
                                        (make-adjustable-vector :init aa :type 'vec)
@@ -134,7 +140,7 @@
     res))
 
 (defun path-offset (pts width &key (s 1d0) closed
-                                   (clim -0.5) (slim -0.95)
+                                   (clim -0.5d0) (slim -0.95d0)
                                    (simplify 1d0))
   (let ((diag (-get-diagonals (to-vector (path-simplify pts simplify))
                 width clim slim closed)))
@@ -300,7 +306,7 @@
 
 (defun -stipple-get-lengths (num-lines len)
   (let* ((lens (rnd:nrnd num-lines))
-         (s (math:sum lens)))
+         (s (dsum lens)))
     (loop for l in lens collect (/ (* l len) s))))
 
 (defun stipple (num-lines len)

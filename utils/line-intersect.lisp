@@ -49,20 +49,17 @@
 
 
 (defun get-intersects (lines)
-  (let ((res (make-adjustable-vector)))
-
-    (loop for i from 0 below (length lines) do
-      (loop for j from (1+ i) below (length lines) do
-        (-isect res (aref lines i) (aref lines j))))
-    res))
+  (loop with res = (make-adjustable-vector)
+        for i from 0 below (length lines)
+        do (loop for j from (1+ i) below (length lines)
+                 do (-isect res (aref lines i) (aref lines j)))
+        finally (return res)))
 
 (defun -memtest (gm key near nearsel)
   (loop for (i j) in nearsel do
     (let ((k (math:add key (list i j))))
-      (multiple-value-bind (val exists)
-        (gethash k gm)
-        (if exists
-          (vextend k near))))))
+      (multiple-value-bind (val exists) (gethash k gm)
+        (when exists (vextend k near))))))
 
 (defun make-grid-map (lines intersects nearsel
                             &key distortfxn
@@ -74,9 +71,8 @@
 
     (loop for (ui wi us ws) across intersects do
       (let ((key (list ui wi)))
-        (multiple-value-bind (val exists)
-          (gethash key gm)
-          (if (not exists)
+        (multiple-value-bind (val exists) (gethash key gm)
+          (when (not exists)
             (setf (gethash key gm) (make-adjustable-vector)
                   (gethash key points)
                   (funcall distortfxn*
@@ -84,8 +80,7 @@
 
     (loop for (ui wi us ws) across intersects do
       (let ((key (list ui wi)))
-        (multiple-value-bind (val exists)
-          (gethash key gm)
+        (multiple-value-bind (val exists) (gethash key gm)
           (-memtest gm key val nearsel))))
     (values gm points)))
 

@@ -21,7 +21,7 @@
     `(let* ((,a* ,a)
             (,sub (vec:sub ,b ,a*)))
       (loop repeat ,n
-            do (let ((,rn  (vec:add-scaled ,a* ,sub (random 1d0))))
+            do (let ((,rn  (vec:from ,a* ,sub (random 1d0))))
                  (declare (vec:vec ,rn))
                  (progn ,@body))))))
 
@@ -43,7 +43,7 @@
 
 ; https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 (defun shuffle (a &aux (a* (ensure-vector a)) (n (length a)))
-  (declare (sequence a))
+  (declare (sequence a) (vector a*))
   (loop for i of-type fixnum from 0 to (- n 2)
         do (-swap a* i (rndi i n)))
   a*)
@@ -65,10 +65,8 @@
 
 (defun array-split (arr p)
   (let ((res (make-adjustable-vector)))
-
     (vextend (make-adjustable-vector :init (list (aref arr 0))) res)
-
-    (loop for i from 1 below (length arr) do
+    (loop for i of-type fixnum from 1 below (length arr) do
       (prob p
         (vextend (make-adjustable-vector :init (list (aref arr i))) res)
         (vextend (aref arr i) (aref res (1- (length res))))))
@@ -80,14 +78,12 @@
 
 ; TODO: this can be optimized
 (defun on-circ (rad &key (xy vec:*zero*))
-  (declare (double-float rad))
-  (declare (vec:vec xy))
-  (vec:add-scaled xy (vec:cos-sin (random PII)) rad))
+  (declare (double-float rad) (vec:vec xy))
+  (vec:from xy (vec:cos-sin (random PII)) rad))
 
 
 (defun non-circ (n rad &key (xy vec:*zero*))
-  (declare (fixnum n))
-  (declare (double-float rad))
+  (declare (fixnum n) (double-float rad))
   (loop repeat n collect (on-circ rad :xy xy)))
 
 
@@ -105,27 +101,23 @@
 
 
 (defun nin-circ (n rad &key (xy vec:*zero*))
-  (declare (fixnum n))
-  (declare (double-float rad))
+  (declare (fixnum n) (double-float rad))
   (loop repeat n collect (in-circ rad :xy xy)))
 
 
 (defun in-box (sx sy &key (xy vec:*zero*))
-  (declare (double-float sx sy))
-  (declare (vec:vec xy))
+  (declare (double-float sx sy) (vec:vec xy))
   (vec:add xy (vec:vec (rnd* sx) (rnd* sy))))
 
 
 (defun nin-box (n sx sy &key (xy vec:*zero*))
-  (declare (fixnum n))
-  (declare (double-float sx sy))
-  (declare (vec:vec xy))
+  (declare (fixnum n) (double-float sx sy) (vec:vec xy))
   (loop repeat n collect (in-box sx sy :xy xy)))
 
 
 (defun on-line (a b)
   (declare (vec:vec a b))
-  (vec:add-scaled a (vec:sub b a) (random 1d0)))
+  (vec:from a (vec:sub b a) (random 1d0)))
 
 
 (defun on-line* (ab)
@@ -136,16 +128,14 @@
 
 
 (defun non-line (n a b)
-  (declare (fixnum n))
-  (declare (vec:vec a b))
+  (declare (fixnum n) (vec:vec a b))
   (loop with ba = (vec:sub b a)
         repeat n
-        collect (vec:add-scaled a ba (random 1d0))))
+        collect (vec:from a ba (random 1d0))))
 
 
 (defun non-line* (n ab)
-  (declare (fixnum n))
-  (declare (list ab))
+  (declare (fixnum n) (list ab))
   (destructuring-bind (a b) ab
     (declare (vec:vec a b))
     (non-line n a b)))

@@ -15,7 +15,7 @@
                                 (snek::-ok-ind (+ (snek::mutate-ind ,mut)
                                             (rnd:rndi -1 2))))
                           ;(setf (mutate-xy ,mut)
-                          ;      (math:add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0d0)))
+                          ;      (vec:add (mutate-xy ,mut) (rnd:rnd:in-circ 2.0d0)))
                           (snek::do-mutate (snek::mutate-rules ,mut) ,a ,mut))
                    ,a))
                ,bd))))

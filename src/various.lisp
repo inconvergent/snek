@@ -125,16 +125,19 @@
                             :adjustable t))
 
 
-(defun make-generic-hash-table (&key init (test #'equal)
-                                &aux (init* (ensure-vector init
-                                              :fx #'to-adjustable-vector)))
-  (declare (sequence init) (function test) (vector init*))
+(defun make-generic-hash-table (&key init (test #'equal))
+  (declare (sequence init) (function test))
   (if (< (length init) 1)
     (make-hash-table :test test)
-    (loop with res = (make-hash-table :test test)
-          for (k v) across init*
-          do (setf (gethash k res) v)
-          finally (return res))))
+    (if (equal (type-of init) 'cons)
+      (loop with res = (make-hash-table :test test)
+            for (k v) in init
+            do (setf (gethash k res) v)
+            finally (return res))
+      (loop with res = (make-hash-table :test test)
+            for (k v) across init
+            do (setf (gethash k res) v)
+            finally (return res)))))
 
 
 (defun count-things (data &key (test #'equal)

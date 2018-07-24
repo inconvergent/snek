@@ -36,8 +36,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun add (grph a b)
-  (declare (graph grph))
-  (declare (fixnum a b))
+  (declare (graph grph) (fixnum a b))
   (with-struct (graph- adj make-hset verts) grph
     (if (progn (hset:add* verts (list a b))
                (reduce (lambda (x y) (or x y))
@@ -64,8 +63,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun del (grph a b)
-  (declare (graph grph))
-  (declare (fixnum a b))
+  (declare (graph grph) (fixnum a b))
   (with-struct (graph- adj verts) grph
     (if (reduce (lambda (x y) (or x y))
                 (list (-del adj a b) (-del adj b a)))
@@ -86,8 +84,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun mem (grph a b)
-  (declare (graph grph))
-  (declare (fixnum a b))
+  (declare (graph grph) (fixnum a b))
   (with-struct (graph- adj) grph
     (multiple-value-bind (val exists) (gethash a adj)
       (when exists (hset:mem val b)))))
@@ -97,8 +94,7 @@ a simple (undirected) graph structure based on adjacency lists.
   (declare (graph grph))
   (let ((res (make-adjustable-vector :size (graph-size grph)))
         (adj (graph-adj grph)))
-    (declare (type (array list) res))
-    (declare (hash-table adj))
+    (declare (type (array list) res) (hash-table adj))
     (loop for a of-type fixnum being the hash-keys of adj do
       (loop for b of-type fixnum in (hset:to-list (gethash a adj))
         if (<= a b)
@@ -107,8 +103,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun get-incident-edges (grph v)
-  (declare (graph grph))
-  (declare (fixnum v))
+  (declare (graph grph) (fixnum v))
   (with-struct (graph- adj) grph
     (let ((a (gethash v adj)))
       (when a (loop for w of-type fixnum being the hash-keys of a
@@ -121,8 +116,7 @@ a simple (undirected) graph structure based on adjacency lists.
 
 
 (defun vmem (grph v)
-  (declare (graph grph))
-  (declare (fixnum v))
+  (declare (graph grph) (fixnum v))
   (hset:mem (graph-verts grph) v))
 
 

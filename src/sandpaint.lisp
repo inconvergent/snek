@@ -362,11 +362,12 @@
                               :width size
                               :height size)))
       (with-open-file
-        (stream (ensure-filename fn ".png") :direction :output
+        (fstream (ensure-filename fn ".png") :direction :output
                                             :if-exists :supersede
                                             :if-does-not-exist :create
                                             :element-type '(unsigned-byte 8))
-        (zpng:start-png png stream)
+        (declare (stream fstream))
+        (zpng:start-png png fstream)
         (-square-loop (x y size)
           (multiple-value-bind (r g b a) (-png-vals indfx vals x y gamma #'-u8)
             (declare (fixnum r g b))

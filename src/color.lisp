@@ -105,7 +105,7 @@ Colors are stored internally with premultiplied alpha.
       (let ((x (* c (- 1d0 (abs (- (mod (* 6d0 h) 2d0) 1d0)))))
             (m (- v c)))
         (destructuring-bind (r g b)
-          (math:add (list m m m)
+          (math:dadd (list m m m)
                     (case (floor (mod (* h 6d0) 6d0))
                       (0 (list c x 0d0))
                       (1 (list x c 0d0))

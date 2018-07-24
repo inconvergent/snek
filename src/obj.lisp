@@ -3,9 +3,9 @@
 
 
 (defstruct obj
-  (verts nil :read-only nil)
-  (faces nil :read-only nil)
-  (lines nil :read-only nil)
+  (verts nil :type vector :read-only t)
+  (faces nil :type vector :read-only t)
+  (lines nil :type vector :read-only t)
   (num-verts 0 :type fixnum :read-only nil)
   (num-lines 0 :type fixnum :read-only nil)
   (num-faces 0 :type fixnum :read-only nil))
@@ -44,17 +44,21 @@
 (defun save (o fn &key (mesh-name "mesh"))
   (declare (obj o))
   (with-struct (obj- verts faces lines) o
-    (with-open-file (stream (ensure-filename fn ".obj")
-                            :direction :output :if-exists :supersede)
-      (format stream "o ~a~%" mesh-name)
-      (loop for ll across verts
+    (with-open-file (fstream (ensure-filename fn ".obj")
+                             :direction :output :if-exists :supersede)
+      (declare (stream fstream))
+      (format fstream "o ~a~%" mesh-name)
+      (loop for ll of-type list across verts
             do (destructuring-bind (x y z) ll
-                 (format stream "v ~f ~f ~f~%" x y z)))
-      (loop for ee across faces
+                 (declare (double-float x y z))
+                 (format fstream "v ~f ~f ~f~%" x y z)))
+      (loop for ee of-type list across faces
             do (destructuring-bind (a b c) (math:add ee '(1 1 1))
-                 (format stream "f ~d ~d ~d~%" a b c)))
-      (loop for ll across lines
-            do (format stream "l")
-               (loop for l in ll do (format stream " ~d" (1+ l)))
-               (format stream "~%")))))
+                 (declare (fixnum a b c))
+                 (format fstream "f ~d ~d ~d~%" a b c)))
+      (loop for ll of-type list across lines
+            do (format fstream "l")
+               (loop for l of-type fixnum in (math:add ll '(1 1 1))
+                     do (format fstream " ~d" l))
+               (format fstream "~%")))))
 

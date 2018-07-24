@@ -125,8 +125,7 @@
 
 
 (defun nrnd (n &optional (x 1d0))
-  (declare (fixnum n))
-  (declare (double-float x))
+  (declare (fixnum n) (double-float x))
   (loop repeat n collect (rnd x)))
 
 
@@ -149,8 +148,7 @@
 
 
 (defun nrndbtwn (n a b)
-  (declare (fixnum n))
-  (declare (double-float a b))
+  (declare (fixnum n) (double-float a b))
   (loop for i from 0 below n collect (rndbtwn a b)))
 
 
@@ -160,14 +158,12 @@
 
 
 (defun nrnd* (n &optional (x 1d0))
-  (declare (fixnum n))
-  (declare (double-float x))
+  (declare (fixnum n) (double-float x))
   (loop repeat n collect (rnd* x)))
 
 
 (defun rndspace (n a b &key order)
-  (declare (fixnum n))
-  (declare (double-float a b))
+  (declare (fixnum n) (double-float a b))
   (destructuring-bind (a b)
     (sort (list a b) #'<)
     (declare (double-float a b))
@@ -189,7 +185,6 @@
 
 
 (defun bernoulli (n p)
-  (declare (fixnum n))
-  (declare (double-float p))
+  (declare (fixnum n) (double-float p))
   (loop repeat n collect (if (< (rnd:rnd) p) 1d0 0d0)))
 

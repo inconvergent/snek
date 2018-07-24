@@ -12,7 +12,7 @@
         for char-pos-x in (rnd:rndspace line-chars sx (+ sx width) :order t)
         for char-pos-y in (rnd:rndspace line-chars (- sy 10d0) (+ sy 10d0))
         for char-height in (math:add (rnd:rndspace line-chars 0.4d0 1d0)
-                                     (math:scale*
+                                     (math:dscale*
                                        (rnd:bernoulli line-chars 0.05d0)
                                        2d0))
         collect

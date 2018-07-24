@@ -264,21 +264,22 @@
 ; ----- END BZSPL -----
 
 
-(defun wpath (psvg pts &key width sw rs)
+(defun wpath (psvg pts &key width sw rs (simplify nil))
   (declare (plot-svg psvg) (list pts))
   (with-struct (plot-svg- scene stroke-width rep-scale) psvg
     (if (not width)
       ; single path
-      (path psvg pts :sw sw)
+      (path psvg pts :sw sw :simplify simplify)
       ; multi path
       (let ((pth (make-adjustable-vector))
             (rep (math:int (ceiling (* (if rs rs rep-scale) width))))
-            (rup (/ width 2d0))
-            (rdown (- (/ width 2d0))))
+            (rup (* width 0.5d0))
+            (rdown (- (* width 0.5d0))))
 
         (when (= 0 (math:mod2 rep)) (setf rep (1+ rep)))
-        (loop for a in pts
-              and b in (cdr pts)
+        (loop with pts* = (if simplify (math:path-simplify pts simplify) pts)
+              for a in pts*
+              and b in (cdr pts*)
               do (accumulate-path pth a)
                  (loop for s in (math:linspace rep rdown rup)
                        and i from 0
@@ -303,8 +304,8 @@
                  and i- downfrom (1- n)
                  do (vextend
                       (vec:on-line* s
-                        (aref diagonals (if closed i
-                                          (if (= (math:mod2 k) 0) i i-))))
+                        (aref diagonals
+                              (if closed i (if (= (math:mod2 k) 0) i i-))))
                       res))
     finally (return (to-list res))))
 
@@ -365,7 +366,8 @@
 (defun save (psvg fn)
   (declare (plot-svg psvg))
   (with-struct (plot-svg- scene) psvg
-    (with-open-file (s (ensure-filename fn ".svg")
+    (with-open-file (fstream (ensure-filename fn ".svg")
                        :direction :output :if-exists :supersede)
-      (cl-svg:stream-out s scene))))
+      (declare (stream fstream))
+      (cl-svg:stream-out fstream scene))))
 

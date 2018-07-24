@@ -50,7 +50,7 @@
                   &aux (s* (if (not s) (lambda () 0.5d0) s))
                        (n (length pts)))
     (if (> (loop for i from 0 below (1- n) minimizing
-             (math:dst (aref pts i) (aref pts (1+ i)))) lim)
+             (math:ddst (aref pts i) (aref pts (1+ i)))) lim)
 
       ; do split
       (destructuring-bind (a b)
