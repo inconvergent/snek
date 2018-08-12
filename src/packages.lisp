@@ -17,6 +17,7 @@
     :dst
     :dst*
     :dst2
+    :fan
     :flip
     :idiv
     :iscale
@@ -88,17 +89,22 @@
   (:use :common-lisp)
   (:export
     :add
+    :clamp
     :close-path
     :convex-split
     :copy-sort
     :cpath
+    :curvature-offsets
+    :curvature-offset-paths
     :dadd
     :daddmod*
     :ddiv
     :ddst
+    :ddxy
     :dfloat
     :dfloat*
     :dmult
+    :dop
     :dscale
     :dscale*
     :dsub
@@ -107,6 +113,7 @@
     :inc
     :int
     :int*
+    :kappa
     :lget
     :line-from
     :linspace
@@ -132,13 +139,14 @@
     :sub
     :with-linspace)
   (:import-from :common-lisp-user
-    :vector-last
+    :PI5
     :ensure-vector
     :length-1
     :make-adjustable-vector
     :to-adjustable-vector
     :to-list
     :to-vector
+    :vector-last
     :vextend
     :with-gensyms))
 
@@ -177,6 +185,8 @@
     :prob
     :probsel
     :rcond
+    :rep
+    :rep*
     :rnd
     :rnd*
     :rndbtwn
@@ -187,6 +197,7 @@
     :rndspacei
     :set-rnd-state
     :shuffle
+    :with-in-box
     :with-in-circ
     :with-on-line
     :with-prob
@@ -291,6 +302,10 @@
   (:import-from :common-lisp-user
     :vextend
     :make-adjustable-vector
+    :to-vector
+    :PI5
+    :length-1
+    :vector-last
     :to-list
     :with-gensyms
     :with-struct))
@@ -332,6 +347,10 @@
     :circ
     :clear
     :dens-stroke
+    :filter-walk
+    :flip-x
+    :flip-y
+    :get-size
     :lin-path
     :make
     :pix
@@ -342,10 +361,9 @@
     :reflect-diag
     :reflect-x
     :reflect-y
-    :filter-walk
-    :flip-x
-    :flip-y
+    :rnd-copy-rect
     :rot
+    :sample
     :save
     :set-bg-color
     :set-fg-color
@@ -382,15 +400,17 @@
     :show-crop
     :wbzspl
     :wcirc
+    :wcircs
     :wpath)
   (:import-from :common-lisp-user
     :aif
-    :vextend
     :close-path
     :ensure-filename
     :make-adjustable-vector
-    :to-vector
     :to-list
+    :to-vector
+    :vector-last
+    :vextend
     :with-struct))
 
 

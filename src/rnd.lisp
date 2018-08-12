@@ -16,6 +16,7 @@
       (loop repeat ,nname collect (progn ,@body)))))
 
 
+; TODO: deprecated
 (defmacro with-prob (p &body body)
   "
   executes body with probability p.
@@ -27,14 +28,25 @@
 
 
 (defmacro prob (p a &optional b)
+  "
+  executes body with probability p.
+  "
   `(if (< (rnd) ,p) ,a ,b))
 
 
 (defmacro either (a b)
+  "
+  excecutes either a or b with a probablility of 0.5
+  "
   `(prob 0.5d0 ,a ,b))
 
 
 (defmacro rcond (&rest clauses)
+  "
+  executes the forms in clauses according to the weighted sum of all p1, p2 ...
+  clauses should be on this form:
+    ((p1 form) (p2 form))
+  "
   (with-gensyms (val)
     (let* ((tot 0d0)
            (clauses* (loop for (prob . body) in clauses
@@ -44,7 +56,24 @@
       (cond ,@clauses*)))))
 
 
+(defmacro rep (n &body body)
+  "
+  repeat body at most n-1 times
+  "
+  `(loop repeat (rndi ,n) do (progn ,@body)))
+
+
+(defmacro rep* (a b &body body)
+  "
+  repeat body between [a b) times.
+  "
+  `(loop repeat (rndi ,a ,b) do (progn ,@body)))
+
+
 (defmacro with-rndspace ((n a b rn &key collect) &body body)
+  "
+  repeat body where rn is n numbers between (a b)
+  "
   (declare (symbol rn))
   (with-gensyms (a* b* d)
     `(destructuring-bind (,a* ,b*)

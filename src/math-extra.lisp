@@ -23,12 +23,12 @@
 
 
 (defun path-angles (pts)
-  (let ((res (make-adjustable-vector)))
-    (loop for i from 0 below (length-1 pts)
-          do (vextend (vec:norm (vec:sub (aref pts (1+ i))
-                                            (aref pts i))) res))
-    (vextend (aref res (length-1 res)) res)
-    res))
+  (loop with res = (make-adjustable-vector)
+        for i from 0 below (length-1 pts)
+        do (vextend (vec:norm (vec:sub (aref pts (1+ i))
+                                       (aref pts i))) res)
+        finally (vextend (aref res (length-1 res)) res)
+                (return res)))
 
 
 (defun -path-simplify (pts lim &optional left right)
@@ -324,4 +324,110 @@
           do (vextend (list curr (+ curr l)) res)
              (incf curr (+ l g))
           finally (return res))))
+
+
+; ----- CURVATURE OFFSET EXPERIMENTAL -----
+
+;TODO: add first order estimations on boundary points?
+(defun ddxy (pts i s)
+  "
+  calculate first and second partial derivatives of pts.
+  assumes that pts is parameterised from 0 to 1.
+  only works on internal points.
+  "
+  (declare (vector pts) (fixnum i) (double-float s))
+  (let* ((p- (aref pts (1- i)))
+         (p+ (aref pts (1+ i)))
+         (p (aref pts i)))
+    (declare (vec:vec p- p+ p))
+    (values (/ (- (vec::vec-x p+) (vec::vec-x p-)) s)
+            (/ (- (vec::vec-y p+) (vec::vec-y p-)) s)
+            (/ (+ (vec::vec-x p+) (vec::vec-x p-) (* -2d0 (vec::vec-x p)))
+               (expt s 2d0))
+            (/ (+ (vec::vec-y p+) (vec::vec-y p-) (* -2d0 (vec::vec-y p)))
+               (expt s 2d0)))))
+
+
+(defun kappa (pts i s)
+  "
+  estimate curvature based on pts.
+  only works on internal points (because of ddxy)
+  "
+  (declare (vector pts) (fixnum i) (double-float s))
+  (multiple-value-bind (dx dy ddx ddy) (ddxy pts i s)
+    (declare (double-float dx dy ddx ddy))
+    (/ (abs (- (* dx ddy) (* dy ddx)))
+       (expt (+ (* dx dx) (* dy dy)) (the double-float (/ 3d0 2d0))))))
+
+
+(defun -coffset (pts angles i s)
+  (let* ((va (aref angles (1- i)))
+         (vb (aref angles i))
+         (ab (vec:angle vb)))
+    (declare (vec:vec va vb) (double-float ab))
+    (list (kappa pts i s) (aref pts i)
+          (if (<= (the double-float (vec:cross va vb)) 0d0) (vec:cos-sin (+ ab PI5))
+                                                            (vec:cos-sin (- ab PI5))))))
+
+(defun -pad-offsets (pts)
+  (let ((res (make-adjustable-vector :type 'vec:vec)))
+    (vextend (aref pts 0) res)
+    (loop for l across pts do (vextend l res))
+    (vextend (vector-last res) res)
+    res))
+
+
+; TODO: closed version
+(defun curvature-offsets (pts &aux (pts* (ensure-vector pts)))
+  "
+  offset pts according to estimated curvature.
+  pts must be evenly distributed
+  "
+  (declare (sequence pts) (vector pts*))
+  (-pad-offsets
+    (to-vector (loop with angles of-type vector = (math:path-angles pts*)
+                     for i of-type fixnum from 1 below (length-1 pts*)
+                     collect (-coffset pts* angles i (/ 2d0 (length pts*)))))))
+
+
+(defun -do-split-num (res rs curvefx curr c a b)
+  (let* ((cw (funcall curvefx c))
+         (n (math:int (ceiling (* rs cw)))))
+    (declare (double-float cw) (fixnum n))
+    (when (> (length res) 0) (vextend (list n cw a b) (vector-last res)))
+    (when (not (= n curr))
+      (vextend (make-adjustable-vector :init (list (list n cw a b))) res))
+    n))
+
+(defun -split-num (offsets rs curvefx)
+  (loop with curr of-type fixnum = -1
+        with res = (make-adjustable-vector)
+        for (c a b) across offsets
+        do (setf curr (-do-split-num res rs curvefx curr c a b))
+        finally (return res)))
+
+
+; TODO: closed?
+(defun curvature-offset-paths (pts &key (rs 0.1d0)
+                                        (curvefx (lambda (c) (* 500d0 (expt c 0.6d0))))
+                                        (spacefx (lambda (n) (math:linspace n 0d0 1d0))))
+  "
+  offset pts according to curvature.
+  pts must be evenly sampled for this to work properly.
+  experimental.
+  "
+  (declare (list pts) (double-float rs) (function curvefx spacefx))
+  (let ((res (make-adjustable-vector))
+        (offsets (math:curvature-offsets pts)))
+    (loop for offset of-type vector across (-split-num offsets rs curvefx)
+          do (loop with n of-type fixnum = (first (aref offset 0))
+                   for s of-type double-float in (funcall spacefx n)
+                   do (vextend
+                        (list n (loop for (_ c a b) across offset
+                                      collect (vec:on-line s a (vec:from a b c))
+                                              of-type vec:vec))
+                        res)))
+    res))
+
+
 

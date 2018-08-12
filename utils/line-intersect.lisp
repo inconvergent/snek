@@ -38,14 +38,10 @@
 
 
 (defun -isect (res lu lw)
-  (loop for u across lu
-        and ui from 0 do
-    (loop for w across lw
-          and wi from 0
-          do (multiple-value-bind (int us ws)
-               (vec:segx u w)
-               (when int
-                     (vextend (list ui wi us ws) res))))))
+  (loop for u across lu and ui from 0
+        do (loop for w across lw and wi from 0
+                 do (multiple-value-bind (x us ws) (vec:segx u w)
+                      (when x (vextend (list ui wi us ws) res))))))
 
 
 (defun get-intersects (lines)

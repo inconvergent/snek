@@ -117,8 +117,7 @@
   "
   draw path
   "
-  (declare (plot-tile-svg msvg))
-  (declare (list pts))
+  (declare (plot-tile-svg msvg) (list pts))
   (with-struct (plot-tile-svg- paper-id-fx paper-fx grid
                                papers overview nxny) msvg
     (plot-svg:path overview pts :sw sw :stroke stroke :closed closed)
@@ -141,9 +140,7 @@
   note that len is a ratio of the full length of line
   (a number between 0 and 1)
   "
-  (declare (plot-tile-svg msvg))
-  (declare (list line))
-  (declare (double-float len))
+  (declare (plot-tile-svg msvg) (list line) (double-float len))
   (let ((stip (math:stipple num len)))
     (loop for (a b) across stip
           do (path msvg (list (vec:on-line* a line)
@@ -158,9 +155,7 @@
   if the length of the line is shorter than len, a single line (no stipples)
   will be drawn.
   "
-  (declare (plot-tile-svg msvg))
-  (declare (list line))
-  (declare (double-float len))
+  (declare (plot-tile-svg msvg) (list line) (double-float len))
   (let ((d (vec:dst* line)))
     (if (<= d len)
       (path msvg line :sw sw :stroke stroke)
@@ -175,9 +170,7 @@
   draw n stipples along path pts
   WARN: this is incomplete and will probably not perform as expected
   "
-  (declare (plot-tile-svg msvg))
-  (declare (list pts))
-  (declare (fixnum n))
+  (declare (plot-tile-svg msvg) (list pts) (fixnum n))
   (loop with all = (to-vector (lin-path:pos*
                                (lin-path:make pts :closed closed)
                                (sort (rnd:nrnd (* 2 n)) (rnd:either #'< #'>))))

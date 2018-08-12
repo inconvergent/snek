@@ -525,3 +525,8 @@
   (loop for i from 0 below n
         collect (from xy (cos-sin (+ rot (* (/ (math:dfloat i) n) PII))) rad)))
 
+(defun fan (n rad &key (xy *zero*) (rot 0d0))
+  (declare (fixnum n) (double-float rad rot) (vec xy))
+  (loop for p in (polygon n rad :xy xy :rot rot)
+        collect (list xy p)))
+

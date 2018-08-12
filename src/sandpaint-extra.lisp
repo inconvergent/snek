@@ -46,7 +46,7 @@
             (list vec:*zero*))))
 
 
-; experimental CA
+; EXPERIMENTAL
 ; TODO there is a bug here. good luck.
 (defun chromatic-aberration (sand &key mid (s 1d0))
   (declare (optimize (safety 0) speed (debug 0)))
@@ -103,15 +103,28 @@
         (copy-scale-rgba-array-to-from vals new-vals new-counts size)))))
 
 
-; TODO: incomplete
-(defun filter-walk (sand walker noise &key (alpha 0.5d0))
+; EXPERIMENTAL
+;(defun filter-walk (sand walker noise &key (alpha 0.5d0))
+;  (declare (optimize (safety 0) speed (debug 0)))
+;  (-do-op (sand size vals indfx :name "rot-cw")
+;    (loop for j from 0 below size
+;          do (loop for i from 0 to (/ size 2)
+;                   do (let ((v (funcall walker noise)))
+;                        (vec:with-xy ((vec:add (vec:vec-coerce i j) v) x y)
+;                          (-inside-round (size (vec:vec x y) xx yy)
+;                           (-operator-over indfx vals xx yy
+;                            (-rgb-from vals (funcall indfx i j) alpha)))))))))
+
+
+; EXPERIMENTAL
+(defun rnd-copy-rect (sand n sx sy &key from to)
   (declare (optimize (safety 0) speed (debug 0)))
-  (-do-op (sand size vals indfx :name "rot-cw")
-    (loop for j from 0 below size
-          do (loop for i from 0 to (/ size 2)
-                   do (let ((v (funcall walker noise)))
-                        (vec:with-xy ((vec:add (vec:vec-coerce i j) v) x y)
-                          (-inside-round (size (vec:vec x y) xx yy)
-                           (-operator-over indfx vals xx yy
-                            (-rgb-from vals (funcall indfx i j) alpha)))))))))
+  (-do-op (sand size vals indfx :name nil)
+    (let ((angle (rnd:rnd* PI)))
+      (rnd:with-in-box (n sx sy pxy)
+        (-inside-floor (size (vec:add to (vec:rot pxy angle)) ax ay)
+          (-inside-floor (size (vec:add from pxy) bx by)
+            (let ((pa (funcall indfx ax ay 0))
+                  (pb (funcall indfx bx by 0)))
+              (-swap vals pa pb))))))))
 

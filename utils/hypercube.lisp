@@ -61,7 +61,7 @@
 
     (loop for p across pts do (setf (gethash p pts*) t))
 
-    (vextend (first (rnd:nrnd-from 1 pts)) res)
+    (vextend (rnd:rndget pts) res)
     (loop until (>= (length res) n) do
       (let ((new (-walk (aref res (1- (length res))))))
         (multiple-value-bind (val exists)

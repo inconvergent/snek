@@ -4,4 +4,6 @@
 *.obj
 *.mp4
 *.gif
+/res/
 *progress
+*-srt

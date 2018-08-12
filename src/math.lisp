@@ -38,6 +38,13 @@
   (mapcar (lambda (x) (dfloat x)) xx))
 
 
+(defun clamp (v mi ma)
+  (declare (double-float v mi ma))
+  (cond ((< v mi) mi)
+        ((< v ma) v)
+        (t ma)))
+
+
 ; RANGES
 
 
@@ -124,6 +131,12 @@
 
 
 ; LIST DOUBLE FLOAT MATH
+
+
+(defun dop (aa op)
+  (declare (list aa) (function op))
+  (loop for a of-type double-float in aa
+        collect (funcall op a) of-type double-float))
 
 
 (defun dadd (aa bb)

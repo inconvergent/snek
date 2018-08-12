@@ -201,7 +201,7 @@
               (funcall draw h))))))
 
 
-; ----- BZSPL HELPERS -----
+; ----- BZSPL -----
 
 (defun -fl (a)
   (declare (list a))
@@ -232,7 +232,6 @@
         and b in (-roll-once pts)
         do (-quadratric pth a (vec:mid a b))))
 
-; -----
 
 (defun bzspl (psvg pts &key closed sw)
   (declare (plot-svg psvg))
@@ -248,10 +247,8 @@
          :stroke "black"
          :stroke-width (if sw sw stroke-width)))))
 
-; -----
 
-; TODO width == 1?
-(defun wbzspl (psvg pts offset width &key closed sw rs)
+(defun wbzspl (psvg pts offset &key (width 1d0) closed sw rs)
   (declare (plot-svg psvg))
   (with-struct (plot-svg- rep-scale) psvg
     (loop for s in (math:linspace
@@ -261,13 +258,13 @@
       (bzspl psvg (vec:lsub* pts (vec:scale offset s))
              :closed closed :sw sw))))
 
-; ----- END BZSPL -----
 
+; ----- WPATH -----
 
 (defun wpath (psvg pts &key width sw rs (simplify nil))
   (declare (plot-svg psvg) (list pts))
   (with-struct (plot-svg- scene stroke-width rep-scale) psvg
-    (if (not width)
+    (if (or (not width) (<= width 1d0))
       ; single path
       (path psvg pts :sw sw :simplify simplify)
       ; multi path
@@ -310,6 +307,8 @@
     finally (return (to-list res))))
 
 
+; ----- CPATH -----
+
 (defun cpath (psvg pts &key (width 1d0) closed (clim -0.5d0)
                             (slim -0.95d0) (simplify 1d0) sw rs
                        &aux (pts* (to-vector (if closed (close-path pts) pts)))
@@ -332,6 +331,8 @@
             x y r r r r2 r r r2)))
 
 
+; ----- CIRC -----
+
 (defun circ (psvg xy rad &key (fill "none") sw aspath)
   (declare (plot-svg psvg) (vec:vec xy) (double-float rad))
   (with-struct (plot-svg- scene stroke-width) psvg
@@ -352,6 +353,8 @@
         do (circ psvg xy rad :fill fill :sw sw :aspath aspath)))
 
 
+; ----- WCIRC -----
+
 (defun wcirc (psvg xy rad &key outer-rad rs aspath)
   (declare (plot-svg psvg))
   (with-struct (plot-svg- rep-scale) psvg
@@ -361,6 +364,12 @@
                            (if rs rs rep-scale)))))
     (loop for r in (math:linspace n inner-rad outer-rad*)
           do (circ psvg xy r :aspath aspath)))))
+
+
+(defun wcircs (psvg pts rad &key outer-rad rs aspath)
+  (declare (plot-svg psvg))
+  (loop for pt in pts
+        do (wcirc psvg pt rad :outer-rad outer-rad :rs rs :aspath aspath)))
 
 
 (defun save (psvg fn)

@@ -14,8 +14,7 @@
 
 
 (defun edge-length (snk e)
-  (declare (snek snk))
-  (declare (list e))
+  (declare (snek snk) (list e))
   (with-struct (snek- verts) snk
     (destructuring-bind (a b) e
       (declare (type fixnum a b))

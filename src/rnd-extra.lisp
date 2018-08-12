@@ -15,6 +15,20 @@
                  (progn ,@body))))))
 
 
+(defmacro with-in-box ((n sx sy v &key xy) &body body)
+  (declare (symbol v))
+  (with-gensyms (sx* sy* xy* m)
+    `(let* ((,sx* ,sx)
+            (,sy* ,sy)
+            (,xy* ,xy)
+            (,m (if ,xy* ,xy* vec:*zero*)))
+      (declare (vec:vec ,m))
+      (loop repeat ,n
+            do (let ((,v (in-box ,sx* ,sy* :xy ,m)))
+                 (declare (vec:vec ,v))
+                 (progn ,@body))))))
+
+
 (defmacro with-on-line ((n a b rn) &body body)
   (declare (symbol rn))
   (with-gensyms (sub a*)

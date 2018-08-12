@@ -90,8 +90,7 @@
 
   returns the id of the new vertex
   "
-  (declare (snek snk))
-  (declare (vec:vec xy))
+  (declare (snek snk) (vec:vec xy))
   (with-struct (snek- verts num-verts) snk
     (declare (type (simple-array double-float) verts))
     (setf (aref verts (* 2 num-verts)) (vec::vec-x xy)
@@ -266,8 +265,7 @@
   "
   tests whether v is in grp g
   "
-  (declare (snek snk))
-  (declare (fixnum v))
+  (declare (snek snk) (fixnum v))
   (with-struct (snek- grps) snk
     (multiple-value-bind (grp exists) (gethash g grps)
       (if exists
@@ -300,14 +298,12 @@
 
 
 (defun get-verts-by-name (snk &key names)
-  (declare (snek snk))
-  (declare (list names))
+  (declare (snek snk) (list names))
   (loop for name in names collect (get-vert-by-name snk :name name)))
 
 
 (defun get-vert-inds-by-name (snk &key names)
-  (declare (snek snk))
-  (declare (list names))
+  (declare (snek snk) (list names))
   (loop for name in names collect (get-vert-ind-by-name snk :name name)))
 
 
@@ -327,8 +323,7 @@
 
 ; TODO: get-all-incident-edges?
 (defun get-incident-edges (snk v &key g)
-  (declare (snek snk))
-  (declare (fixnum v))
+  (declare (snek snk) (fixnum v))
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
       (graph:get-incident-edges grph v))))
@@ -364,8 +359,7 @@
 
 
 (defun del-edge! (snk ee &key g)
-  (declare (snek snk))
-  (declare (list ee))
+  (declare (snek snk) (list ee))
   (with-grp (snk grp g)
     (with-struct (grp- grph) grp
       (destructuring-bind (a b) ee
@@ -374,9 +368,7 @@
 
 
 (defun verts-in-rad (snk xy rad)
-  (declare (snek snk))
-  (declare (vec:vec xy))
-  (declare (double-float rad))
+  (declare (snek snk) (vec:vec xy) (double-float rad))
   (with-struct (snek- verts zmap) snk
     (declare (type (simple-array double-float) verts))
     (zmap:verts-in-rad zmap verts xy rad)))

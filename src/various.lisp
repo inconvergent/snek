@@ -22,8 +22,7 @@
 
 
 (defun append-number (fn i)
-  (declare (string fn)
-           (fixnum i))
+  (declare (string fn) (fixnum i))
   (format nil "~a-~8,'0d" fn i))
 
 
@@ -67,13 +66,14 @@
 
 
 (defun length-1 (a)
-  (declare (vector a))
+  (declare (sequence a))
   (1- (the fixnum (length a))))
 
 
 (defun vector-last (a)
   (declare (vector a))
   (aref a (the fixnum (length-1 a))))
+
 
 (defun vector-first (a)
   (declare (vector a))

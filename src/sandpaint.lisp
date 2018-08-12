@@ -15,6 +15,17 @@
               (progn ,@body))))))
 
 
+(defmacro -inside-floor ((size xy x y) &body body)
+  (declare (symbol x y))
+  (with-gensyms (sname)
+    `(let ((,sname ,size))
+      (declare (fixnum ,sname))
+      (multiple-value-bind (,x ,y) (vec::-vfloor* ,xy)
+        (declare (fixnum ,x ,y))
+        (when (and (< -1 ,x ,sname) (< -1 ,y ,sname))
+              (progn ,@body))))))
+
+
 (defmacro -square-loop ((x y n) &body body)
   (declare (symbol x y))
   (with-gensyms (nname)
@@ -36,6 +47,18 @@
       ,(when name `(format t "applying:~a...~%" ,name))
       (progn ,@body)
       ,(when name `(format t "done.~%")))))
+
+
+(defmacro -do-op* ((sand size vals indfx) &body body)
+  (declare (symbol sand size vals indfx))
+  (with-gensyms (sname)
+    `(let* ((,sname ,sand)
+            (,size (sandpaint-size ,sname))
+            (,vals (sandpaint-vals ,sname))
+            (,indfx (sandpaint-indfx ,sname)))
+      (declare (type (simple-array double-float) ,vals)
+               (function ,indfx) (fixnum ,size))
+      (progn ,@body))))
 
 
 (defun get-ind-fx (size)
@@ -65,6 +88,21 @@
            (fixnum ind)
            (type (simple-array double-float (*)) vals))
   (color:rgb (aref vals ind) (aref vals (1+ ind)) (aref vals (+ ind 2)) a))
+
+
+(defun sample (sand xy &key (alpha 1d0))
+  (-do-op* (sand size vals indfx)
+    (-inside-floor (size xy x y)
+      (let* ((ind (funcall indfx x y))
+             (a (aref vals (+ ind 3))))
+        (color:rgb (/ (aref vals ind) a)
+                   (/ (aref vals (1+ ind)) a)
+                   (/ (aref vals (+ ind 2)) a)
+                   alpha)))))
+
+
+(defun get-size (sand)
+  (sandpaint-size sand))
 
 
 (declaim (inline -scale-convert))
@@ -404,11 +442,11 @@
 
 (defun -init-rgb-from-png (indfx vals img s)
   (loop for i from 0 below s do
-        (loop for j from 0 below s do
-              (setf (aref vals (funcall indfx j i 0)) (-ui8 (aref img i j 0))
-                    (aref vals (funcall indfx j i 1)) (-ui8 (aref img i j 1))
-                    (aref vals (funcall indfx j i 2)) (-ui8 (aref img i j 2))
-                    (aref vals (funcall indfx j i 3)) 1d0))))
+    (loop for j from 0 below s do
+          (setf (aref vals (funcall indfx j i 0)) (-ui8 (aref img i j 0))
+                (aref vals (funcall indfx j i 1)) (-ui8 (aref img i j 1))
+                (aref vals (funcall indfx j i 2)) (-ui8 (aref img i j 2))
+                (aref vals (funcall indfx j i 3)) 1d0))))
 
 ; TODO: indexed/grayscale channel only
 (defun png-open (fn)
