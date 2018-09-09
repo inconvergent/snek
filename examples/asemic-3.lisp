@@ -105,7 +105,7 @@
 
         (loop for i from 0 below 500 do
           (snek:with (snk)
-            (snek:itr-all-verts (snk v)
+            (snek:itr-verts (snk v)
               (snek:move-vert? v (rnd:in-circ 0.1d0))
               (snek:move-vert? v (funcall state-gen v 0.00001d0))))
           (snek:itr-grps (snk g :collect nil)

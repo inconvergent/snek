@@ -127,16 +127,30 @@
            (list ,@body))))))
 
 
-(defmacro itr-verts ((snk i &key g (collect t)) &body body)
+(defmacro itr-verts ((snk i &key (collect t)) &body body)
   "
-  iterates over all verts in grp g as i.
-
-  you should use itr-all-verts if you can, as it is faster.
-
-  if g is not provided, the main grp wil be used.
+  iterates over ALL verts in snk as i.
   "
   (declare (symbol snk)
            (type boolean collect))
+  (with-gensyms (sname)
+    `(let ((,sname ,snk))
+      (loop for ,i of-type fixnum from 0 below (snek-num-verts ,sname)
+        ,(if collect 'collect 'do) (list ,@body)))))
+
+
+(defmacro itr-grp-verts ((snk i &key g (collect t)) &body body)
+  "
+  iterates over all verts in grp g as i.
+
+  NOTE: this will only yield vertices that belong to at least one edge that is
+  part of g. if you want all vertices in snek you should use itr-verts instead.
+  itr-verts is also faster, since it does not rely on the underlying graph
+  structure.
+
+  if g is not provided, the main grp wil be used.
+  "
+  (declare (symbol snk) (type boolean collect))
   (with-gensyms (grp sname)
     `(let ((,sname ,snk))
       (with-grp (,sname ,grp ,g)
@@ -156,18 +170,6 @@
       (map ',(if collect 'list 'nil)
           (lambda (,i) (declare (fixnum ,i)) (list ,@body))
           (get-prm-vert-inds ,sname :p ,p)))))
-
-
-(defmacro itr-all-verts ((snk i &key (collect t)) &body body)
-  "
-  iterates over all verts in snk as i.
-  "
-  (declare (symbol snk)
-           (type boolean collect))
-  (with-gensyms (sname)
-    `(let ((,sname ,snk))
-      (loop for ,i of-type fixnum from 0 below (snek-num-verts ,sname)
-        ,(if collect 'collect 'do) (list ,@body)))))
 
 
 (defmacro itr-edges ((snk i &key g (collect t)) &body body)

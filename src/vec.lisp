@@ -415,10 +415,14 @@
       nil))
 
 
-(defun segdst (aa v)
-  (declare (list aa) (vec v))
-  (destructuring-bind (va vb)
-    aa
+(defun segdst (line v)
+  "
+  find distance between line and v.
+  returns values (distance s) where is is the interpolation value that will
+  yield the closest point on line.
+  "
+  (declare (list line) (vec v))
+  (destructuring-bind (va vb) line
     (let ((l2 (dst2 va vb)))
       (if (<= l2 0d0)
         ; line is a point
@@ -444,10 +448,9 @@
         (values parallel nil nil)
         ; otherwise check if they intersect
         (let ((p (/ (+ (* (- (vec-y sa)) (- (vec-x a1) (vec-x b1)))
-                       (*    (vec-x sa)  (- (vec-y a1) (vec-y b1)))) u))
-
-              (q (/ (- (*    (vec-x sb)  (- (vec-y a1) (vec-y b1)))
-                       (*    (vec-y sb)  (- (vec-x a1) (vec-x b1)))) u)))
+                       (* (vec-x sa) (- (vec-y a1) (vec-y b1)))) u))
+              (q (/ (- (* (vec-x sb) (- (vec-y a1) (vec-y b1)))
+                       (* (vec-y sb) (- (vec-x a1) (vec-x b1)))) u)))
           ; t if intersection
           ; nil otherwise
           (values (and (>= p 0d0) (<= p 1d0) (>= q 0d0) (<= q 1d0))
@@ -458,6 +461,20 @@
   (declare (list l))
   (destructuring-bind (a b) l
     (segx a b :parallel parallel)))
+
+
+(defun psegx (aa bb &key parallel
+                    &aux (aa* (ensure-vector aa))
+                         (bb* (ensure-vector bb)))
+
+  (loop with res = (make-adjustable-vector)
+        for i from 0 below (1- (length aa*))
+        do (loop for j from 0 below (1- (length bb*))
+                 do (multiple-value-bind (x s p)
+                      (vec:segx (list (aref aa* i) (aref aa* (1+ i)))
+                                (list (aref bb* j) (aref bb* (1+ j))))
+                      (when x (vextend (list i j s p) res))))
+        finally (return (if (> (length res) 0) res nil))))
 
 
 ; TODO: incomplete
@@ -499,6 +516,14 @@
   (declare (double-float p) (list ab))
   (destructuring-bind (a b) ab
     (on-line p a b)))
+
+
+(defun lon-line* (pp ab)
+  (declare (sequence pp) (list ab))
+  (destructuring-bind (a b) ab
+    (if (equal (type-of pp) 'cons)
+      (loop for p of-type double-float in pp collect (on-line p a b))
+      (loop for p of-type double-float across pp collect (on-line p a b)))))
 
 
 (defun on-spiral (p rad &key (xy *zero*) (rot 0d0))

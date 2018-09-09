@@ -30,6 +30,23 @@
             (del-edge? e)))))
 
 
+(defun center (snk xy)
+  (with-struct (snek- verts num-verts) snk
+    (loop for i from 0 below (* 2 num-verts) by 2
+          minimizing (aref verts i) into minx
+          maximizing (aref verts i) into maxx
+          minimizing (aref verts (1+ i)) into miny
+          maximizing (aref verts (1+ i)) into maxy
+          finally (let ((mx (* 0.5d0 (+ minx maxx)))
+                        (my (* 0.5d0 (+ miny maxy))))
+                    (itr-verts (snk v)
+                      (vec:with-xy ((get-vert snk v) vx vy)
+                        (snek:move-vert! snk v
+                          (vec:vec (+ (vec::vec-x xy) (- vx mx))
+                                   (+ (vec::vec-y xy) (- vy my)))
+                          :rel nil)))))))
+
+
 ; primitives?
 (defun add-circ! (snk num rad &key (xy vec:*zero*) g)
   (let ((vv (loop for p of-type double-float in (math:linspace num 0.0d0 1.0d0)

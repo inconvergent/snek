@@ -31,7 +31,7 @@
       (print-every i 100)
 
       (snek:with (snk :zwidth 60.0d0)
-        (snek:itr-all-verts (snk v)
+        (snek:itr-verts (snk v)
           (map 'list (lambda (w) (force? snk v w -0.05))
                      (snek:verts-in-rad snk (snek:get-vert snk v) 60.0d0))
           ;(snek:with-verts-in-rad (snk (snek:get-vert snk v) 60d0 w)

@@ -57,7 +57,7 @@
                               :bg (color:black))))
 
     (snek:with (snk)
-      (snek:itr-all-verts (snk v)
+      (snek:itr-verts (snk v)
         (snek:move-vert? v (rnd:in-circ 9d0))))
 
     (let ((grps (snek:get-all-grps snk)))
@@ -65,7 +65,7 @@
         (print-every i 100)
 
         (snek:with (snk)
-          (snek:itr-all-verts (snk v)
+          (snek:itr-verts (snk v)
             (snek:move-vert? v (funcall v-state-gen v vnoise))
             (snek:move-vert? v (rnd:in-circ 0.07d0))))
 

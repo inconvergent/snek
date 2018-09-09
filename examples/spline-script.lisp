@@ -47,7 +47,7 @@
     (loop for p in (math:linspace 500 0d0 1d0)
           and i from 0 do
       (snek:with (snk)
-        (snek:itr-all-verts (snk v)
+        (snek:itr-verts (snk v)
           (snek:move-vert? v drift)
           (snek:move-vert? v (rnd:in-circ 0.1d0))
           ;(snek:move-vert? v (funcall state-gen v 0.000008d0))

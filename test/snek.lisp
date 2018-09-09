@@ -299,19 +299,19 @@
     (do-test (snek::snek-wc snk) 1)
 
     (snek:with (snk)
-      (snek:itr-all-verts (snk v)
+      (snek:itr-verts (snk v)
         (snek:move-vert? v (vec:vec 2d0 2d0))))
 
     (do-test
-      (sort (flatten (snek:itr-all-verts (snk i) i)) #'<)
+      (sort (flatten (snek:itr-verts (snk i) i)) #'<)
       '(0 1 2 3 4 5 6 7 8 9 10 11))
 
     (do-test
-      (flatten (snek:itr-all-verts (snk i :collect nil) i))
+      (flatten (snek:itr-verts (snk i :collect nil) i))
       nil)
 
     (do-test
-      (sort (flatten (snek:itr-verts (snk i) i)) #'<)
+      (sort (flatten (snek:itr-grp-verts (snk i) i)) #'<)
       '(0 1 2 3 5 6 7 11))
 
     (do-test
@@ -415,10 +415,10 @@
       (snek:add-edge! snk '(3 2) :g g2)
       (snek:add-edge! snk '(1 5) :g g3)
 
-      (do-test (sort (flatten (snek:itr-verts (snk i :g g2) i)) #'<)
+      (do-test (sort (flatten (snek:itr-grp-verts (snk i :g g2) i)) #'<)
                '(1 2 3))
 
-      (do-test (sort (flatten (snek:itr-verts (snk i :g nil) i)) #'<)
+      (do-test (sort (flatten (snek:itr-grp-verts (snk i :g nil) i)) #'<)
                '(1 2))
 
       (do-test (sort (flatten (snek:itr-edges (snk e :g g1) e)) #'<)

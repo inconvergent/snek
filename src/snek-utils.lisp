@@ -185,6 +185,16 @@
           collect (vec:sarr-get verts v))))
 
 
+(defun move-vert! (snk v xy &key (rel t) &aux (v* (* 2 v)))
+  (declare (snek snk) (fixnum v) (vec:vec xy) (boolean rel))
+  (with-struct (snek- verts num-verts) snk
+    (when (>= v num-verts) (error "attempting to move invalid vert, ~a (~a)" v num-verts))
+    (if rel (setf (aref verts v*) (+ (vec::vec-x xy) (aref verts v*))
+                  (aref verts (1+ v*)) (+ (vec::vec-y xy) (aref verts (1+ v*))))
+            (setf (aref verts v*) (vec::vec-x xy)
+                  (aref verts (1+ v*)) (vec::vec-y xy)))))
+
+
 (defun get-all-grps (snk &key main)
   "
   returns all grps.
@@ -200,7 +210,7 @@
   returns a single grp.
   "
   (declare (snek snk))
-  (gethash g (snek-grps snk)) )
+  (gethash g (snek-grps snk)))
 
 
 (defun get-all-prms (snk)
@@ -350,12 +360,12 @@
               (sort (list a b) #'<))))))))
 
 
-(defun add-edges! (snk ee)
+(defun add-edges! (snk ee &key g)
   "
   adds multiple edges (see above). returns a list of the results.
   "
   (declare (snek snk) (list ee))
-  (loop for e of-type list in ee collect (add-edge! snk e)))
+  (loop for e of-type list in ee collect (add-edge! snk e :g g)))
 
 
 (defun del-edge! (snk ee &key g)
@@ -365,6 +375,25 @@
       (destructuring-bind (a b) ee
         (declare (fixnum a b))
         (graph:del grph a b)))))
+
+; TODO: handle grp
+; TODO: return either edges or v
+(defun split-edge! (snk ee &key xy
+                           &aux (xy* (if xy xy (vec:on-line* 0.5d0
+                                                 (snek:get-verts snk ee)))))
+  "
+  split edge at xy (or middle if xy is nil).
+  returns new vert ind.
+  "
+  (declare (snek snk) (list ee))
+  (snek:del-edge! snk ee)
+  (let ((v (add-vert! snk xy*)))
+    (declare (fixnum v))
+    (destructuring-bind (a b) ee
+      (declare (fixnum a b))
+      (list (snek:add-edge! snk (list v a))
+            (snek:add-edge! snk (list v b)))
+      v)))
 
 
 (defun verts-in-rad (snk xy rad)

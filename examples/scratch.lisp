@@ -43,7 +43,7 @@
                  (snek:with (snk)
                    ; TODO mutate was used here. implement later.
                    (snek:join-verts? p1 p2)
-                   (snek:itr-verts (snk v)
+                   (snek:itr-grp-verts (snk v)
                      (snek:move-vert? v (vec:sarr-get velocities v)))))))
 
         (snek:draw-edges snk sand grains))

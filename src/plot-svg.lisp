@@ -261,8 +261,8 @@
 
 ; ----- WPATH -----
 
-(defun wpath (psvg pts &key width sw rs (simplify nil))
-  (declare (plot-svg psvg) (list pts))
+(defun wpath (psvg pts &key width sw rs (simplify nil) (opposite t))
+  (declare (plot-svg psvg) (list pts) (boolean simplify opposite))
   (with-struct (plot-svg- scene stroke-width rep-scale) psvg
     (if (or (not width) (<= width 1d0))
       ; single path
@@ -273,18 +273,20 @@
             (rup (* width 0.5d0))
             (rdown (- (* width 0.5d0))))
 
-        (when (= 0 (math:mod2 rep)) (setf rep (1+ rep)))
+        (when (< rep 2) (setf rep 2))
+        (when (and opposite (= 0 (math:mod2 rep))) (setf rep (1+ rep)))
+
         (loop with pts* = (if simplify (math:path-simplify pts simplify) pts)
               for a in pts*
               and b in (cdr pts*)
-              do (accumulate-path pth a)
+              do (when opposite (accumulate-path pth a))
                  (loop for s in (math:linspace rep rdown rup)
                        and i from 0
                        do (accumulate-path pth
                             (if (= (math:mod2 i) 0) a b)
                             (if (= (math:mod2 i) 0) b a)
                             (vec:scale (vec:norm (vec:perp (vec:sub b a))) s)))
-                 (accumulate-path pth b))
+                 (when opposite (accumulate-path pth b)))
 
         (cl-svg:draw scene
           (:path :d (cl-svg:path (finalize-path pth)))
@@ -292,6 +294,8 @@
           :stroke "black"
           :stroke-width (if sw sw stroke-width))))))
 
+
+; ----- CPATH -----
 
 (defun -accumulate-cpath (diagonals rep closed &aux (n (length diagonals)))
   (loop with res = (make-adjustable-vector)
@@ -307,8 +311,6 @@
     finally (return (to-list res))))
 
 
-; ----- CPATH -----
-
 (defun cpath (psvg pts &key (width 1d0) closed (clim -0.5d0)
                             (slim -0.95d0) (simplify 1d0) sw rs
                        &aux (pts* (to-vector (if closed (close-path pts) pts)))
@@ -322,6 +324,8 @@
       (path psvg (-accumulate-cpath diagonals rep closed) :sw sw))))
 
 
+; ----- CIRC -----
+
 ; draw circle with arc.
 (defun -arccirc (x y r*)
   (let* ((r (math:sfloat r*))
@@ -330,8 +334,6 @@
     (format nil "M~a,~a m -~a,0 a ~a,~a 0 1,0 ~a 0 a ~a,~a 0 1,0 -~a 0"
             x y r r r r2 r r r2)))
 
-
-; ----- CIRC -----
 
 (defun circ (psvg xy rad &key (fill "none") sw aspath)
   (declare (plot-svg psvg) (vec:vec xy) (double-float rad))

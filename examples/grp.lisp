@@ -35,7 +35,7 @@
         (snek:with (snk)
           (snek:itr-grps (snk g)
             (let ((ns (funcall (gethash g grp-states) noise)))
-              (snek:itr-verts (snk v :g g)
+              (snek:itr-grp-verts (snk v :g g)
                 (snek:move-vert? v
                   (vec:add ns (rnd:in-circ 0.05d0)))))))
 

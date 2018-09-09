@@ -23,7 +23,7 @@
         (format t "itt ~a edges ~a ~%" i (length (snek:get-edges snk))))
 
       (snek:with (snk)
-        (snek:itr-all-verts (snk v)
+        (snek:itr-verts (snk v)
                             ;nil
           ;(snek:move-vert? v (rnd:in-circ 1d0))
           ;(snek:move-vert? v 1d0 2d0)

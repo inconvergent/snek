@@ -329,43 +329,43 @@
 ; ----- CURVATURE OFFSET EXPERIMENTAL -----
 
 ;TODO: add first order estimations on boundary points?
-(defun ddxy (pts i s)
+(defun ddxy (pts i &aux (n (length pts)))
   "
-  calculate first and second partial derivatives of pts.
-  assumes that pts is parameterised from 0 to 1.
-  only works on internal points.
+  calculate first and second derivatives of pts wrt t
+  (the parametrisation variable).
+  assumes that pts is parameterised from 0 to 1, and evenly sampled in t.
   "
-  (declare (vector pts) (fixnum i) (double-float s))
-  (let* ((p- (aref pts (1- i)))
-         (p+ (aref pts (1+ i)))
-         (p (aref pts i)))
-    (declare (vec:vec p- p+ p))
+  (declare (vector pts) (fixnum i))
+  (let ((s (/ 2d0 (math:dfloat (1- n))))
+        (p- (aref pts (1- i)))
+        (p+ (aref pts (1+ i)))
+        (p (aref pts i)))
+    (declare (vec:vec p- p+ p) (double-float s))
     (values (/ (- (vec::vec-x p+) (vec::vec-x p-)) s)
             (/ (- (vec::vec-y p+) (vec::vec-y p-)) s)
             (/ (+ (vec::vec-x p+) (vec::vec-x p-) (* -2d0 (vec::vec-x p)))
-               (expt s 2d0))
+               #1=(expt s 2d0))
             (/ (+ (vec::vec-y p+) (vec::vec-y p-) (* -2d0 (vec::vec-y p)))
-               (expt s 2d0)))))
+               #1#))))
 
 
-(defun kappa (pts i s)
+(defun kappa (pts i)
   "
   estimate curvature based on pts.
-  only works on internal points (because of ddxy)
   "
-  (declare (vector pts) (fixnum i) (double-float s))
-  (multiple-value-bind (dx dy ddx ddy) (ddxy pts i s)
+  (declare (vector pts) (fixnum i))
+  (multiple-value-bind (dx dy ddx ddy) (ddxy pts i)
     (declare (double-float dx dy ddx ddy))
     (/ (abs (- (* dx ddy) (* dy ddx)))
        (expt (+ (* dx dx) (* dy dy)) (the double-float (/ 3d0 2d0))))))
 
 
-(defun -coffset (pts angles i s)
+(defun -coffset (pts angles i)
   (let* ((va (aref angles (1- i)))
          (vb (aref angles i))
          (ab (vec:angle vb)))
     (declare (vec:vec va vb) (double-float ab))
-    (list (kappa pts i s) (aref pts i)
+    (list (kappa pts i) (aref pts i)
           (if (<= (the double-float (vec:cross va vb)) 0d0) (vec:cos-sin (+ ab PI5))
                                                             (vec:cos-sin (- ab PI5))))))
 
@@ -387,7 +387,7 @@
   (-pad-offsets
     (to-vector (loop with angles of-type vector = (math:path-angles pts*)
                      for i of-type fixnum from 1 below (length-1 pts*)
-                     collect (-coffset pts* angles i (/ 2d0 (length pts*)))))))
+                     collect (-coffset pts* angles i )))))
 
 
 (defun -do-split-num (res rs curvefx curr c a b)
@@ -425,7 +425,7 @@
                    do (vextend
                         (list n (loop for (_ c a b) across offset
                                       collect (vec:on-line s a (vec:from a b c))
-                                              of-type vec:vec))
+                                        of-type vec:vec))
                         res)))
     res))
 

@@ -31,7 +31,7 @@
             (setf vb (vec:add vb (rnd:in-circ (* 0.001d0 j))))
 
             (snek:with (snk)
-              (snek:itr-verts (snk v)
+              (snek:itr-grp-verts (snk v)
                 (snek:move-vert? v (vec:add (rnd:in-circ 0.1d0) vb)))
               (snek:join-verts? v1 v2))
 

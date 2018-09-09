@@ -21,7 +21,7 @@
   (let ((walkers (make-hash-table :test #'equal)))
     ; iterate all verts in all grps
     (snek:itr-grps (snk g)
-      (snek:itr-verts (snk v :g g)
+      (snek:itr-grp-verts (snk v :g g)
         ; associate a random 2d walker with this vert.
         ; these walkers have a randomly changing
         ; acceleration, which gives intersting behaviour
@@ -51,7 +51,7 @@
 
             (snek:with (snk)
               (snek:itr-grps (snk g)
-                (snek:itr-verts (snk v :g g)
+                (snek:itr-grp-verts (snk v :g g)
                   ; get an alteration for vert v
                   (funcall state-gen v noise))))
 

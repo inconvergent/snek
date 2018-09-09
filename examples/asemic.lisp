@@ -45,12 +45,12 @@
                          (lambda () (rnd:get-acc-circ-stp*)))))
 
         (snek:with (snk)
-          (snek:itr-all-verts (snk v)
+          (snek:itr-verts (snk v)
             (snek:move-vert? v (funcall drift 0.04d0))))
 
         (loop for i from 0 below 200 do
           (snek:with (snk)
-            (snek:itr-all-verts (snk v)
+            (snek:itr-verts (snk v)
               ;(snek:move-vert? v (funcall state-gen v 0.00009d0))
               (snek:move-vert? v (rnd:in-circ 0.4d0))))
           (sandpaint:bzspl-stroke sand (bzspl:make (snek:get-all-verts snk))

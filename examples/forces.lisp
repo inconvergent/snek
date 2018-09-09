@@ -25,7 +25,7 @@
       (print-every k 100)
 
       (snek:with (snk :zwidth 10.0d0)
-        (snek:itr-all-verts (snk v)
+        (snek:itr-verts (snk v)
           (snek:move-vert? v (rnd:in-circ 1d0))
           (map 'list
             (lambda (u) (force? snk u v -0.1d0))

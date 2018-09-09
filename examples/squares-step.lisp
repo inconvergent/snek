@@ -40,7 +40,7 @@
 
         ;(snek:with (snk)
         ;  (snek:itr-grps (snk g)
-        ;    (snek:itr-verts (snk v :g g)
+        ;    (snek:itr-grp-verts (snk v :g g)
         ;      (snek:move-vert? v (rnd:in-circ 0.3d0) :rel t))))
 
         (snek:itr-grps (snk g :collect nil)

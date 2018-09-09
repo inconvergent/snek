@@ -31,7 +31,7 @@
       (start-timer "with")
       (snek:with (snk :zwidth farl)
         (start-timer "in-with")
-        (snek:itr-all-verts (snk v)
+        (snek:itr-verts (snk v)
           (snek:move-vert? v (rnd:in-circ (* stp 5d0)))
           (map 'list (lambda (w)
                        (with-timer ("snek:with-dx")

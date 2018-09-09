@@ -110,3 +110,11 @@
   (setf (gethash (first pts) visited) t)
   (setf (gethash  (first (last pts)) visited) t))
 
+
+(defun wbzspl (psvg proj visited pts w)
+  (print :hi)
+  (plot-svg:wbzspl psvg (mapcar (lambda (x) (funcall proj x)) pts)
+                   (vec:vec 1d0 0d0) :width w)
+  (setf (gethash (first pts) visited) t)
+  (setf (gethash  (first (last pts)) visited) t))
+

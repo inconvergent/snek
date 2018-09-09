@@ -35,6 +35,7 @@
     :lmid
     :lmult
     :lmult*
+    :lon-line*
     :lrot
     :lround
     :lscale*
@@ -52,6 +53,7 @@
     :one
     :op
     :perp
+    :psegx
     :polygon
     :ptinside
     :rect
@@ -81,6 +83,7 @@
   (:import-from :common-lisp-user
     :vextend
     :close-path
+    :ensure-vector
     :make-adjustable-vector
     :with-gensyms))
 
@@ -469,6 +472,7 @@
     :alt-then?
     :append-edge-segx?
     :append-edge?
+    :center
     :del-edge!
     :del-edge?
     :draw-circ
@@ -498,15 +502,16 @@
     :get-verts
     :get-verts-by-name
     :is-vert-in-grp
-    :itr-all-verts
+    :itr-verts
     :itr-edges
     :itr-grps
     :itr-prm-verts
     :itr-prms
-    :itr-verts
+    :itr-grp-verts
     :join-verts?
     :make
     :make-mutate
+    :move-vert!
     :move-vert?
     :mutate
     :prmf
@@ -516,6 +521,7 @@
     :sel-args
     :set-grp-props
     :set-prm-props
+    :split-edge!
     :split-edge?
     :verts-in-rad
     :with

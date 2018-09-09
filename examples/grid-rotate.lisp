@@ -31,7 +31,7 @@
     (loop for i from 0 below 50 do
       (print-every i 100)
       (snek:with (snk)
-        (snek:itr-all-verts (snk v)
+        (snek:itr-verts (snk v)
           ;(snek:move-vert? v (funcall state-gen v 0.0009d0))
           (snek:move-vert? v (rnd:in-circ 0.5d0))))
       ;(snek:itr-grps (snk g)

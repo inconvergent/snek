@@ -57,7 +57,7 @@
                  char-rad)))
 
         ;(snek:with (snk)
-        ;  (snek:itr-all-verts (snk v)
+        ;  (snek:itr-verts (snk v)
         ;    (snek:move-vert? v (funcall drift 0.04d0))))
 
         (loop for word in (funcall get-words num-words (vec:vec border y))
@@ -65,7 +65,7 @@
 
         (loop for i from 0 below 200 do
           (snek:with (snk)
-            (snek:itr-all-verts (snk v)
+            (snek:itr-verts (snk v)
               (snek:move-vert? v (rnd:in-circ 0.4d0))))
           (snek:itr-grps (snk g :collect nil)
             (sandpaint:bzspl-stroke sand

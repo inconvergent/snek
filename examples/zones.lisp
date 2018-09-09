@@ -18,7 +18,7 @@
       (loop for k from 1 to itt
         do (print-every k 100)
            (snek:with (snk :zwidth 40.0d0)
-             (snek:itr-all-verts (snk v)
+             (snek:itr-verts (snk v)
                (snek:move-vert? v (rnd:in-circ 0.7d0))
                (let ((verts (snek:verts-in-rad snk (snek:get-vert snk v) 40.0d0)))
                  (if (> (length verts) 0)
