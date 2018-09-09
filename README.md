@@ -1,4 +1,4 @@
-# SNEK is Not an Acronym
+# SNEK-A System for Making Generative Systems
 
 
 ## About
@@ -15,25 +15,26 @@ In short `snek` is four things:
    combined with a programming pattern for applying changes to the structure.
    The pattern relies on `alterations`, see below.
 
-2. A series of useful data structures and tools. E.g. a 2D vector `vec` and a
-   package for generating different kinds of random numbers: `rnd`.
-
+2. A series of useful data structures and tools. E.g. a 2D vector `vec`, a
+   package for generating different kinds of random numbers: `rnd`, as well as
+   tools for handling colors (`color`), splines (`bzspl`), and various vector
+   an path functionality (`math`, `lin-path`).
 
 3. A tool for drawing things called `sandpaint`. `sandpaint` uses random
-   sampling to draw it's primitives. This creates a fairly distinct and gritty
+   sampling to draw its primitives. This creates a fairly distinct and gritty
    look in many cases.
 
-4. A tool for drawing svg files.
+4. A tool for drawing svg files. Mainly svg files that are good for plotting.
 
 ![head](img/spline-script.lisp.png?raw=true "ex")
 
 
 ### About the Name
 
-A while back someone on twitter suggested that if Python 3 was named "snek" it
-would avoid naming confusion. I found that amusing at the time, and picked snek
-as the placeholder name for this project. I've been looking for a better name,
-but I haven't found one yet.
+A while back someone on Twitter suggested that if Python 3 was named "snek" it
+would avoid naming confusion. I found that amusing at the time, and picked
+`snek` as the placeholder name for this project. I've been looking for a better
+name, but I haven't found one yet.
 
 
 ## Alterations
@@ -45,7 +46,8 @@ https://inconvergent.net/2017/snek-is-not-an-acronym/.
 
 I have also written about things related to `snek` at
 
-  - https://inconvergent.net/2017/a-propensity-for-mistakes/ (indirectly about `snek`)
+  - https://inconvergent.net/2017/a-propensity-for-mistakes/ (indirectly about
+    `snek`)
   - https://inconvergent.net/2017/a-method-for-mistakes/
   - https://inconvergent.net/2017/arbitrary-alterations/
   - https://inconvergent.net/2017/grains-of-sand/ (about "sandpainting", see
@@ -72,12 +74,7 @@ Here is and example of manipulating a `snek` instance called `snk` using
 ; alterations have been applied
 ```
 
-
-### Custom alterations
-
-You can define your own arbitrary alterations. There is an example of this in
-`ex/custom-alt.lisp`. I have also written about it here:
-https://inconvergent.net/2017/arbitrary-alterations/
+For more examples, see below.
 
 
 ## Examples
@@ -88,11 +85,18 @@ If you don't provide a filename (with full or relative path) as the first
 argument, the resulting file will be named `./tmp.png`.
 
 
+### Custom alterations
+
+You can define your own arbitrary alterations. There is an example of this in
+`ex/custom-alt.lisp`. I have also written about it here:
+https://inconvergent.net/2017/arbitrary-alterations/
+
+
 ## Usage
 
-I use snek for most of the work that I post on twitter
+I use snek for most of the work that I post online
 (https://twitter.com/inconvergent). Both for generating raster images as well
-as vector images for plotting.
+as vector images for plotter drawings.
 
 ![lines](img/lines.lisp.png?raw=true "ex")
 
@@ -128,14 +132,9 @@ warning or explanation. I will keep a note of the version number in
 `src/load.lisp`.
 
 
-## Bugs
-
- - bzspl has lower sample density near the edges in some cases.
-
-
 ## Thanks
 
-I would like to thank
+I would like to thank:
 
   - https://twitter.com/RainerJoswig
   - https://twitter.com/paulg
