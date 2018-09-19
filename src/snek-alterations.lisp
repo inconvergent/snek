@@ -3,48 +3,40 @@
 
 ; ADD VERT
 
-(defstruct (add-vert-alt
-    (:constructor add-vert? (xy &key p))
-    (:predicate add-vert-alt-p*))
+(defstruct (add-vert-alt (:constructor add-vert? (xy &key p))
+                         (:predicate add-vert-alt-p*))
   (xy nil :type vec:vec :read-only t)
   (p nil :type symbol :read-only t))
 
-
 (defun do-add-vert-alt (snk a)
   "
-  add vert at xy.
+  add new vert at xy. returns the new vert ind.
   "
-  (declare (snek snk)
-           (add-vert-alt a))
+  (declare (snek snk) (add-vert-alt a))
   (with-struct (add-vert-alt- xy p) a
     (add-vert! snk xy :p p)))
 
 
 ; ADD EDGE
 
-(defstruct (add-edge*-alt
-    (:constructor add-edge*? (xya xyb &key g)))
+(defstruct (add-edge*-alt (:constructor add-edge*? (xya xyb &key g)))
   (xya nil :type vec:vec :read-only t)
   (xyb nil :type vec:vec :read-only t)
   (g nil :type symbol :read-only t))
 
-
 (defun do-add-edge*-alt (snk a)
   "
-  add verts xya and xyb, and create an edge between them.
+  add verts xya and xyb, and creates an edge (in grp g) between them.
   "
-  (declare (snek snk)
-           (add-edge*-alt a))
+  (declare (snek snk) (add-edge*-alt a))
   (with-struct (add-edge*-alt- xya xyb g) a
-    (add-edge! snk (list (add-vert! snk xya)
-                         (add-vert! snk xyb))
+    (add-edge! snk (list (add-vert! snk xya) (add-vert! snk xyb))
                :g g)))
 
 
 ; MOVE VERT
 
-(defstruct (move-vert-alt
-    (:constructor move-vert? (v xy &key (rel t))))
+(defstruct (move-vert-alt (:constructor move-vert? (v xy &key (rel t))))
   (rel t :type boolean :read-only t)
   (xy nil :type vec:vec :read-only t)
   (v nil :type fixnum :read-only t))
@@ -53,8 +45,8 @@
 (defun do-move-vert-alt (snk a)
   "
   move vert v.
-  if rel: move relative to original position.
-  else: move to xy.
+    if rel: move relative to original position.
+    else: move to xy.
   "
   (declare (snek snk) (move-vert-alt a))
   (with-struct (snek- verts num-verts) snk
@@ -66,31 +58,26 @@
               (y (vec::vec-y xy))
               (i (* 2 v))
               (ii (1+ (* 2 v))))
-          (declare (double-float x y)
-                   (fixnum i ii))
+          (declare (double-float x y) (fixnum i ii))
           (if rel (setf (aref verts i) (+ (aref verts i) x)
                         (aref verts ii) (+ (aref verts ii) y))
-                  (setf (aref verts i) x
-                        (aref verts ii) y))
+                  (setf (aref verts i) x (aref verts ii) y))
           (vec:vec (aref verts i) (aref verts ii)))))))
 
 
 ; APPEND EDGE
 
-(defstruct (append-edge-alt
-    (:constructor append-edge? (v xy &key (rel t) g)))
+(defstruct (append-edge-alt (:constructor append-edge? (v xy &key (rel t) g)))
   (xy nil :type vec:vec :read-only t)
   (v nil :type fixnum :read-only t)
   (g nil :type symbol :read-only t)
   (rel t :type boolean :read-only t))
 
-
 (defun do-append-edge-alt (snk a)
   "
   add edge between vert v and new vert xy
   "
-  (declare (snek snk)
-           (append-edge-alt a))
+  (declare (snek snk) (append-edge-alt a))
   (with-struct (snek- num-verts) snk
     (with-struct (append-edge-alt- v xy rel g) a
       (-valid-vert (num-verts v :err nil)
@@ -111,24 +98,21 @@
 
 
 (defun -line-segx-edges (snk line &key g)
-  (declare (snek snk)
-           (list line))
+  (declare (snek snk) (list line))
   (loop for e of-type list across (get-edges snk :g g)
         if (multiple-value-bind (x s)
              (vec:segx line (get-verts snk e))
              (and x (> s 1d-7)))
         do (return t)))
 
-
 (defun do-append-edge-segx-alt (snk a)
   "
-  add edge between vert v and new vert xy if the new edge does not intersect
-  any of the existing edges (in g).
+  add edge between vert v and new vert xy, if the new edge does not intersect
+  any of the existing edges (in grp g).
 
-  if x, the new edge is only added if it intersects.
+  if x, the new edge is only added if it intersects (the converse).
   "
-  (declare (snek snk)
-           (append-edge-segx-alt a))
+  (declare (snek snk) (append-edge-segx-alt a))
   (with-struct (append-edge-segx-alt- v xy rel x g) a
     (let* ((p1 (get-vert snk v))
            (p2 (if rel (vec:add p1 xy) xy))
@@ -140,8 +124,7 @@
 
 ; JOIN VERTS
 
-(defstruct (join-verts-alt
-    (:constructor join-verts? (v w &key g)))
+(defstruct (join-verts-alt (:constructor join-verts? (v w &key g)))
   (v nil :type fixnum :read-only t)
   (w nil :type fixnum :read-only t)
   (g nil :type symbol :read-only t))
@@ -149,10 +132,9 @@
 
 (defun do-join-verts-alt (snk a)
   "
-  create edge between valid verts v and w.
+  create edge between valid verts v and w (in grp g).
   "
-  (declare (snek snk)
-           (join-verts-alt a))
+  (declare (snek snk) (join-verts-alt a))
   (with-struct (snek- num-verts) snk
     (with-struct (join-verts-alt- v w g) a
       (-valid-vert (num-verts v :err nil)
@@ -162,16 +144,13 @@
 
 ; DEL EDGE
 
-(defstruct (del-edge-alt
-    (:constructor del-edge? (e &key g)))
+(defstruct (del-edge-alt (:constructor del-edge? (e &key g)))
   (e nil :type list :read-only t)
   (g nil :type symbol :read-only t))
 
-
 (defun do-del-edge-alt (snk a)
-
   "
-  del edge v and w.
+  del edge e (of grp g).
   "
   (declare (snek snk) (del-edge-alt a))
   (with-struct (del-edge-alt- e g) a
@@ -179,41 +158,41 @@
 
 
 ; SPLIT EDGE
-
-(defstruct (split-edge-alt
-    (:constructor split-edge? (e &key g)))
+(defstruct (split-edge-alt (:constructor split-edge? (e &key xy g)))
   (e nil :type list :read-only t)
+  (xy nil :read-only t)
   (g nil :type symbol :read-only t))
-
 
 (defun do-split-edge-alt (snk a)
   "
   insert a vert, v, at the middle of edge e = (a b)
+  if xy is not nil v will be positioned at xy.
   such that we get edges (a v) and (v b).
+
+  returns the new edges (or nil).
   "
   (declare (snek snk) (split-edge-alt a))
-  (with-struct (split-edge-alt- e g) a
+  (with-struct (split-edge-alt- e xy g) a
     (let ((res (del-edge! snk e :g g))
           (verts (snek-verts snk)))
       (declare (type (simple-array double-float) verts))
-      (destructuring-bind (a b) e
-        (declare (fixnum a b))
-        (if res
-          (let ((c (add-vert! snk (vec:mid (vec:sarr-get verts a)
-                                           (vec:sarr-get verts b)))))
-            (add-edge! snk (list a c) :g g)
-            (add-edge! snk (list c b) :g g)))))))
+      (when res
+        (destructuring-bind (a b) e
+          (declare (fixnum a b))
+          (let ((c (add-vert! snk (if xy xy (vec:mid (vec:sarr-get verts a)
+                                                     (vec:sarr-get verts b))))))
+            (list (add-edge! snk (list a c) :g g)
+                  (add-edge! snk (list c b) :g g))))))))
 
 
 ; ALT THEN
 
-(defstruct (alt-then
-    (:constructor alt-then? (alt &key (then (lambda (a r) (declare (ignore a r)) nil))
-                                      (else (lambda (a) (declare (ignore a)) nil)))))
+(defstruct (alt-then (:constructor
+    alt-then? (alt &key (then (lambda (a r) (list a r)))
+                        (else #'identity))))
   (alt nil :read-only t)
   (then nil :type function :read-only t)
   (else nil :type function :read-only t))
-
 
 (defun do-alt-then (snk a)
   "
@@ -224,8 +203,7 @@
   (declare (snek snk) (alt-then a))
   (with-struct (alt-then- alt then else) a
     (declare (function then else))
-    (let ((res (funcall (gethash (type-of alt) (snek-alt-names snk))
-                        snk alt)))
-      (if res (funcall then alt res)
-              (funcall else alt)))))
+    (let ((r (funcall (gethash (type-of alt) (snek-alt-names snk)) snk alt)))
+      (if r (funcall then alt r)
+            (funcall else alt)))))
 

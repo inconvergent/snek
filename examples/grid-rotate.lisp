@@ -22,8 +22,8 @@
          (snk (snek:make :max-verts 100000))
          (state-gen (get-walker-state-gen (lambda () (rnd:get-circ-stp*))))
          (sand (sandpaint:make size
-                 :fg (color:black 0.05)
-                 :bg (color:white))))
+                 :fg (pigment:black 0.05)
+                 :bg (pigment:white))))
 
     (loop for i from 0 below 10
           do (place-grid snk 0 size (vec:vec 500d0 500d0)))

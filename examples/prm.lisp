@@ -6,7 +6,7 @@
 
 
 (defun main (size fn)
-  (let* ((psvg (plot-svg:make* :width 1000d0
+  (let* ((psvg (draw-svg:make* :width 1000d0
                                :height 1000d0
                                :stroke-width 1d0))
          (left 150d0)
@@ -33,7 +33,7 @@
         (snek:prmr snk :p p :type :hatch
                             :args (list :closed t :rs 0.2 :angles (rnd:nrnd 2)))))
 
-    (plot-svg:save psvg fn)))
+    (draw-svg:save psvg fn)))
 
 
 (time (main 1000 (second (cmd-args))))

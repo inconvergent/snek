@@ -1,12 +1,12 @@
 
-(in-package :plot-svg)
+(in-package :draw-svg)
 
 (defparameter *short* 1000d0)
 (defparameter *long* 1414.285d0)
 (declaim (type double-float *short* *long*))
 
 
-(defstruct plot-svg
+(defstruct draw-svg
   (layout nil :type symbol :read-only t)
   (stroke-width nil :type double-float :read-only t)
   (rep-scale nil :type double-float :read-only t)
@@ -41,8 +41,8 @@
                     :height "420mm"
                     :width "297mm"
                     :view-box (-view-box *short* *long*)))
-    (otherwise (error "invalid layout. use: plot-svg:a4-portrait,
-      plot-svg:a4-landscape, plot-svg:a3-landscape or plot-svg:a3-portrait."))))
+    (otherwise (error "invalid layout. use: draw-svg:a4-portrait,
+      draw-svg:a4-landscape, draw-svg:a3-landscape or draw-svg:a3-portrait."))))
 
 
 (defun -get-width-height (layout)
@@ -55,7 +55,7 @@
 (defun make (&key (layout 'a4-landscape) (stroke-width 1.1d0) (rep-scale 1.3d0))
   (destructuring-bind (width height)
     (-get-width-height layout)
-    (make-plot-svg :layout layout
+    (make-draw-svg :layout layout
                    :stroke-width stroke-width
                    :rep-scale rep-scale
                    :height height
@@ -64,7 +64,7 @@
 
 
 (defun make* (&key height width (stroke-width 1.1d0) (rep-scale 1.3d0))
-  (make-plot-svg :layout 'custom
+  (make-draw-svg :layout 'custom
                  :stroke-width stroke-width
                  :rep-scale rep-scale
                  :height height
@@ -75,8 +75,8 @@
 
 
 (defun show-boundary (psvg &key sw (stroke "red"))
-  (declare (plot-svg psvg))
-  (with-struct (plot-svg- width height) psvg
+  (declare (draw-svg psvg))
+  (with-struct (draw-svg- width height) psvg
     (let ((mw (* 0.5d0 width))
           (mh (* 0.5d0 height)))
       (path psvg (vec:rect mw mh :xy (vec:vec mw mh)) :closed t
@@ -84,8 +84,8 @@
 
 
 (defun show-crop (psvg &key (len 3d0) sw (stroke "red"))
-  (declare (plot-svg psvg))
-  (with-struct (plot-svg- width height) psvg
+  (declare (draw-svg psvg))
+  (with-struct (draw-svg- width height) psvg
     (loop for m in (list (list (vec:vec 0d0 0d0) (vec:vec len 0d0))
                          (list (vec:vec width 0d0) (vec:vec (- width len) 0d0))
                          (list (vec:vec 0d0 height) (vec:vec len height))
@@ -112,10 +112,10 @@
         finally (return res)))
 
 
-(defun path (psvg pts &key sw (fill "none") (stroke "black")
+(defun path (psvg pts &key sw (fill "none") (stroke "black") (fo 1d0) (so 1d0)
                            closed (simplify nil))
-  (declare (plot-svg psvg) (list pts))
-  (with-struct (plot-svg- scene stroke-width) psvg
+  (declare (draw-svg psvg) (list pts))
+  (with-struct (draw-svg- scene stroke-width) psvg
     (cl-svg:draw scene
       (:path
         :d (cl-svg:path
@@ -127,6 +127,8 @@
                      finally (progn (when closed (vextend "Z" pth))
                                     (return pth))))))
       :fill fill
+      :fill-opacity fo
+      :stroke-opacity so
       :stroke stroke
       :stroke-width (if sw sw stroke-width))))
 
@@ -162,10 +164,10 @@
                             (steps (lambda (n) (math:linspace n 0d0 1d0)))
                             stitch drop closed rs sw
                        &aux (draw (if drop
-                                    (lambda (p) (rnd:prob drop nil (plot-svg:path psvg p :sw sw)))
-                                    (lambda (p) (plot-svg:path psvg p :sw sw)))))
+                                    (lambda (p) (rnd:prob drop nil (draw-svg:path psvg p :sw sw)))
+                                    (lambda (p) (draw-svg:path psvg p :sw sw)))))
   (declare (function draw))
-  (with-struct (plot-svg- rep-scale) psvg
+  (with-struct (draw-svg- rep-scale) psvg
     (let ((res (math:hatch (-get-pts pts closed)
                            :angles angles
                            :steps steps
@@ -183,10 +185,10 @@
                    (steps (lambda (n) (math:linspace n 0d0 1d0)))
                    stitch drop closed rs sw
               &aux (draw (if drop
-                           (lambda (p) (rnd:prob drop nil (plot-svg:path psvg p :sw sw)))
-                           (lambda (p) (plot-svg:path psvg p :sw sw)))))
-  (declare (plot-svg psvg))
-  (with-struct (plot-svg- rep-scale) psvg
+                           (lambda (p) (rnd:prob drop nil (draw-svg:path psvg p :sw sw)))
+                           (lambda (p) (draw-svg:path psvg p :sw sw)))))
+  (declare (draw-svg psvg))
+  (with-struct (draw-svg- rep-scale) psvg
     (let ((res (make-adjustable-vector)))
       (loop for pts across mpts
             do (loop for h across (math:hatch (-get-pts pts closed)
@@ -233,24 +235,25 @@
         do (-quadratric pth a (vec:mid a b))))
 
 
-(defun bzspl (psvg pts &key closed sw)
-  (declare (plot-svg psvg))
+(defun bzspl (psvg pts &key closed sw (stroke "black") (so 1d0))
+  (declare (draw-svg psvg))
   (when (< (length pts) 3)
     (error "needs at least 3 pts."))
 
-  (with-struct (plot-svg- scene stroke-width) psvg
+  (with-struct (draw-svg- scene stroke-width) psvg
     (let ((pth (make-adjustable-vector)))
       (if closed (-do-closed pts pth) (-do-open pts pth))
       (cl-svg:draw scene
         (:path :d (cl-svg:path (finalize-path pth)))
          :fill "none"
-         :stroke "black"
+         :stroke stroke
+         :stroke-opacity so
          :stroke-width (if sw sw stroke-width)))))
 
 
 (defun wbzspl (psvg pts offset &key (width 1d0) closed sw rs)
-  (declare (plot-svg psvg))
-  (with-struct (plot-svg- rep-scale) psvg
+  (declare (draw-svg psvg))
+  (with-struct (draw-svg- rep-scale) psvg
     (loop for s in (math:linspace
                      (math:int (ceiling (* (if rs rs rep-scale) width)))
                      (- (/ width 2d0))
@@ -261,9 +264,10 @@
 
 ; ----- WPATH -----
 
-(defun wpath (psvg pts &key width sw rs (simplify nil) (opposite t))
-  (declare (plot-svg psvg) (list pts) (boolean simplify opposite))
-  (with-struct (plot-svg- scene stroke-width rep-scale) psvg
+(defun wpath (psvg pts &key width sw rs (simplify nil) (opposite t)
+                            (so 1d0))
+  (declare (draw-svg psvg) (list pts) (boolean simplify opposite))
+  (with-struct (draw-svg- scene stroke-width rep-scale) psvg
     (if (or (not width) (<= width 1d0))
       ; single path
       (path psvg pts :sw sw :simplify simplify)
@@ -292,6 +296,7 @@
           (:path :d (cl-svg:path (finalize-path pth)))
           :fill "none"
           :stroke "black"
+          :stroke-opacity so
           :stroke-width (if sw sw stroke-width))))))
 
 
@@ -312,16 +317,20 @@
 
 
 (defun cpath (psvg pts &key (width 1d0) closed (clim -0.5d0)
+                            (stroke "black")
                             (slim -0.95d0) (simplify 1d0) sw rs
+                            (so 1d0)
                        &aux (pts* (to-vector (if closed (close-path pts) pts)))
                             (width* (* width 0.5d0)))
-  (declare (plot-svg psvg) (list pts))
-  (with-struct (plot-svg- rep-scale) psvg
+  (declare (draw-svg psvg) (list pts))
+  (with-struct (draw-svg- rep-scale) psvg
     (let ((rep (math:int (ceiling (* (if rs rs rep-scale) width))))
           (diagonals (math::-get-diagonals
                        (to-vector (math:path-simplify pts* simplify))
                        width* clim slim closed)))
-      (path psvg (-accumulate-cpath diagonals rep closed) :sw sw))))
+      (path psvg (-accumulate-cpath diagonals rep closed)
+            :stroke stroke
+            :sw sw :so so))))
 
 
 ; ----- CIRC -----
@@ -335,48 +344,53 @@
             x y r r r r2 r r r2)))
 
 
-(defun circ (psvg xy rad &key (fill "none") sw aspath)
-  (declare (plot-svg psvg) (vec:vec xy) (double-float rad))
-  (with-struct (plot-svg- scene stroke-width) psvg
+(defun circ (psvg xy rad &key (fill "none") sw aspath
+                              (so 1d0) (fo 1d0))
+  (declare (draw-svg psvg) (vec:vec xy) (double-float rad))
+  (with-struct (draw-svg- scene stroke-width) psvg
     (vec:with-xy-short (xy x y)
       (let ((sw* (if sw sw stroke-width)))
         (if aspath
           (cl-svg:draw scene (:path :d (-arccirc x y rad))
-                       :fill fill :stroke "black" :stroke-width sw*)
+                       :fill fill :stroke "black" :stroke-width sw*
+                       :fill-opacity fo :stroke-opacity so)
           (cl-svg:draw scene (:circle :cx x :cy y :r rad)
-                       :fill fill :stroke "black" :stroke-width sw*))))))
+                       :fill fill :stroke "black" :stroke-width sw*
+                       :fill-opacity fo :stroke-opacity so))))))
 
 
 ; TODO: create path with multiple circs
 ; TODO: multiple rads
-(defun circs (psvg vv rad &key (fill "none") sw aspath)
-  (declare (plot-svg psvg) (list vv) (double-float rad))
+(defun circs (psvg vv rad &key (fill "none") sw aspath
+                               (fo 1d0) (so 1d0))
+  (declare (draw-svg psvg) (list vv) (double-float rad))
   (loop for xy of-type vec:vec in vv
-        do (circ psvg xy rad :fill fill :sw sw :aspath aspath)))
+        do (circ psvg xy rad :fill fill :sw sw :aspath aspath :fo fo :so so)))
 
 
 ; ----- WCIRC -----
 
-(defun wcirc (psvg xy rad &key outer-rad rs aspath)
-  (declare (plot-svg psvg))
-  (with-struct (plot-svg- rep-scale) psvg
+(defun wcirc (psvg xy rad &key outer-rad rs aspath (so 1d0) (fo 1d0))
+  (declare (draw-svg psvg))
+  (with-struct (draw-svg- rep-scale) psvg
     (let* ((inner-rad (if outer-rad rad 1d0))
            (outer-rad* (if outer-rad outer-rad rad))
            (n (math:int (* (ceiling (abs (- outer-rad* inner-rad)))
                            (if rs rs rep-scale)))))
     (loop for r in (math:linspace n inner-rad outer-rad*)
-          do (circ psvg xy r :aspath aspath)))))
+          do (circ psvg xy r :aspath aspath :so so :fo fo)))))
 
 
-(defun wcircs (psvg pts rad &key outer-rad rs aspath)
-  (declare (plot-svg psvg))
+(defun wcircs (psvg pts rad &key outer-rad rs aspath (so 1d0) (fo 1d0))
+  (declare (draw-svg psvg))
   (loop for pt in pts
-        do (wcirc psvg pt rad :outer-rad outer-rad :rs rs :aspath aspath)))
+        do (wcirc psvg pt rad :outer-rad outer-rad
+                  :rs rs :aspath aspath :so so :fo fo)))
 
 
 (defun save (psvg fn)
-  (declare (plot-svg psvg))
-  (with-struct (plot-svg- scene) psvg
+  (declare (draw-svg psvg))
+  (with-struct (draw-svg- scene) psvg
     (with-open-file (fstream (ensure-filename fn ".svg")
                        :direction :output :if-exists :supersede)
       (declare (stream fstream))

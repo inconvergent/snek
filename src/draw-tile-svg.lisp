@@ -1,11 +1,11 @@
 
-(in-package :plot-tile-svg)
+(in-package :draw-tile-svg)
 
 ; export svg drawings across tiled sheets of paper.
 ; this functinality is experimental and has limited features.
 
 
-(defstruct plot-tile-svg
+(defstruct draw-tile-svg
   (nxny nil :type list :read-only t)
   (stroke-width nil :type double-float :read-only t)
   (dw 0d0 :type double-float :read-only t)
@@ -23,7 +23,7 @@
           for x from 0 below nx
           do (loop for y from 0 below ny
                    do (setf (gethash (list x y) papers)
-                            (plot-svg:make :layout 'plot-svg:a3-landscape
+                            (draw-svg:make :layout 'draw-svg:a3-landscape
                                            :stroke-width stroke-width)))
           finally (return papers))))
 
@@ -55,13 +55,13 @@
 
 
 (defun make (&key (nxny (list 2 2)) (stroke-width 1.1d0))
-  (let* ((overview (plot-svg:make :layout 'plot-svg:a3-landscape
+  (let* ((overview (draw-svg:make :layout 'draw-svg:a3-landscape
                                   :stroke-width stroke-width))
-         (dw (plot-svg::plot-svg-width overview))
-         (dh (plot-svg::plot-svg-height overview))
+         (dw (draw-svg::draw-svg-width overview))
+         (dh (draw-svg::draw-svg-height overview))
          (rpw (/ dw (first nxny)))
          (rph (/ dh (second nxny))))
-    (make-plot-tile-svg :nxny nxny
+    (make-draw-tile-svg :nxny nxny
                         :stroke-width stroke-width
                         :overview overview
                         :dw dw
@@ -117,17 +117,17 @@
   "
   draw path
   "
-  (declare (plot-tile-svg msvg) (list pts))
-  (with-struct (plot-tile-svg- paper-id-fx paper-fx grid
+  (declare (draw-tile-svg msvg) (list pts))
+  (with-struct (draw-tile-svg- paper-id-fx paper-fx grid
                                papers overview nxny) msvg
-    (plot-svg:path overview pts :sw sw :stroke stroke :closed closed)
+    (draw-svg:path overview pts :sw sw :stroke stroke :closed closed)
 
     (when closed (vextend (aref pts* 0) pts*))
     (loop for (segment paperid)
           in (-append-paper-id paper-id-fx (-split-path-segments-on-grid
                                              grid (-path-segments pts*)))
           if (-inside paperid nxny)
-          do (plot-svg:path (gethash paperid papers)
+          do (draw-svg:path (gethash paperid papers)
                (mapcar (lambda (pt) (funcall paper-fx pt paperid)) segment)
                :sw sw
                :stroke stroke))))
@@ -140,7 +140,7 @@
   note that len is a ratio of the full length of line
   (a number between 0 and 1)
   "
-  (declare (plot-tile-svg msvg) (list line) (double-float len))
+  (declare (draw-tile-svg msvg) (list line) (double-float len))
   (let ((stip (math:stipple num len)))
     (loop for (a b) across stip
           do (path msvg (list (vec:on-line* a line)
@@ -155,7 +155,7 @@
   if the length of the line is shorter than len, a single line (no stipples)
   will be drawn.
   "
-  (declare (plot-tile-svg msvg) (list line) (double-float len))
+  (declare (draw-tile-svg msvg) (list line) (double-float len))
   (let ((d (vec:dst* line)))
     (if (<= d len)
       (path msvg line :sw sw :stroke stroke)
@@ -170,7 +170,7 @@
   draw n stipples along path pts
   WARN: this is incomplete and will probably not perform as expected
   "
-  (declare (plot-tile-svg msvg) (list pts) (fixnum n))
+  (declare (draw-tile-svg msvg) (list pts) (fixnum n))
   (loop with all = (to-vector (lin-path:pos*
                                (lin-path:make pts :closed closed)
                                (sort (rnd:nrnd (* 2 n)) (rnd:either #'< #'>))))
@@ -180,20 +180,20 @@
 
 
 (defun bzspl (msvg pts &key sw (stroke "black") closed (dens 1d0))
-  (declare (plot-tile-svg msvg))
+  (declare (draw-tile-svg msvg))
   (path msvg (bzspl:adaptive-pos (bzspl:make pts :closed closed) :dens dens)
         :sw sw :stroke stroke))
 
 
 (defun save (msvg fn)
-  (declare (plot-tile-svg msvg))
-  (with-struct (plot-tile-svg- papers overview grid) msvg
-    (plot-svg:show-crop overview)
-    (loop for path across grid do (plot-svg:path overview path :stroke "blue"))
+  (declare (draw-tile-svg msvg))
+  (with-struct (draw-tile-svg- papers overview grid) msvg
+    (draw-svg:show-crop overview)
+    (loop for path across grid do (draw-svg:path overview path :stroke "blue"))
     (loop for (nx ny) being the hash-keys of papers using (hash-value paper)
-          do (plot-svg:show-crop paper)
-             (plot-svg:save paper
+          do (draw-svg:show-crop paper)
+             (draw-svg:save paper
                (ensure-filename fn (format nil "-part-~ax~a" nx ny) t)))
-    (plot-svg:save overview
+    (draw-svg:save overview
       (append-postfix (ensure-filename fn "" t) "-overview"))))
 

@@ -53,8 +53,8 @@
         (h-state-gen (get-walker-state-gen
                      (lambda () (rnd:get-acc-lin-stp (rnd:rnd)))))
         (sand (sandpaint:make size
-                              :fg (color:white 0.01)
-                              :bg (color:black))))
+                              :fg (pigment:white 0.01)
+                              :bg (pigment:black))))
 
     (snek:with (snk)
       (snek:itr-verts (snk v)

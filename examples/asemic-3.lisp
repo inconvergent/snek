@@ -87,13 +87,13 @@
         (line-num 10)
         (grains 95)
         (sand (sandpaint:make size
-                              :fg (color:white 0.009)
-                              :bg (color:white))))
+                              :fg (pigment:white 0.009)
+                              :bg (pigment:white))))
 
-    (sandpaint:set-fg-color sand (color:vdark 0.009))
+    (sandpaint:set-fg-color sand (pigment:vdark 0.009))
     (draw-block-grid size border line-chars line-num 19d0 34d0 600000 sand)
 
-    (sandpaint:set-fg-color sand (color:white 0.009))
+    (sandpaint:set-fg-color sand (pigment:white 0.009))
 
     (loop for y in (math:linspace line-num border (- size border)) do
       (format t "~a ~%" y)

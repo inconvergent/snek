@@ -44,7 +44,7 @@
     (snek:itr-grps (snk g :collect nil)
       (let ((pts (snek:get-grp-verts snk :g g)))
         (when (> (length pts) 2)
-          (plot-svg:bzspl psvg pts))))))
+          (draw-svg:bzspl psvg pts))))))
 
 
 (defun main (size fn)
@@ -91,13 +91,13 @@
         (block draw-loop
           (loop for k from 0 do
             (let ((snk (snek:make))
-                  (psvg (plot-svg:make :layout 'plot-svg:a4-landscape))
+                  (psvg (draw-svg:make :layout 'draw-svg:a4-landscape))
                   (txt (subseq words wind)))
               (incf wind (aif (do-write snk alphabet spacebox trbl txt)
                               it
                               (return-from draw-loop)))
               (draw snk psvg)
-              (plot-svg:save psvg (append-postfix fn (format nil "-~3,'0d" k))))))))))
+              (draw-svg:save psvg (append-postfix fn (format nil "-~3,'0d" k))))))))))
 
 
 (time (main 1000 (second (cmd-args))))

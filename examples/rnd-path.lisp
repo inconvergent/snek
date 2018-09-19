@@ -57,8 +57,8 @@
         (noise 0.00000005d0)
         (snk (snek:make))
         (sand (sandpaint:make size
-                :fg (color:white 0.01)
-                :bg (color:rgb 0.05 0.05 0.05)))
+                :fg (pigment:white 0.01)
+                :bg (pigment:rgb 0.05 0.05 0.05)))
         (pa (lin-path:make (rnd-path 4)))
         (pb (lin-path:make (rnd-path 4)))
         (lsa (rnd:get-acc-lin-stp (rnd:rnd)))

@@ -6,5 +6,5 @@
     (lambda (i)
       (vec:with-xy ((bzspl:pos spla i) h s)
         (vec:with-xy ((bzspl:pos splb i) v _)
-          (color:hsv h s v alpha))))))
+          (pigment:hsv h s v alpha))))))
 

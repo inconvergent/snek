@@ -18,7 +18,7 @@
 
 (asdf:defsystem "snek"
   :description "A System for Making Generative Systems"
-  :version "2.52.0"
+  :version "2.60.1"
   :author "inconvergent"
   :licence "MIT"
   :serial t
@@ -31,7 +31,7 @@
                (:file "vec")
                (:file "math")
                (:file "math-extra")
-               (:file "color")
+               (:file "pigment")
                (:file "hset")
                (:file "rnd-extra")
                (:file "graph")
@@ -40,8 +40,8 @@
                (:file "sandpaint")
                (:file "sandpaint-flip-reflect")
                (:file "sandpaint-extra")
-               (:file "plot-svg")
-               (:file "plot-tile-svg")
+               (:file "draw-svg")
+               (:file "draw-tile-svg")
                (:file "obj")
                (:file "zonemap")
                (:file "snek-macros")

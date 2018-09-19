@@ -7,8 +7,8 @@
 (defun main (size fn)
   (let ((sand (sandpaint:make
                 size
-                :fg (color:black 0.01)
-                :bg (color:white)))
+                :fg (pigment:black 0.01)
+                :bg (pigment:white)))
         (path-a (close-path (rnd:nin-box 10 500d0 500d0 :xy (vec:vec 500d0 500d0))))
         (path-b (close-path (rnd:nin-box 4 500d0 500d0 :xy (vec:vec 500d0 500d0))))
         (na (rnd:get-lin-stp))

@@ -13,8 +13,8 @@
         (rad 185d0)
         (snk (snek:make))
         (sand (sandpaint:make size
-                :fg (color:white 0.005)
-                :bg (color:gray 0.1d0))))
+                :fg (pigment:white 0.005)
+                :bg (pigment:gray 0.1d0))))
 
     (loop for x in (math:linspace rep 200d0 1800d0) for i from 0 do
       (loop for y in (math:linspace rep 200d0 1800d0) for j from 0 do

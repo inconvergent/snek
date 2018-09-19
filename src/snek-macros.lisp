@@ -75,20 +75,18 @@
            (list ,@body))))))
 
 
-(defmacro with-grp ((snk grp g) &body body)
+(defmacro with-grp ((snk g* g) &body body)
   "
-  select a grp from a snek instance. the grp will be available
-  in the context as g.
+  select grp g from snek instance. g will be available in this context as g*.
   "
   (declare (symbol snk))
   (with-gensyms (grps exists gname sname)
     `(let ((,sname ,snk)
            (,gname ,g))
       (let ((,grps (snek-grps ,sname)))
-        (multiple-value-bind (,grp ,exists)
+        (multiple-value-bind (,g* ,exists)
           (gethash ,gname ,grps)
-            (unless ,exists
-              (error "attempted to access invalid group: ~a" ,gname))
+            (unless ,exists (error "attempted to access invalid group: ~a" ,gname))
             (progn ,@body))))))
 
 
@@ -192,8 +190,7 @@
   "
   iterates over all grps of snk as g.
   "
-  (declare (symbol snk)
-           (type boolean collect))
+  (declare (symbol snk) (type boolean collect))
   (with-gensyms (grps sname main*)
     `(let ((,sname ,snk)
            (,main* ,main))

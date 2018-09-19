@@ -28,8 +28,8 @@
         (noise 1.5d0)
         (itt 8000)
         (sand (sandpaint:make size
-                :fg (color:black 0.08)
-                :bg (color:white))))
+                :fg (pigment:black 0.08)
+                :bg (pigment:white))))
 
     (setf verts (loop for i from 1 to 100
                       collect (snek:add-vert! snk (rnd:rndget lattice))))

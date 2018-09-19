@@ -41,8 +41,8 @@
         (num-words 10)
         (char-scale (vec:vec 0.5d0 1.5d0))
         (sand (sandpaint:make size
-                              :fg (color:black 0.009)
-                              :bg (color:white))))
+                              :fg (pigment:black 0.009)
+                              :bg (pigment:white))))
 
 
     (loop for y in (math:linspace line-num border (- size border)) do

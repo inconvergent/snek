@@ -24,7 +24,8 @@ In short `snek` is four things:
    sampling to draw its primitives. This creates a fairly distinct and gritty
    look in many cases.
 
-4. A tool for drawing svg files. Mainly svg files that are good for plotting.
+4. A tool for drawing svg files (`draw-svg`). Mainly svg files that are good
+   for plotting.
 
 ![head](img/spline-script.lisp.png?raw=true "ex")
 
@@ -50,8 +51,7 @@ I have also written about things related to `snek` at
     `snek`)
   - https://inconvergent.net/2017/a-method-for-mistakes/
   - https://inconvergent.net/2017/arbitrary-alterations/
-  - https://inconvergent.net/2017/grains-of-sand/ (about "sandpainting", see
-    `src/sandpaint.lisp`)
+  - https://inconvergent.net/2017/grains-of-sand/
 
 Here is and example of manipulating a `snek` instance called `snk` using
 `alterations`. Alteration constructors are postfixed with `?`.
@@ -74,7 +74,8 @@ Here is and example of manipulating a `snek` instance called `snk` using
 ; alterations have been applied
 ```
 
-For more examples, see below.
+You can also manipulate the state directly. These functions are postfixed with
+`!`.  Eg. `(snek:move-vert! ...)`.
 
 
 ## Examples

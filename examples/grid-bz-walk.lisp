@@ -52,8 +52,8 @@
         (grains 10)
         (edge 60d0)
         (sand (sandpaint:make size
-                :fg (color:white 0.05)
-                :bg (color:dark))))
+                :fg (pigment:white 0.05)
+                :bg (pigment:dark))))
 
 
     (let* ((grid (get-grid (math:dfloat size) edge 5))
@@ -62,13 +62,13 @@
 
       (loop for i from 0 below itt do
         (print-every i 100000)
-        (sandpaint:set-fg-color sand (color:hsv 0.51 1 1 0.05))
+        (sandpaint:set-fg-color sand (pigment:hsv 0.51 1 1 0.05))
         (sandpaint:bzspl-stroke sand
           (bzspl:make (loop for w in walkers-a collect (funcall w noise))
                       :closed t)
           grains)
 
-        (sandpaint:set-fg-color sand (color:hsv 0.91 1 1 0.05))
+        (sandpaint:set-fg-color sand (pigment:hsv 0.91 1 1 0.05))
         (sandpaint:bzspl-stroke sand
           (bzspl:make (loop for w in walkers-b collect (funcall w noise))
                       :closed t)

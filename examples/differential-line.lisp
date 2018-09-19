@@ -23,8 +23,8 @@
         (farl 100d0)
         (stp 0.004d0)
         (sand (sandpaint:make size
-                              :fg (color:white 0.05)
-                              :bg (color:dark))))
+                              :fg (pigment:white 0.05)
+                              :bg (pigment:dark))))
 
     (start-timer "total")
     (loop for i from 0 below itt do
@@ -65,7 +65,7 @@
           ;    3 grains))
           ;(sandpaint:save sand (append-number fn i) :gamma 1.5)
           ;(sandpaint:save sand fn :gamma 1.5)
-          ;(sandpaint:clear sand (color:dark))
+          ;(sandpaint:clear sand (pigment:dark))
           )))
       (sum-timer "total")
       (show-timers)))

@@ -10,8 +10,8 @@
   (let* ((num 1000000)
          (pix-num 1000000)
          (grains 100)
-         (sand (sandpaint:make 1000 :fg (color:black 0.01)
-                                    :bg (color:white))))
+         (sand (sandpaint:make 1000 :fg (pigment:black 0.01)
+                                    :bg (pigment:white))))
 
   (format t "strokes:~%")
   (time

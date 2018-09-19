@@ -57,7 +57,7 @@
   (let ((left 200d0)
         (right 800d0)
         (bs 150d0)
-        (psvg (plot-svg:make* :width 1000d0
+        (psvg (draw-svg:make* :width 1000d0
                               :height 1000d0
                               :stroke-width 1d0
                               :rep-scale 0.5d0)))
@@ -129,9 +129,9 @@
                                (vec:vec 120d0 850d0))) res)
 
       (loop for (c box) across res do
-        (plot-svg:cpath psvg box :width 15d0 :closed c)))
+        (draw-svg:cpath psvg box :width 15d0 :closed c)))
 
-    (plot-svg:save psvg "plot-cpath")))
+    (draw-svg:save psvg "plot-cpath")))
 
 (time (main 1000 (second (cmd-args))))
 

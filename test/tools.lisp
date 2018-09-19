@@ -102,9 +102,7 @@
 
   (rnd:set-rnd-state 1)
 
-  (do-test
-    (length (rnd:rndspace 10 0d0 10d0))
-    10)
+  (do-test (length (rnd:rndspace 10 0d0 10d0)) 10)
 
   (do-test
     (rnd:rndspace 10 0d0 10d0) '(8.383887417540674d0 3.704390759927394d0
@@ -300,8 +298,7 @@
             (vec:vec 4.718551216740959d0 -4.763338116541952d0)
             (vec:vec 35.77978017789252d0 42.62675016658848d0)))
 
-    (do-test (length (bzspl:adaptive-pos (bzspl:make pts-a)))
-             226)
+    (do-test (length (bzspl:adaptive-pos (bzspl:make pts-a))) 226)
 
     (do-test
       (bzspl:adaptive-pos (bzspl:make (list (vec:vec 0d0 0d0)
@@ -346,9 +343,7 @@
 
     (do-test (sort (hset:to-list hs) #'<) (list 20 40 73)))
 
-
   (let ((hs (hset:make :init (list 1 2 3))))
-
     (do-test (hset:to-list hs) (list 1 2 3))))
 
 
@@ -394,7 +389,21 @@
 
     (do-test (graph:del grph 5 20) t)
 
-    (do-test (sort (graph:get-verts grph) #'<) nil)))
+    (do-test (sort (graph:get-verts grph) #'<) nil))
+
+  (let ((grph (graph:make :closed t)))
+
+    (do-test (graph:get-loop grph) nil)
+
+    (graph:add grph 1 0)
+    (graph:add grph 1 2)
+    (graph:add grph 2 0)
+
+    (do-test (to-list (graph:get-loop grph)) (list 1 0 2))
+
+    (graph:add grph 2 9)
+
+    (do-test (graph:get-loop grph) nil)))
 
 
 (defun test-linear-path ()

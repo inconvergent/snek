@@ -2,11 +2,10 @@
 (defpackage :vec
   (:use :common-lisp)
   (:export
-    :*one*
     :*half*
+    :*one*
     :*zero*
     :add
-    :from
     :all-inside
     :angle
     :copy
@@ -19,6 +18,7 @@
     :dst2
     :fan
     :flip
+    :from
     :idiv
     :iscale
     :isub
@@ -53,8 +53,8 @@
     :one
     :op
     :perp
-    :psegx
     :polygon
+    :psegx
     :ptinside
     :rect
     :rep
@@ -97,8 +97,8 @@
     :convex-split
     :copy-sort
     :cpath
-    :curvature-offsets
     :curvature-offset-paths
+    :curvature-offsets
     :dadd
     :daddmod*
     :ddiv
@@ -206,10 +206,10 @@
     :with-prob
     :with-rndspace)
   (:import-from :common-lisp-user
-    :vextend
-    :make-adjustable-vector
     :ensure-vector
+    :make-adjustable-vector
     :to-vector
+    :vextend
     :with-gensyms))
 
 
@@ -226,7 +226,7 @@
     :with-gensyms))
 
 
-(defpackage :color
+(defpackage :pigment
   (:use :common-lisp)
   (:export
     :black
@@ -240,6 +240,7 @@
     :rgba
     :show
     :show
+    :to-hex
     :to-list
     :to-list*
     :transparent
@@ -273,6 +274,7 @@
     :del
     :get-edges
     :get-incident-edges
+    :get-loop
     :get-num-edges
     :get-num-verts
     :get-verts
@@ -284,6 +286,7 @@
   (:import-from :common-lisp-user
     :flatten
     :make-adjustable-vector
+    :vector-last
     :vextend
     :with-gensyms
     :with-struct))
@@ -303,13 +306,13 @@
     :tangent
     :with-rndpos)
   (:import-from :common-lisp-user
-    :vextend
-    :make-adjustable-vector
-    :to-vector
     :PI5
     :length-1
-    :vector-last
+    :make-adjustable-vector
     :to-list
+    :to-vector
+    :vector-last
+    :vextend
     :with-gensyms
     :with-struct))
 
@@ -373,13 +376,12 @@
     :stroke
     :strokes)
   (:import-from :common-lisp-user
-    :aif
     :ensure-filename
     :with-gensyms
     :with-struct))
 
 
-(defpackage :plot-svg
+(defpackage :draw-svg
   (:use :common-lisp)
   (:export
     :*short*
@@ -406,7 +408,6 @@
     :wcircs
     :wpath)
   (:import-from :common-lisp-user
-    :aif
     :close-path
     :ensure-filename
     :make-adjustable-vector
@@ -417,7 +418,7 @@
     :with-struct))
 
 
-(defpackage :plot-tile-svg
+(defpackage :draw-tile-svg
   (:use :common-lisp)
   (:export
     :lstipple
@@ -428,14 +429,14 @@
     :save)
   (:import-from :common-lisp-user
     :append-postfix
-    :vextend
-    :vextend*
-    :ensure-vector
     :ensure-filename
+    :ensure-vector
     :length-1
     :make-adjustable-vector
-    :to-vector
     :to-adjustable-vector
+    :to-vector
+    :vextend
+    :vextend*
     :with-struct))
 
 
@@ -448,7 +449,6 @@
     :make
     :save)
   (:import-from :common-lisp-user
-    :aif
     :vextend
     :ensure-filename
     :make-adjustable-vector
@@ -472,7 +472,7 @@
     :alt-then?
     :append-edge-segx?
     :append-edge?
-    :center
+    :center!
     :del-edge!
     :del-edge?
     :draw-circ
@@ -485,6 +485,7 @@
     :get-edges
     :get-grp
     :get-grp-as-bzspl
+    :get-grp-loop
     :get-grp-props
     :get-grp-verts
     :get-incident-edges
@@ -502,12 +503,12 @@
     :get-verts
     :get-verts-by-name
     :is-vert-in-grp
-    :itr-verts
     :itr-edges
+    :itr-grp-verts
     :itr-grps
     :itr-prm-verts
     :itr-prms
-    :itr-grp-verts
+    :itr-verts
     :join-verts?
     :make
     :make-mutate
@@ -516,30 +517,29 @@
     :mutate
     :prmf
     :prmr
-    :prune-edges-by-len
+    :prune-edges-by-len!
     :psvg-get-prm-types
     :sel-args
-    :set-grp-props
-    :set-prm-props
+    :set-grp-props!
+    :set-prm-props!
     :split-edge!
     :split-edge?
     :verts-in-rad
     :with
     :with-dx
-    :with-grp
     :with-rnd-edge
     :with-rnd-vert
     :with-verts-in-rad
     :zwith)
   (:import-from :common-lisp-user
     :append-postfix
-    :vextend
     :close-path
     :exec-with-args
     :flatten
     :make-adjustable-vector
     :make-generic-hash-table
     :to-list
+    :vextend
     :with-gensyms
     :with-struct))
 

@@ -75,19 +75,19 @@
 
 (defun show-dots (psvg visited proj &optional (rad 1d0))
   (loop for k being the hash-keys of visited do
-    (plot-svg:circ psvg (funcall proj k) rad)))
+    (draw-svg:circ psvg (funcall proj k) rad)))
 
 
 (defun tris (psvg proj n abc)
   (destructuring-bind (a b c) abc
     (loop for s in (math:linspace n 0d0 1d0) do
-      (plot-svg:path psvg (list (vec:on-line s (funcall proj a)  (funcall proj b))
+      (draw-svg:path psvg (list (vec:on-line s (funcall proj a)  (funcall proj b))
                                 (vec:on-line s (funcall proj a)  (funcall proj c)))))))
 
 (defun quads (psvg proj n abcd)
   (destructuring-bind (a b c d) abcd
     (loop for s in (math:linspace n 0d0 1d0) do
-      (plot-svg:path psvg (list (vec:on-line s (funcall proj a)  (funcall proj b))
+      (draw-svg:path psvg (list (vec:on-line s (funcall proj a)  (funcall proj b))
                                 (vec:on-line s (funcall proj c)  (funcall proj d)))))))
 
 
@@ -106,14 +106,14 @@
 
 
 (defun bzspl (psvg proj visited pts)
-  (plot-svg:bzspl psvg (mapcar (lambda (x) (funcall proj x)) pts))
+  (draw-svg:bzspl psvg (mapcar (lambda (x) (funcall proj x)) pts))
   (setf (gethash (first pts) visited) t)
   (setf (gethash  (first (last pts)) visited) t))
 
 
 (defun wbzspl (psvg proj visited pts w)
   (print :hi)
-  (plot-svg:wbzspl psvg (mapcar (lambda (x) (funcall proj x)) pts)
+  (draw-svg:wbzspl psvg (mapcar (lambda (x) (funcall proj x)) pts)
                    (vec:vec 1d0 0d0) :width w)
   (setf (gethash (first pts) visited) t)
   (setf (gethash  (first (last pts)) visited) t))

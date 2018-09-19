@@ -20,41 +20,44 @@
     - to get indices of verts (in a grp): (get-vert-inds snk :g g)
     - ...
 
-  this functionality is still experimental.
-  "
+  use :type :closed to create a closed graph, which allows looking up a closed
+  loop.
 
+  the grp functionality is still experimental.
+  "
   (declare (snek snk))
   (with-struct (snek- grps grp-size) snk
     (multiple-value-bind (v exists) (gethash name* grps)
       (declare (ignore v) (boolean exists))
       (when exists (error "grp name already exists: ~a" name*)))
-    (setf (gethash name* grps) (-make-grp :name name*
-                                          :type type
-                                          :grph (graph:make :size grp-size)
-                                          :props props)))
+    (setf (gethash name* grps) (-make-grp
+                                 :name name*
+                                 :type type
+                                 :grph (graph:make :size grp-size
+                                                   :closed (equal type :closed))
+                                 :props props)))
   name*)
 
 
 (defun add-prm! (snk &key name type props args
                      &aux (name* (if name name (gensym))))
   "
-  constructor for prm instances.
+  constructor for prms (primitives).
 
-  prms (primitives) are generic entities of a particular type.  eg. a primitive
-  is a path, a bzspl or a circle.
+  prms are generic entities of a particular type. eg. a primitive is a path, a
+  bzspl or a circle.
 
   nil is not an allowed prm name. if name is nil, the name will be a gensym.
 
   the default type is nil.
 
   a given prm can be 'rendered' using (snek:prmr snk :p p). the behaviour of
-  (snek:prmr...) is determined by the rfxn functions. these functions is either
-  the default function or whatever functions are provided by to the :prms when
-  creating a snek instance
+  (snek:prmr...) is determined by the rfxn functions. these functions are
+  either the default function or whatever functions are provided by to the
+  :prms when creating a snek instance
 
-  this functionality is experimental.
+  the prm functionality is experimental.
   "
-
   (declare (snek snk))
   (with-struct (snek- prms) snk
     (multiple-value-bind (v exists) (gethash name* prms)
@@ -87,8 +90,7 @@
 (defun add-vert! (snk xy &key p name)
   "
   adds a new vertex to snek
-
-  returns the id of the new vertex
+  returns the new vert ind.
   "
   (declare (snek snk) (vec:vec xy))
   (with-struct (snek- verts num-verts) snk
@@ -102,26 +104,23 @@
         (declare (ignore v) (boolean exists))
         (when exists (error "vert name already exists: ~a" name))
         (setf (gethash name (snek-vert-names snk)) i)))
-    (when p
-      (with-struct (prm- verts) (gethash p (snek-prms snk))
-        (vextend i verts)
-        (incf (prm-num-verts (gethash p (snek-prms snk))))))
+    (when p (with-struct (prm- verts) (gethash p (snek-prms snk))
+              (vextend i verts)
+              (incf (prm-num-verts (gethash p (snek-prms snk))))))
     i))
 
 
 (defun add-verts! (snk vv &key p names)
   "
   adds new vertices to snek
-
   returns the ids of the new vertices
   "
   (declare (snek snk) (list vv names))
   (if names
-    (progn
-      (if (not (= (length names) (length vv)))
-        (error "must provide same number of verts and names"))
-      (loop for xy of-type vec:vec in vv and name in names
-            collect (add-vert! snk xy :p p :name name)))
+    (progn (if (not (= (length names) (length vv)))
+             (error "must provide same number of verts and names"))
+           (loop for xy of-type vec:vec in vv and name in names
+                 collect (add-vert! snk xy :p p :name name)))
     (loop for xy of-type vec:vec in vv
           collect (add-vert! snk xy :p p))))
 
@@ -136,12 +135,20 @@
   (grp-props (get-grp snk :g g)))
 
 
-(defun set-prm-props (snk v &key p)
+(defun get-grp-loop (snk &key g)
+  (declare (snek snk))
+  (with-grp (snk g* g)
+    (unless (equal (grp-type g*) :closed)
+      (error "error in get-grp-loop: grp is not of type :closed."))
+    (graph:get-loop (grp-grph g*))))
+
+
+(defun set-prm-props! (snk v &key p)
   (declare (snek snk))
   (setf (prm-props (get-prm snk :p p)) v))
 
 
-(defun set-grp-props (snk v &key g)
+(defun set-grp-props! (snk v &key g)
   (declare (snek snk))
   (setf (grp-props (get-grp snk :g g)) v))
 
@@ -153,7 +160,7 @@
 
 (defun get-vert (snk v)
   "
-  get the coordinate (vec) of vertex (id) v
+  get the coordinate (vec) of vert v.
   "
   (declare (snek snk) (fixnum v))
   (with-struct (snek- verts num-verts) snk
@@ -163,9 +170,9 @@
 
 
 (defun get-verts (snk vv &aux (vv* (if (equal (type-of vv) 'cons)
-                                     vv (to-list vv))))
+                                       vv (to-list vv))))
   "
-  get the coordinates (vec) of vert indices in vv
+  get the coordinates (vec) of verts in vv
   "
   (declare (snek snk) (sequence vv))
   (with-struct (snek- verts num-verts) snk
@@ -188,7 +195,8 @@
 (defun move-vert! (snk v xy &key (rel t) &aux (v* (* 2 v)))
   (declare (snek snk) (fixnum v) (vec:vec xy) (boolean rel))
   (with-struct (snek- verts num-verts) snk
-    (when (>= v num-verts) (error "attempting to move invalid vert, ~a (~a)" v num-verts))
+    (when (>= v num-verts)
+          (error "attempting to move invalid vert, ~a (~a)" v num-verts))
     (if rel (setf (aref verts v*) (+ (vec::vec-x xy) (aref verts v*))
                   (aref verts (1+ v*)) (+ (vec::vec-y xy) (aref verts (1+ v*))))
             (setf (aref verts v*) (vec::vec-x xy)
@@ -197,7 +205,7 @@
 
 (defun get-all-grps (snk &key main)
   "
-  returns all grps.
+  returns all grps. use :main t to include main/nil grp.
   "
   (declare (snek snk) (boolean main))
   (loop for g being the hash-keys of (snek-grps snk)
@@ -207,7 +215,7 @@
 
 (defun get-grp (snk &key g)
   "
-  returns a single grp.
+  returns the grp g. if g is not provided, the main/nil grp will be returned.
   "
   (declare (snek snk))
   (gethash g (snek-grps snk)))
@@ -223,7 +231,7 @@
 
 (defun get-prm (snk &key p)
   "
-  get a single prm.
+  get a single prm. there is no nil prm.
   "
   (declare (snek snk))
   (when (not p) (error "must provide a prm name."))
@@ -232,7 +240,7 @@
 
 (defun get-grp-verts (snk &key g)
   "
-  returns all vertices in grp g
+  returns all vertices in grp g.
   "
   (declare (snek snk))
   (get-verts snk (get-vert-inds snk :g g)))
@@ -240,7 +248,7 @@
 
 (defun get-prm-verts (snk &key p)
   "
-  returns all vertices in prm p
+  returns all vertices in prm p.
   "
   (declare (snek snk))
   (when (not p) (error "must provide a prm name."))
@@ -254,9 +262,9 @@
 (defun prmr (snk &key p type args)
   (declare (snek snk))
   (when (not p) (error "must provide a prm name."))
-  (let* ((pr (gethash p (snek-prms snk)))
-         (type* (if type type (prm-type pr))))
-    (when pr
+  (let* ((p* (gethash p (snek-prms snk)))
+         (type* (if type type (prm-type p*))))
+    (when p*
       (multiple-value-bind (fxn exists) (gethash type* (snek-prm-names snk))
         (when (not exists) (error "trying to use undefined prm type: ~a" type*))
         (funcall (the function fxn) snk p  (snek:sel-args snk p args))))))
@@ -265,10 +273,9 @@
 (defun get-prm-vert-inds (snk &key p)
   (declare (snek snk))
   (when (not p) (error "must provide a prm name."))
-  (multiple-value-bind (pr exists) (gethash p (snek-prms snk))
+  (multiple-value-bind (p* exists) (gethash p (snek-prms snk))
     (when (not exists) (error "prm does not exist: ~a" p))
-    (with-struct (prm- verts) pr
-      verts)))
+    (prm-verts p*)))
 
 
 (defun is-vert-in-grp (snk v &key g)
@@ -277,10 +284,9 @@
   "
   (declare (snek snk) (fixnum v))
   (with-struct (snek- grps) snk
-    (multiple-value-bind (grp exists) (gethash g grps)
-      (if exists
-        (graph:vmem (grp-grph grp) v)
-        (error "grp does not exist: ~a" grp)))))
+    (multiple-value-bind (g* exists) (gethash g grps)
+      (if exists (graph:vmem (grp-grph g*) v)
+                 (error "grp does not exist: ~a" g)))))
 
 
 (defun get-vert-inds (snk &key g)
@@ -289,10 +295,9 @@
   "
   (declare (snek snk))
   (with-struct (snek- grps) snk
-    (multiple-value-bind (grp exists) (gethash g grps)
-      (if exists
-        (graph:get-verts (grp-grph grp))
-        (error "grp does not exist: ~a" grp)))))
+    (multiple-value-bind (g* exists) (gethash g grps)
+      (if exists (graph:get-verts (grp-grph g*))
+                 (error "grp does not exist: ~a" g)))))
 
 
 (defun get-vert-ind-by-name (snk &key name)
@@ -319,24 +324,22 @@
 
 (defun get-num-edges (snk &key g)
   (declare (snek snk))
-  (with-grp (snk grp g)
-    (graph:get-num-edges (grp-grph grp))))
+  (with-grp (snk g* g)
+    (graph:get-num-edges (grp-grph g*))))
 
 
 ; TODO: option to include both directions?
 (defun get-edges (snk &key g)
   (declare (snek snk))
-  (with-grp (snk grp g)
-    (with-struct (grp- grph) grp
-      (graph:get-edges grph))))
+  (with-grp (snk g* g)
+    (graph:get-edges (grp-grph g*))))
 
 
-; TODO: get-all-incident-edges?
+; TODO: get-all-incident-edges (not just in grp g)?
 (defun get-incident-edges (snk v &key g)
   (declare (snek snk) (fixnum v))
-  (with-grp (snk grp g)
-    (with-struct (grp- grph) grp
-      (graph:get-incident-edges grph v))))
+  (with-grp (snk g* g)
+    (graph:get-incident-edges (grp-grph g*) v)))
 
 
 (defun add-edge! (snk ee &key g)
@@ -347,17 +350,14 @@
   returns nil if the edge exists already.
   "
   (declare (snek snk) (list ee))
-  (with-grp (snk grp g)
+  (with-grp (snk g* g)
     (with-struct (snek- num-verts) snk
       (declare (fixnum num-verts))
-      (with-struct (grp- grph) grp
+      (with-struct (grp- grph) g*
         (destructuring-bind (a b) ee
           (declare (fixnum a b))
-          (when (and (< a num-verts)
-                     (< b num-verts)
-                     (not (eql a b)))
-            (when (graph:add grph a b)
-              (sort (list a b) #'<))))))))
+          (when (and (< a num-verts) (< b num-verts) (not (eql a b)))
+            (when (graph:add grph a b) (sort (list a b) #'<))))))))
 
 
 (defun add-edges! (snk ee &key g)
@@ -370,30 +370,30 @@
 
 (defun del-edge! (snk ee &key g)
   (declare (snek snk) (list ee))
-  (with-grp (snk grp g)
-    (with-struct (grp- grph) grp
+  (with-grp (snk g* g)
+    (with-struct (grp- grph) g*
       (destructuring-bind (a b) ee
         (declare (fixnum a b))
         (graph:del grph a b)))))
 
-; TODO: handle grp
-; TODO: return either edges or v
-(defun split-edge! (snk ee &key xy
+
+(defun split-edge! (snk ee &key xy g
                            &aux (xy* (if xy xy (vec:on-line* 0.5d0
                                                  (snek:get-verts snk ee)))))
   "
   split edge at xy (or middle if xy is nil).
-  returns new vert ind.
+  returns new vert ind (and new edges).
   "
   (declare (snek snk) (list ee))
-  (snek:del-edge! snk ee)
+  (snek:del-edge! snk ee :g g)
   (let ((v (add-vert! snk xy*)))
     (declare (fixnum v))
     (destructuring-bind (a b) ee
       (declare (fixnum a b))
-      (list (snek:add-edge! snk (list v a))
-            (snek:add-edge! snk (list v b)))
-      v)))
+      (let ((edges (list (snek:add-edge! snk (list v a) :g g)
+                         (snek:add-edge! snk (list v b) :g g))))
+        (declare (list edges))
+        (values v edges)))))
 
 
 (defun verts-in-rad (snk xy rad)

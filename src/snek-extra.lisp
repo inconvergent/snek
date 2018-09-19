@@ -14,6 +14,9 @@
 
 
 (defun edge-length (snk e)
+  "
+  returns the length of edge e.
+  "
   (declare (snek snk) (list e))
   (with-struct (snek- verts) snk
     (destructuring-bind (a b) e
@@ -22,7 +25,10 @@
                (vec:sarr-get verts b)))))
 
 
-(defun prune-edges-by-len (snk lim &optional (fx #'>))
+(defun prune-edges-by-len! (snk lim &optional (fx #'>))
+  "
+  remove edges longer than lim, use fx #'< to remove edges shorter than lim.
+  "
   (declare (snek snk) (double-float lim) (function fx))
   (with (snk)
     (itr-edges (snk e)
@@ -30,21 +36,26 @@
             (del-edge? e)))))
 
 
-(defun center (snk xy)
+(defun center! (snk &key (xy vec:*zero*))
+  "
+  center the verts of snk on xy. returns the previous center.
+  "
   (with-struct (snek- verts num-verts) snk
-    (loop for i from 0 below (* 2 num-verts) by 2
-          minimizing (aref verts i) into minx
-          maximizing (aref verts i) into maxx
-          minimizing (aref verts (1+ i)) into miny
-          maximizing (aref verts (1+ i)) into maxy
+    (loop for i of-type fixnum from 0 below (* 2 num-verts) by 2
+          minimizing (aref verts i) into minx of-type double-float
+          maximizing (aref verts i) into maxx of-type double-float
+          minimizing (aref verts (1+ i)) into miny of-type double-float
+          maximizing (aref verts (1+ i)) into maxy of-type double-float
           finally (let ((mx (* 0.5d0 (+ minx maxx)))
                         (my (* 0.5d0 (+ miny maxy))))
+                    (declare (double-float mx my))
                     (itr-verts (snk v)
                       (vec:with-xy ((get-vert snk v) vx vy)
                         (snek:move-vert! snk v
                           (vec:vec (+ (vec::vec-x xy) (- vx mx))
                                    (+ (vec::vec-y xy) (- vy my)))
-                          :rel nil)))))))
+                          :rel nil)))
+                    (vec:vec mx my)))))
 
 
 ; primitives?
@@ -86,7 +97,7 @@
 ; PRIMITIVES
 
 (defun psvg-get-prm-types (psvg)
-  (declare (type plot-svg::plot-svg psvg))
+  (declare (type draw-svg::draw-svg psvg))
   (labels ((stdfx (type fxn)
             (list type (lambda (snk p &optional ea)
               (exec-with-args fxn (list psvg (snek:get-prm-verts snk :p p))
@@ -94,19 +105,19 @@
 
            (circfx (snk p &optional ea)
              (declare (ignore ea))
-             (exec-with-args #'plot-svg:circ
+             (exec-with-args #'draw-svg:circ
                              (list psvg (first (get-prm-verts snk :p p))
                                         (get-prm-props snk :p p))))
            (circsfx (snk p &optional ea)
              (declare (ignore ea))
-             (exec-with-args #'plot-svg:circs
+             (exec-with-args #'draw-svg:circs
                              (list psvg (get-prm-verts snk :p p)
                                         (get-prm-props snk :p p)))))
 
     (append (mapcar #'stdfx (list :bzspl :path :hatch)
-                            (list #'plot-svg:bzspl
-                                  #'plot-svg:path
-                                  #'plot-svg:hatch))
+                            (list #'draw-svg:bzspl
+                                  #'draw-svg:path
+                                  #'draw-svg:hatch))
             (list (list :circs #'circsfx)
                   (list :circ #'circfx)))))
 

@@ -21,8 +21,8 @@
         (rep 7)
         (snk (snek:make :max-verts 100000))
         (sand (sandpaint:make size
-                              :fg (color:black 0.01)
-                              :bg (color:white))))
+                              :fg (pigment:black 0.01)
+                              :bg (pigment:white))))
 
     (snek:add-verts! snk (rnd:nin-box 100 450d0 450d0 :xy (vec:vec 500d0 500d0)))
 

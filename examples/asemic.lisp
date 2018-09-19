@@ -32,8 +32,8 @@
         (line-chars 30)
         (line-num 20)
         (sand (sandpaint:make size
-                              :fg (color:black 0.009)
-                              :bg (color:white))))
+                              :fg (pigment:black 0.009)
+                              :bg (pigment:white))))
 
     (loop for y in (math:linspace line-num border (- size border)) do
       (format t "~a ~%" y)

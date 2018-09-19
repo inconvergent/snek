@@ -18,8 +18,8 @@
          (grid (get-grid size 50d0 ngrid))
          (state-gen (get-walker-state-gen (lambda () (rnd:get-acc-circ-stp*))))
          (sand (sandpaint:make size
-                 :fg (color:white 0.05)
-                 :bg (color:dark))))
+                 :fg (pigment:white 0.05)
+                 :bg (pigment:dark))))
 
     (snek:add-verts! snk (flatten grid))
 
@@ -55,7 +55,7 @@
       ;    (bzspl:rndpos (snek:get-grp-as-bzspl snk g) 1000 :order t)
       ;    1.2d0 40))
 
-      ;(sandpaint:set-fg-color sand (color:hsv 0.5 0.8 0.8 0.05))
+      ;(sandpaint:set-fg-color sand (pigment:hsv 0.5 0.8 0.8 0.05))
       ;(sandpaint:circ sand (snek:get-all-verts snk) 2d0 300)
 
 

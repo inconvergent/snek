@@ -472,7 +472,8 @@
         do (loop for j from 0 below (1- (length bb*))
                  do (multiple-value-bind (x s p)
                       (vec:segx (list (aref aa* i) (aref aa* (1+ i)))
-                                (list (aref bb* j) (aref bb* (1+ j))))
+                                (list (aref bb* j) (aref bb* (1+ j)))
+                                :parallel parallel)
                       (when x (vextend (list i j s p) res))))
         finally (return (if (> (length res) 0) res nil))))
 

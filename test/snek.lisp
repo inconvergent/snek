@@ -155,8 +155,7 @@
       (snek:get-incident-edges snk 1)
       '((1 2) (0 1) (1 3)))
 
-    (do-test (snek:get-incident-edges snk 100)
-             nil)))
+    (do-test (snek:get-incident-edges snk 100) nil)))
 
 
 (defun test-snek-with ()
@@ -168,9 +167,8 @@
             (snek:move-vert? 0 (vec:vec 1d0 0d0))
             nil
             t
-            (list 5
-                  (snek:add-vert? (vec:vec 12d0 3d0))
-                  (snek:add-vert? (vec:vec 13d0 3d0)))
+            (list 5 (snek:add-vert? (vec:vec 12d0 3d0))
+                    (snek:add-vert? (vec:vec 13d0 3d0)))
             (list nil)
             (list (list))))
 
@@ -183,8 +181,7 @@
     (snek:with (snk)
       (snek:add-vert? (vec:vec 10d0 3d0)))
 
-    (do-test (snek:get-vert snk 11)
-             (vec:vec 10d0 3d0))
+    (do-test (snek:get-vert snk 11) (vec:vec 10d0 3d0))
 
     (do-test
       (snek:with (snk :collect t)
@@ -192,8 +189,7 @@
         (snek:add-vert? (vec:vec 70d0 3d0)))
       '(12 13))
 
-    (do-test (snek::snek-num-verts snk)
-             14)
+    (do-test (snek::snek-num-verts snk) 14)
 
     (snek:with (snk)
       (snek:add-edge*? (vec:vec 7d0 3d0) (vec:vec 100d0 0.99d0)))
@@ -271,7 +267,7 @@
         (snek:split-edge? '(1 2))
         (snek:split-edge? '(1 2))
         (snek:split-edge? '(5 6)))
-      '((2 11) nil (6 12)))
+      '(((1 11) (2 11)) NIL ((5 12) (6 12))))
 
   (do-test (snek:get-num-edges snk) 14)
 
@@ -421,20 +417,30 @@
       (do-test (sort (flatten (snek:itr-grp-verts (snk i :g nil) i)) #'<)
                '(1 2))
 
-      (do-test (sort (flatten (snek:itr-edges (snk e :g g1) e)) #'<)
-               '(1 2))
+      (do-test (sort (flatten (snek:itr-edges (snk e :g g1) e)) #'<) '(1 2))
 
-      (do-test (sort (snek:get-vert-inds snk :g g1) #'<)
-               '(1 2))
+      (do-test (sort (snek:get-vert-inds snk :g g1) #'<) '(1 2))
 
-      (do-test (sort (snek:get-vert-inds snk :g g3) #'<)
-               '(1 5))
+      (do-test (sort (snek:get-vert-inds snk :g g3) #'<) '(1 5))
 
-      (do-test (length (snek:get-vert-inds snk))
-               2)
+      (do-test (length (snek:get-vert-inds snk)) 2)
 
-      (do-test (length (snek:itr-grps (snk g) g))
-               3))))
+      (do-test (length (snek:itr-grps (snk g) g)) 3)))
+
+  (let* ((snk (snek:make))
+         (g (snek:add-grp! snk :type :closed)))
+    (snek:add-vert! snk (vec:vec 1d0 1d0))
+    (snek:add-vert! snk (vec:vec 1d0 1d0))
+    (snek:add-vert! snk (vec:vec 1d0 1d0))
+
+    (do-test (snek:get-grp-loop snk :g g) nil)
+
+    (snek:add-edge! snk (list 2 0) :g g)
+    (do-test (snek:get-grp-loop snk :g g) nil)
+    (snek:add-edge! snk (list 1 2) :g g)
+    (snek:add-edge! snk (list 1 0) :g g)
+
+    (do-test (to-list (snek:get-grp-loop snk :g g )) (list 2 0 1))))
 
 (defun test-snek-prm ()
   (let ((snk (snek:make :max-verts 22 :grp-size 30
@@ -453,12 +459,10 @@
       (snek:add-vert! snk (vec:vec 700d0 800d0) :p p2)
 
       (do-test
-        (flatten (snek:itr-prm-verts (snk i :p p2) i))
-        '(1 5))
+        (flatten (snek:itr-prm-verts (snk i :p p2) i)) '(1 5))
 
       (do-test
-        (flatten (snek:itr-prm-verts (snk i :p p1) i))
-        '(0 3 4))
+        (flatten (snek:itr-prm-verts (snk i :p p1) i)) '(0 3 4))
 
       (do-test
         (snek:get-prm-verts snk :p p1)
@@ -466,14 +470,11 @@
               (vec:vec 400.0d0 500.0d0)
               (vec:vec 600.0d0 700.0d0)))
 
-      (do-test (to-list (snek:prmr snk :p p1))
-               '(0 3 4))
+      (do-test (to-list (snek:prmr snk :p p1)) '(0 3 4))
 
-      (do-test (to-list (snek:prmr snk :p p2))
-               '(1 5))
+      (do-test (to-list (snek:prmr snk :p p2)) '(1 5))
 
-      (do-test (length (snek:itr-prms (snk p) p))
-               3))))
+      (do-test (length (snek:itr-prms (snk p) p)) 3))))
 
 
 (defun main ()

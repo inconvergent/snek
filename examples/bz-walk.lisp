@@ -9,8 +9,8 @@
         (noise 0.000000005d0)
         (grains 20)
         (sand (sandpaint:make size
-                :fg (color:white 0.05)
-                :bg (color:dark))))
+                :fg (pigment:white 0.05)
+                :bg (pigment:dark))))
 
 
     (let* (
@@ -31,7 +31,7 @@
         for p in (math:linspace itt 0d0 1d0 :end nil)
         for i from 0
         do (print-every i 100000)
-           (sandpaint:set-fg-color sand (color:hsv p 1 1 0.05))
+           (sandpaint:set-fg-color sand (pigment:hsv p 1 1 0.05))
            (sandpaint:stroke sand
              (list (bzspl:pos b p)
                    (bzspl:pos b-1 p))

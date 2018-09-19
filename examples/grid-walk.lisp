@@ -55,8 +55,8 @@
         (grains 2)
         (edge 0d0)
         (sand (sandpaint:make size
-                :fg (color:white 0.05)
-                :bg (color:dark))))
+                :fg (pigment:white 0.05)
+                :bg (pigment:dark))))
 
     (let* ((grid (get-grid size edge (rnd:rndi 5 11)))
            (walkers (math:nrep nwalkers (get-walker grid))))

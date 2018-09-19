@@ -8,22 +8,22 @@
 
 (defun test-color ()
 
-  (do-test (color:rgb 0.1 1.0 0.5) (color:rgb 0.1 1.0 0.5))
+  (do-test (pigment:rgb 0.1 1.0 0.5) (pigment:rgb 0.1 1.0 0.5))
 
-  (do-test (color:to-list(color:rgb 0.1 1.0 0.5 0.2))
+  (do-test (pigment:to-list(pigment:rgb 0.1 1.0 0.5 0.2))
            (list 0.10000000149011612d0 1.0d0 0.5d0 0.20000000298023224d0))
 
-  (do-test (color:hsv 0.5 1.0 1.0) (color:rgb 0 1.0 1.0))
+  (do-test (pigment:hsv 0.5 1.0 1.0) (pigment:rgb 0 1.0 1.0))
 
-  (do-test (color:to-list (color:rgb 0 1.0 1.0 0.5))
+  (do-test (pigment:to-list (pigment:rgb 0 1.0 1.0 0.5))
            (list 0.0d0 1.0d0 1.0d0 0.5d0))
 
-  (do-test (color:to-list* (color:rgb 0 1.0 1.0 0.5))
+  (do-test (pigment:to-list* (pigment:rgb 0 1.0 1.0 0.5))
            (list 0.0d0 0.5d0 0.5d0 0.5d0))
 
-  (do-test (color:cmyk 1 0 0 0) (color:rgb 0 1.0 1.0))
+  (do-test (pigment:cmyk 1 0 0 0) (pigment:rgb 0 1.0 1.0))
 
-  (do-test (color:cmyk 0.5 0 0 0.5) (color:rgb 0.25 0.5 0.5)))
+  (do-test (pigment:cmyk 0.5 0 0 0.5) (pigment:rgb 0.25 0.5 0.5)))
 
 
 (defun get-sample-pix (sand)
@@ -39,10 +39,10 @@
 
 (defun test-sandpaint ()
   (let ((sand (sandpaint:make 100
-                              :fg (color:black)
-                              :bg (color:white))))
+                              :fg (pigment:black)
+                              :bg (pigment:white))))
     (loop for p in (rnd:nin-box 100000 50d0 50d0 :xy (vec:vec 50d0 50d0)) do
-          (sandpaint:set-fg-color sand (color:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 0.004))
+          (sandpaint:set-fg-color sand (pigment:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 0.004))
           (sandpaint:pix sand (list p)))
 
     (do-test
@@ -53,16 +53,16 @@
             0.9617585443476347d0 0.9684279445612141d0 0.9686700238368381d0 1.0d0
             0.9829785654522593d0 0.9840476095774362d0 0.9852693651002268d0 1.0d0)))
 
-  (let ((sand (sandpaint:make 100 :fg (color:black)
-                                  :bg (color:transparent))))
+  (let ((sand (sandpaint:make 100 :fg (pigment:black)
+                                  :bg (pigment:transparent))))
 
-   (sandpaint:set-fg-color sand (color:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 0.3d0))
+   (sandpaint:set-fg-color sand (pigment:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 0.3d0))
    (sandpaint:pix sand (rnd:nin-box 100000 40d0 50d0 :xy (vec:vec 50d0 50d0)))
 
-   (sandpaint:set-fg-color sand (color:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 0.3d0))
+   (sandpaint:set-fg-color sand (pigment:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 0.3d0))
    (sandpaint:pix sand (rnd:nin-box 100000 50d0 20d0 :xy (vec:vec 50d0 50d0)))
 
-   (sandpaint:set-fg-color sand (color:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 1d0))
+   (sandpaint:set-fg-color sand (pigment:rgb (rnd:rnd) (rnd:rnd) (rnd:rnd) 1d0))
    (sandpaint:pix sand (rnd:nin-box 100000 20d0 50d0 :xy (vec:vec 50d0 50d0)))
 
     (do-test

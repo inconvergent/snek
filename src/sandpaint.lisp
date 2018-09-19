@@ -71,8 +71,8 @@
 (defstruct sandpaint
   (size nil :type fixnum :read-only t)
   (vals nil :type (simple-array double-float) :read-only tt)
-  (fg nil :type color:rgba :read-only nil)
-  (bg nil :type color:rgba :read-only nil)
+  (fg nil :type pigment:rgba :read-only nil)
+  (bg nil :type pigment:rgba :read-only nil)
   (indfx nil :type function :read-only t))
 
 
@@ -87,7 +87,7 @@
   (declare (optimize (safety 0) speed (debug 0))
            (fixnum ind)
            (type (simple-array double-float (*)) vals))
-  (color:rgb (aref vals ind) (aref vals (1+ ind)) (aref vals (+ ind 2)) a))
+  (pigment:rgb (aref vals ind) (aref vals (1+ ind)) (aref vals (+ ind 2)) a))
 
 
 (defun sample (sand xy &key (alpha 1d0))
@@ -95,7 +95,7 @@
     (-inside-floor (size xy x y)
       (let* ((ind (funcall indfx x y))
              (a (aref vals (+ ind 3))))
-        (color:rgb (/ (aref vals ind) a)
+        (pigment:rgb (/ (aref vals ind) a)
                    (/ (aref vals (1+ ind)) a)
                    (/ (aref vals (+ ind 2)) a)
                    alpha)))))
@@ -115,8 +115,8 @@
   (declare (optimize (safety 0) speed (debug 0))
            (function indfx)
            (type (simple-array double-float (*)) vals)
-           (fixnum x y) (color:rgba fg))
-  (color:with (fg r g b a)
+           (fixnum x y) (pigment:rgba fg))
+  (pigment:with (fg r g b a)
     (let ((ind (funcall indfx x y))
           (ia (- 1d0 a)))
       (declare (fixnum ind)
@@ -138,7 +138,7 @@
 (defun -draw-stroke (indfx vals size grains v1 v2 fg)
   (declare (function indfx)
            (type (simple-array double-float) vals)
-           (fixnum size grains) (color:rgba fg))
+           (fixnum size grains) (pigment:rgba fg))
   (rnd:with-on-line (grains v1 v2 rn)
     (-inside-round (size rn x y)
       (-operator-over indfx vals x y fg))))
@@ -147,7 +147,7 @@
 (defun -draw-stroke-overlap (indfx vals size grains v1 v2 fg)
   (declare (function indfx)
            (type (simple-array double-float) vals)
-           (fixnum size grains) (color:rgba fg))
+           (fixnum size grains) (pigment:rgba fg))
   (rnd:with-on-line (grains v1 v2 pt)
     (-pix-overlap indfx vals size pt fg)))
 
@@ -155,7 +155,7 @@
 (defun -draw-dens-stroke (indfx vals size dens v1 v2 fg)
   (declare (function indfx)
            (type (simple-array double-float) vals)
-           (fixnum size) (double-float dens) (color:rgba fg))
+           (fixnum size) (double-float dens) (pigment:rgba fg))
   (rnd:with-on-line ((ceiling (* dens (vec:dst v1 v2))) v1 v2 rn)
     (-inside-round (size rn x y)
       (-operator-over indfx vals x y fg))))
@@ -164,7 +164,7 @@
 (defun -draw-circ (indfx vals size xy rad grains fg)
   (declare (function indfx)
            (type (simple-array double-float) vals)
-           (fixnum size grains) (double-float rad) (color:rgba fg))
+           (fixnum size grains) (double-float rad) (pigment:rgba fg))
   (rnd:with-in-circ (grains rad p :xy xy)
     (-inside-round (size p x y)
       (-operator-over indfx vals x y fg))))
@@ -211,7 +211,7 @@
 
 (defun clear (sand &optional c)
   (declare (sandpaint sand))
-  (color:with ((if c c (sandpaint-bg sand)) r g b a)
+  (pigment:with ((if c c (sandpaint-bg sand)) r g b a)
     (-do-op (sand size vals indfx)
       (-square-loop (x y size)
         (let ((ind (funcall indfx x y)))
@@ -222,9 +222,9 @@
                 (aref vals (+ ind 3)) a))))))
 
 
-(defun make (size &key (fg (color:rgb 0.0d0 0.0d0 0.0d0))
-                       (bg (color:rgb 1.0d0 1.0d0 1.0d0)))
-  (color:with (bg r g b a)
+(defun make (size &key (fg (pigment:rgb 0.0d0 0.0d0 0.0d0))
+                       (bg (pigment:rgb 1.0d0 1.0d0 1.0d0)))
+  (pigment:with (bg r g b a)
     (let ((vals (make-rgba-array size))
           (indfx (get-ind-fx size)))
       (declare (function indfx))
@@ -239,12 +239,12 @@
 
 
 (defun set-fg-color (sand c)
-  (declare (color:rgba c))
+  (declare (pigment:rgba c))
   (setf (sandpaint-fg sand) c))
 
 
 (defun set-bg-color (sand c)
-  (declare (color:rgba c))
+  (declare (pigment:rgba c))
   (setf (sandpaint-bg sand) c))
 
 
@@ -295,8 +295,8 @@
 (defun -pix-overlap (indfx vals size pt fg)
   (declare (type (simple-array double-float) vals)
            (fixnum size) (function indfx)
-           (vec:vec pt) (color:rgba fg))
-  (color:with (fg r g b a)
+           (vec:vec pt) (pigment:rgba fg))
+  (pigment:with (fg r g b a)
     (labels
 
       ((-operator-over-overlap (ix iy s)
@@ -304,7 +304,7 @@
                  (fixnum ix iy) (double-float s))
         (when (and (< -1 ix size) (< -1 iy size))
           (-operator-over indfx vals ix iy
-                          (color::-make-rgba :r (* s r) :g (* s g)
+                          (pigment::-make-rgba :r (* s r) :g (* s g)
                                              :b (* s b) :a (* s a))))))
 
         (multiple-value-bind (ix iy fx fy) (-floor-fract pt)
@@ -396,7 +396,7 @@
   "
   (-do-op (sand size vals indfx)
     (let ((png (make-instance 'zpng::pixel-streamed-png
-                              :color-type :truecolor-alpha
+                              :pigment-type :truecolor-alpha
                               :width size
                               :height size)))
       (with-open-file

@@ -12,15 +12,17 @@ a simple (undirected) graph structure based on adjacency lists.
   (num-edges 0 :type fixnum)
   (adj nil :type hash-table)
   (verts nil :type hash-table)
+  (closed nil :type boolean)
   (make-hset nil :read-only t))
 
 
-(defun make (&key (size 1000) (inc 1.5))
+(defun make (&key (closed nil) (size 1000) (inc 1.5))
   (-make-graph :size size
                :inc inc
                :num-edges 0
                :adj (make-hash-table :test #'eql :size size :rehash-size inc)
                :verts (hset:make :size size :inc inc)
+               :closed closed
                :make-hset (lambda (x) (hset:make :init x :size size :inc inc))))
 
 
@@ -30,7 +32,7 @@ a simple (undirected) graph structure based on adjacency lists.
     (gethash a adj)
     (if (not exists)
         (progn (setf val (funcall make (list b))
-                         (gethash a adj) val)
+                     (gethash a adj) val)
                t)
         (hset:add val b))))
 
@@ -108,6 +110,41 @@ a simple (undirected) graph structure based on adjacency lists.
     (let ((a (gethash v adj)))
       (when a (loop for w of-type fixnum being the hash-keys of a
                     collect (sort (list v w) #'<))))))
+
+
+(defun -do-loop-walk (grph visited path)
+  (declare (graph grph) (hash-table visited) (vector path))
+  (let ((edges (get-incident-edges grph (vector-last path))))
+    (when (not (= (length edges) 2)) (return-from -do-loop-walk nil))
+    (loop named lp
+          for v in (hset:to-list (hset:make :init (flatten edges)))
+          do (when (not (hset:mem visited v))
+               (vextend v path)
+               (hset:add visited v)
+               (return-from lp t)))))
+
+(defun get-loop (grph)
+  "
+  if the graph is closed this will return the indices of nodes that construct
+  the closed loop, or nil, if there is not a single loop.
+  "
+  (declare (graph grph))
+  (with-struct (graph- closed adj) grph
+    (when (not closed)
+          (error "graph is not closed. use (graph:make ... :closed t)"))
+    (when (< (hash-table-count adj) 1) (return-from get-loop nil))
+    (let* ((s (loop for k of-type fixnum being the hash-keys of adj
+                    repeat 1 return k))
+           (path (make-adjustable-vector :init (list s) :type 'fixnum))
+           (visited (hset:make :init (list s))))
+      (declare (vector path))
+      (loop with n of-type fixnum = (hash-table-count adj)
+            until (= (length path) n)
+            do (when (not (-do-loop-walk grph visited path))
+                     (return-from get-loop nil)))
+      ;TODO: return this?
+      ;(values path ok)
+      path)))
 
 
 (defun get-verts (grph)

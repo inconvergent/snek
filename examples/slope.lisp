@@ -19,8 +19,8 @@
          (grains 70)
          (itt 6000)
          (sand (sandpaint:make size
-                 :fg (color:black 0.01)
-                 :bg (color:white))))
+                 :fg (pigment:black 0.01)
+                 :bg (pigment:white))))
 
       (loop for j from 1 to repeat
             do (print-every j 2)

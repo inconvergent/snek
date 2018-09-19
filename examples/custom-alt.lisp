@@ -19,9 +19,9 @@
                    (progn
                      (incf i)
                      (setf curr it)
-                     (sandpaint:set-fg-color sand (color:rgb 0.0 0.7 0.7 0.01))
+                     (sandpaint:set-fg-color sand (pigment:rgb 0.0 0.7 0.7 0.01))
                      (sandpaint:circ sand (list (snek::append-edge-alt-xy a)) 4d0 3000)
-                     (sandpaint:set-fg-color sand (color:black 0.01))
+                     (sandpaint:set-fg-color sand (pigment:black 0.01))
                      (circ-stroke sand (snek:get-verts snk (list it (snek::append-edge-alt-v a))))
                      (sandpaint:save sand (format nil "~a-~3,'0d" fn i)))))))
 
@@ -40,8 +40,8 @@
 
 (defun main (size fn)
   (let ((sand (sandpaint:make size
-                              :fg (color:black 0.01)
-                              :bg (color:white))))
+                              :fg (pigment:black 0.01)
+                              :bg (pigment:white))))
 
     (draw-path sand fn 5000 10.0d0 (vec:vec 250d0 250d0))))
 
