@@ -519,6 +519,7 @@
     :prmr
     :prune-edges-by-len!
     :psvg-get-prm-types
+    :relative-neighborhood!
     :sel-args
     :set-grp-props!
     :set-prm-props!

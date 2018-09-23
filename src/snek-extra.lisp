@@ -58,6 +58,44 @@
                     (vec:vec mx my)))))
 
 
+(defun -is-rel-neigh (u v near)
+  (declare (vec:vec u v) (list near))
+  (loop with d of-type double-float = (vec:dst u v)
+        for w of-type vec:vec in near
+        if (not (> (max (vec:dst u w) (vec:dst v w)) d)) summing 1 into c of-type fixnum
+        ; TODO: avoid this by stripping u from near* below
+        if (> c 1) do (return-from -is-rel-neigh nil))
+  t)
+
+; TODO: this is still more than a little inefficient
+(defun relative-neighborhood! (snk rad &key g)
+  "
+  find the relative neigborhood graph (limited by the radius rad) of verts in
+  snk. the graph is made in grp g.
+  "
+  (declare (snek snk) (double-float rad))
+  (let ((c 0)
+        (tested (make-hash-table :test #'equal)))
+    (declare (fixnum c))
+    (zwith (snk (max 5d0 rad))
+      (itr-verts (snk v :collect nil)
+        (loop with v* of-type vec:vec = (get-vert snk v)
+              with near of-type vector = (remove-if (lambda (x) (= x v))
+                                                     (verts-in-rad snk v* rad))
+              ; TODO: strip u from near*
+              with near* of-type list = (get-verts snk near)
+              for u of-type fixnum across near
+              if (not (= u v))
+              do (let ((key (sort (list u v) #'<)))
+                   (if (and ; if tested is true: don't perform test.
+                            (not (gethash key tested))
+                            (-is-rel-neigh (get-vert snk u) v* near*))
+                       (when (add-edge! snk key :g g) (incf c))
+                       ; if not rel neigh: update tested
+                       (setf (gethash key tested) t))))))
+    c))
+
+
 ; primitives?
 (defun add-circ! (snk num rad &key (xy vec:*zero*) g)
   (let ((vv (loop for p of-type double-float in (math:linspace num 0.0d0 1.0d0)
@@ -67,8 +105,7 @@
 
 
 ; primitives?
-(defun add-polygon! (snk n rad &key (xy vec:*zero*)
-                                    (rot (* 0.25d0 PI)) g)
+(defun add-polygon! (snk n rad &key (xy vec:*zero*) (rot (* 0.25d0 PI)) g)
   (let ((vv (loop for v of-type vec:vec in (vec:polygon n rad :xy xy :rot rot)
                   collect (add-vert! snk v))))
     (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)

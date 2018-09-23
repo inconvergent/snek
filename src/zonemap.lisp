@@ -95,11 +95,8 @@
 
 ; TODO: rad must be double-float
 (defun verts-in-rad (zm verts xy rad)
-  (declare (type (simple-array double-float) verts)
-           (zmap zm)
-           (vec:vec xy))
+  (declare (type (simple-array double-float) verts) (zmap zm) (vec:vec xy))
   (let ((inds (make-adjustable-vector :type 'fixnum)))
-    (with-verts-in-rad (zm verts xy rad v)
-      (vextend v inds))
+    (with-verts-in-rad (zm verts xy rad v) (vextend v inds))
     inds))
 

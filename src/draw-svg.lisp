@@ -107,8 +107,7 @@
 
 (defun finalize-path (pth)
   (loop with res = (cl-svg:make-path)
-        for x across pth
-        do (cl-svg:with-path res x)
+        for x across pth do (cl-svg:with-path res x)
         finally (return res)))
 
 
@@ -198,16 +197,14 @@
                                               :rnd rnd)
                      do (vextend h res)))
 
-      (loop for h across (if stitch (math:stitch res) res) do
-        (when (and (> (length h) 0) (every #'identity h))
-              (funcall draw h))))))
+      (loop for h across (if stitch (math:stitch res) res)
+            do (when (and (> (length h) 0) (every #'identity h))
+                     (funcall draw h))))))
 
 
 ; ----- BZSPL -----
 
-(defun -fl (a)
-  (declare (list a))
-  (first (last a)))
+(defun -fl (a) (declare (list a)) (first (last a)))
 
 
 (defun -roll-once (a)
@@ -237,18 +234,17 @@
 
 (defun bzspl (psvg pts &key closed sw (stroke "black") (so 1d0))
   (declare (draw-svg psvg))
-  (when (< (length pts) 3)
-    (error "needs at least 3 pts."))
+  (when (< (length pts) 3) (error "needs at least 3 pts."))
 
   (with-struct (draw-svg- scene stroke-width) psvg
     (let ((pth (make-adjustable-vector)))
       (if closed (-do-closed pts pth) (-do-open pts pth))
       (cl-svg:draw scene
         (:path :d (cl-svg:path (finalize-path pth)))
-         :fill "none"
-         :stroke stroke
-         :stroke-opacity so
-         :stroke-width (if sw sw stroke-width)))))
+        :fill "none"
+        :stroke stroke
+        :stroke-opacity so
+        :stroke-width (if sw sw stroke-width)))))
 
 
 (defun wbzspl (psvg pts offset &key (width 1d0) closed sw rs)
@@ -345,6 +341,7 @@
 
 
 (defun circ (psvg xy rad &key (fill "none") sw aspath
+                              (stroke "black")
                               (so 1d0) (fo 1d0))
   (declare (draw-svg psvg) (vec:vec xy) (double-float rad))
   (with-struct (draw-svg- scene stroke-width) psvg
@@ -352,25 +349,27 @@
       (let ((sw* (if sw sw stroke-width)))
         (if aspath
           (cl-svg:draw scene (:path :d (-arccirc x y rad))
-                       :fill fill :stroke "black" :stroke-width sw*
+                       :fill fill :stroke stroke :stroke-width sw*
                        :fill-opacity fo :stroke-opacity so)
           (cl-svg:draw scene (:circle :cx x :cy y :r rad)
-                       :fill fill :stroke "black" :stroke-width sw*
+                       :fill fill :stroke stroke :stroke-width sw*
                        :fill-opacity fo :stroke-opacity so))))))
 
 
 ; TODO: create path with multiple circs
 ; TODO: multiple rads
-(defun circs (psvg vv rad &key (fill "none") sw aspath
+(defun circs (psvg vv rad &key (fill "none") (stroke "black") sw aspath
                                (fo 1d0) (so 1d0))
   (declare (draw-svg psvg) (list vv) (double-float rad))
   (loop for xy of-type vec:vec in vv
-        do (circ psvg xy rad :fill fill :sw sw :aspath aspath :fo fo :so so)))
+        do (circ psvg xy rad :fill fill :sw sw :stroke stroke
+                 :aspath aspath :fo fo :so so)))
 
 
 ; ----- WCIRC -----
 
-(defun wcirc (psvg xy rad &key outer-rad rs aspath (so 1d0) (fo 1d0))
+(defun wcirc (psvg xy rad &key outer-rad rs aspath (stroke "black")
+                               (so 1d0) (fo 1d0))
   (declare (draw-svg psvg))
   (with-struct (draw-svg- rep-scale) psvg
     (let* ((inner-rad (if outer-rad rad 1d0))
@@ -378,14 +377,15 @@
            (n (math:int (* (ceiling (abs (- outer-rad* inner-rad)))
                            (if rs rs rep-scale)))))
     (loop for r in (math:linspace n inner-rad outer-rad*)
-          do (circ psvg xy r :aspath aspath :so so :fo fo)))))
+          do (circ psvg xy r :aspath aspath :so so :fo fo :stroke stroke)))))
 
 
-(defun wcircs (psvg pts rad &key outer-rad rs aspath (so 1d0) (fo 1d0))
+(defun wcircs (psvg pts rad &key outer-rad rs aspath (stroke "black")
+                                 (so 1d0) (fo 1d0))
   (declare (draw-svg psvg))
   (loop for pt in pts
         do (wcirc psvg pt rad :outer-rad outer-rad
-                  :rs rs :aspath aspath :so so :fo fo)))
+                  :rs rs :stroke stroke :aspath aspath :so so :fo fo)))
 
 
 (defun save (psvg fn)

@@ -350,13 +350,14 @@
   returns nil if the edge exists already.
   "
   (declare (snek snk) (list ee))
+  (when (apply #'equal ee) (return-from add-edge! nil))
   (with-grp (snk g* g)
     (with-struct (snek- num-verts) snk
       (declare (fixnum num-verts))
       (with-struct (grp- grph) g*
         (destructuring-bind (a b) ee
           (declare (fixnum a b))
-          (when (and (< a num-verts) (< b num-verts) (not (eql a b)))
+          (when (and (< a num-verts) (< b num-verts))
             (when (graph:add grph a b) (sort (list a b) #'<))))))))
 
 
@@ -379,7 +380,7 @@
 
 (defun split-edge! (snk ee &key xy g
                            &aux (xy* (if xy xy (vec:on-line* 0.5d0
-                                                 (snek:get-verts snk ee)))))
+                                                 (get-verts snk ee)))))
   "
   split edge at xy (or middle if xy is nil).
   returns new vert ind (and new edges).

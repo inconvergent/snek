@@ -29,6 +29,9 @@
 
 
 (defmacro with-loop-grid ((grid xy) &body body)
+  "
+  loop over grid as xy in a 2d grid.
+  "
   (declare (symbol xy))
   (with-gensyms (grid* x y)
     `(let ((,grid* ,grid))
@@ -39,6 +42,10 @@
 
 
 (defmacro with-loop-grid* ((grid xy) &body body)
+  "
+  loop over grid as xy in a 2d grid.
+  grid form is executed independently for each dimension.
+  "
   (declare (symbol xy))
   (with-gensyms (x y)
     `(loop for ,y of-type double-float in ,grid

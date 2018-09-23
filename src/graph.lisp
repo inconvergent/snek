@@ -32,7 +32,7 @@ a simple (undirected) graph structure based on adjacency lists.
     (gethash a adj)
     (if (not exists)
         (progn (setf val (funcall make (list b))
-                     (gethash a adj) val)
+                         (gethash a adj) val)
                t)
         (hset:add val b))))
 
