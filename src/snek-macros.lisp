@@ -7,16 +7,14 @@
   all alterations created in this context will be flattened
   and applied to snk at the end of the context.
   "
-  (declare (symbol snk)
-           (type boolean collect include-alts))
+  (declare (symbol snk) (type boolean collect include-alts))
   (with-gensyms (sname zw aname rec x y resalts)
     (let* ((do-funcall `(funcall (gethash (type-of ,x) ,aname) ,sname ,x))
            (wrap-funcall (cond ((and collect include-alts)
                                   `(vextend (list ,do-funcall ,x) ,resalts))
                                (collect `(vextend ,do-funcall ,resalts))
                                (t do-funcall)))
-           (finally (if collect `(to-list ,resalts)
-                                nil)))
+           (finally (if collect `(to-list ,resalts) nil)))
       `(let* ((,sname ,snk)
               (,zw ,zwidth)
               (,resalts (make-adjustable-vector))
@@ -39,6 +37,8 @@
             ; useful if we want to have a parallel context inside zmap.
             (,rec (list ,@body))))
 
+        (setf (snek-zmap ,sname) nil)
+
         ,finally))))
 
 
@@ -47,13 +47,15 @@
   creates a snek context. the zmap is constant inside this context.
   "
   (declare (symbol snk))
-  (with-gensyms (sname zw y)
+  (with-gensyms (sname zw y res)
     `(let ((,sname ,snk)
            (,zw ,zwidth))
       (zmap::with* (,zw (snek-verts ,sname)
                         (snek-num-verts ,sname)
                         (lambda (,y) (setf (snek-zmap ,sname) ,y)))
-          (progn ,@body)))))
+          (let ((,res (progn ,@body)))
+            (setf (snek-zmap ,sname) nil)
+            ,res)))))
 
 
 (defmacro with-verts-in-rad ((snk xy rad v) &body body)

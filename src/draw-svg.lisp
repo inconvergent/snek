@@ -21,45 +21,44 @@
 
 (defun -get-scene (layout)
   (case layout
-    (a4-landscape (cl-svg:make-svg-toplevel
-                    'cl-svg:svg-1.1-toplevel
-                    :height "210mm"
-                    :width "297mm"
-                    :view-box (-view-box *long* *short*)))
-    (a4-portrait (cl-svg:make-svg-toplevel
+    (:a4-landscape (cl-svg:make-svg-toplevel
+                     'cl-svg:svg-1.1-toplevel
+                     :height "210mm"
+                     :width "297mm"
+                     :view-box (-view-box *long* *short*)))
+    (:a4-portrait (cl-svg:make-svg-toplevel
                     'cl-svg:svg-1.1-toplevel
                     :height "297mm"
                     :width "210mm"
                     :view-box (-view-box *short* *long*)))
-    (a3-landscape (cl-svg:make-svg-toplevel
-                    'cl-svg:svg-1.1-toplevel
-                    :height "297mm"
-                    :width "420mm"
-                    :view-box (-view-box *long* *short*)))
-    (a3-portrait (cl-svg:make-svg-toplevel
+    (:a3-landscape (cl-svg:make-svg-toplevel
+                     'cl-svg:svg-1.1-toplevel
+                     :height "297mm"
+                     :width "420mm"
+                     :view-box (-view-box *long* *short*)))
+    (:a3-portrait (cl-svg:make-svg-toplevel
                     'cl-svg:svg-1.1-toplevel
                     :height "420mm"
                     :width "297mm"
                     :view-box (-view-box *short* *long*)))
-    (otherwise (error "invalid layout. use: draw-svg:a4-portrait,
-      draw-svg:a4-landscape, draw-svg:a3-landscape or draw-svg:a3-portrait."))))
+    (otherwise (error "invalid layout. use: :a4-portrait, :a4-landscape,
+      :a3-landscape or :a3-portrait."))))
 
 
 (defun -get-width-height (layout)
-  (case layout (a4-landscape (list *long* *short*))
-               (a4-portrait (list *short* *long*))
-               (a3-landscape (list *long* *short*))
-               (a3-portrait (list *short* *long*))))
+  (case layout (:a4-landscape (list *long* *short*))
+               (:a4-portrait (list *short* *long*))
+               (:a3-landscape (list *long* *short*))
+               (:a3-portrait (list *short* *long*))))
 
 
-(defun make (&key (layout 'a4-landscape) (stroke-width 1.1d0) (rep-scale 1.3d0))
+(defun make (&key (layout :a4-landscape) (stroke-width 1.1d0) (rep-scale 1.3d0))
   (destructuring-bind (width height)
     (-get-width-height layout)
     (make-draw-svg :layout layout
                    :stroke-width stroke-width
                    :rep-scale rep-scale
-                   :height height
-                   :width width
+                   :height height :width width
                    :scene (-get-scene layout))))
 
 
@@ -67,8 +66,7 @@
   (make-draw-svg :layout 'custom
                  :stroke-width stroke-width
                  :rep-scale rep-scale
-                 :height height
-                 :width width
+                 :height height :width width
                  :scene (cl-svg:make-svg-toplevel 'cl-svg:svg-1.1-toplevel
                                                   :height height
                                                   :width width)))

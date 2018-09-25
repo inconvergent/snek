@@ -70,7 +70,7 @@
 
 (defstruct sandpaint
   (size nil :type fixnum :read-only t)
-  (vals nil :type (simple-array double-float) :read-only tt)
+  (vals nil :type (simple-array double-float) :read-only t)
   (fg nil :type pigment:rgba :read-only nil)
   (bg nil :type pigment:rgba :read-only nil)
   (indfx nil :type function :read-only t))
@@ -95,14 +95,11 @@
     (-inside-floor (size xy x y)
       (let* ((ind (funcall indfx x y))
              (a (aref vals (+ ind 3))))
-        (pigment:rgb (/ (aref vals ind) a)
-                   (/ (aref vals (1+ ind)) a)
-                   (/ (aref vals (+ ind 2)) a)
-                   alpha)))))
+        (pigment:rgb (/ (aref vals ind) a) (/ (aref vals (1+ ind)) a)
+                     (/ (aref vals (+ ind 2)) a) alpha)))))
 
 
-(defun get-size (sand)
-  (sandpaint-size sand))
+(defun get-size (sand) (sandpaint-size sand))
 
 
 (declaim (inline -scale-convert))
@@ -396,14 +393,14 @@
   "
   (-do-op (sand size vals indfx)
     (let ((png (make-instance 'zpng::pixel-streamed-png
-                              :pigment-type :truecolor-alpha
+                              :color-type :truecolor-alpha
                               :width size
                               :height size)))
       (with-open-file
         (fstream (ensure-filename fn ".png") :direction :output
-                                            :if-exists :supersede
-                                            :if-does-not-exist :create
-                                            :element-type '(unsigned-byte 8))
+                                             :if-exists :supersede
+                                             :if-does-not-exist :create
+                                             :element-type '(unsigned-byte 8))
         (declare (stream fstream))
         (zpng:start-png png fstream)
         (-square-loop (x y size)

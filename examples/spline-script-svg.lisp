@@ -91,7 +91,7 @@
         (block draw-loop
           (loop for k from 0 do
             (let ((snk (snek:make))
-                  (psvg (draw-svg:make :layout 'draw-svg:a4-landscape))
+                  (psvg (draw-svg:make :layout :a4-landscape))
                   (txt (subseq words wind)))
               (incf wind (aif (do-write snk alphabet spacebox trbl txt)
                               it

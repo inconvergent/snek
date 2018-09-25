@@ -23,7 +23,7 @@
           for x from 0 below nx
           do (loop for y from 0 below ny
                    do (setf (gethash (list x y) papers)
-                            (draw-svg:make :layout 'draw-svg:a3-landscape
+                            (draw-svg:make :layout :a3-landscape
                                            :stroke-width stroke-width)))
           finally (return papers))))
 
@@ -55,7 +55,7 @@
 
 
 (defun make (&key (nxny (list 2 2)) (stroke-width 1.1d0))
-  (let* ((overview (draw-svg:make :layout 'draw-svg:a3-landscape
+  (let* ((overview (draw-svg:make :layout :a3-landscape
                                   :stroke-width stroke-width))
          (dw (draw-svg::draw-svg-width overview))
          (dh (draw-svg::draw-svg-height overview))

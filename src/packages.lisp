@@ -342,7 +342,6 @@
     :with-struct))
 
 
-
 (defpackage :sandpaint
   (:use :common-lisp)
   (:export
@@ -386,10 +385,6 @@
   (:export
     :*short*
     :*long*
-    :a3-landscape
-    :a3-portrait
-    :a4-landscape
-    :a4-portrait
     :bzspl
     :bzx
     :circ

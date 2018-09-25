@@ -13,6 +13,15 @@
           (bzspl:make pts))))
 
 
+(defun -dst2 (verts u v)
+  (declare (optimize (safety 0) speed (debug 0))
+           (type (simple-array double-float) verts) (fixnum u v))
+  (+ (expt (- (the double-float (aref verts #3=(* 2 u)))
+              (the double-float (aref verts #4=(* 2 v)))) 2d0)
+     (expt (- (the double-float (aref verts (1+ #3#)))
+              (the double-float (aref verts (1+ #4#)))) 2d0)))
+
+
 (defun edge-length (snk e)
   "
   returns the length of edge e.
@@ -21,8 +30,7 @@
   (with-struct (snek- verts) snk
     (destructuring-bind (a b) e
       (declare (type fixnum a b))
-      (vec:dst (vec:sarr-get verts a)
-               (vec:sarr-get verts b)))))
+      (sqrt (-dst2 verts a b)))))
 
 
 (defun prune-edges-by-len! (snk lim &optional (fx #'>))
@@ -58,38 +66,44 @@
                     (vec:vec mx my)))))
 
 
-(defun -is-rel-neigh (u v near)
-  (declare (vec:vec u v) (list near))
-  (loop with d of-type double-float = (vec:dst u v)
-        for w of-type vec:vec in near
-        if (not (> (max (vec:dst u w) (vec:dst v w)) d)) summing 1 into c of-type fixnum
-        ; TODO: avoid this by stripping u from near* below
+(defun -is-rel-neigh (verts u v near)
+  (declare (optimize (safety 0) speed (debug 0))
+           (type (simple-array double-float) verts) (fixnum u v)
+           (vector near))
+  (loop with d of-type double-float = (-dst2 verts u v)
+        for w of-type fixnum across near
+        if (not (> (the double-float
+                        (max (the double-float (-dst2 verts u w))
+                             (the double-float (-dst2 verts v w)))) d))
+          summing 1 into c of-type fixnum
+        ; TODO: avoid this by stripping u from near
         if (> c 1) do (return-from -is-rel-neigh nil))
   t)
 
-; TODO: this is still more than a little inefficient
+; TODO: this is stil more than a little inefficient
 (defun relative-neighborhood! (snk rad &key g)
   "
   find the relative neigborhood graph (limited by the radius rad) of verts in
   snk. the graph is made in grp g.
   "
-  (declare (snek snk) (double-float rad))
+  (declare (optimize (safety 0) speed (debug 0))
+           (snek snk) (double-float rad))
   (let ((c 0)
         (tested (make-hash-table :test #'equal)))
     (declare (fixnum c))
     (zwith (snk (max 5d0 rad))
       (itr-verts (snk v :collect nil)
-        (loop with v* of-type vec:vec = (get-vert snk v)
+        (loop with verts of-type (simple-array double-float) = (snek-verts snk)
               with near of-type vector = (remove-if (lambda (x) (= x v))
-                                                     (verts-in-rad snk v* rad))
-              ; TODO: strip u from near*
-              with near* of-type list = (get-verts snk near)
+                                                    (verts-in-rad snk
+                                                      (get-vert snk v) rad))
+              ; TODO: strip u from near
               for u of-type fixnum across near
-              if (not (= u v))
-              do (let ((key (sort (list u v) #'<)))
+              if (< u v)
+              do (let ((key (list u v)))
                    (if (and ; if tested is true: don't perform test.
                             (not (gethash key tested))
-                            (-is-rel-neigh (get-vert snk u) v* near*))
+                            (-is-rel-neigh verts u v near))
                        (when (add-edge! snk key :g g) (incf c))
                        ; if not rel neigh: update tested
                        (setf (gethash key tested) t))))))

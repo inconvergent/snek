@@ -95,8 +95,7 @@
   (declare (snek snk) (vec:vec xy))
   (with-struct (snek- verts num-verts) snk
     (declare (type (simple-array double-float) verts))
-    (setf (aref verts (* 2 num-verts)) (vec::vec-x xy)
-          (aref verts (1+ (* 2 num-verts))) (vec::vec-y xy)))
+    (vec:sarr-set verts num-verts xy))
 
   (let ((i (1- (incf (snek-num-verts snk)))))
     (when name
@@ -197,10 +196,9 @@
   (with-struct (snek- verts num-verts) snk
     (when (>= v num-verts)
           (error "attempting to move invalid vert, ~a (~a)" v num-verts))
-    (if rel (setf (aref verts v*) (+ (vec::vec-x xy) (aref verts v*))
-                  (aref verts (1+ v*)) (+ (vec::vec-y xy) (aref verts (1+ v*))))
-            (setf (aref verts v*) (vec::vec-x xy)
-                  (aref verts (1+ v*)) (vec::vec-y xy)))))
+    (vec:sarr-set verts v (if rel (vec:vec (+ (aref verts v*) (vec::vec-x xy))
+                                           (+ (aref verts (1+ v*)) (vec::vec-y xy)))
+                                  xy))))
 
 
 (defun get-all-grps (snk &key main)

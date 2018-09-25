@@ -75,7 +75,14 @@
 
   (do-test (snek:edge-length snk '(2 5)) 7.0710678118654755d0)
 
-  (do-test (snek:edge-length snk '(1 2)) 7.615773105863909d0))
+  (do-test (snek:edge-length snk '(1 2)) 7.615773105863909d0)
+
+  (do-test (snek:move-vert! snk 3 (vec:vec 1d0 3d0)) (vec:vec 5d0 6d0))
+
+  (do-test (snek:move-vert! snk 3 (vec:vec 0.5d0 0.6d0) :rel t)
+           (vec:vec 5.5d0 6.6d0))
+
+  (do-test (snek:get-vert snk 3) (vec:vec 5.5d0 6.6d0)))
 
 (defun test-snek-2 (snk)
 
@@ -311,8 +318,7 @@
       '(0 1 2 3 5 6 7 11))
 
     (do-test
-      (snek:itr-edges (snk e)
-        e)
+      (snek:itr-edges (snk e) e)
       '(((1 2)) ((1 3)) ((0 1)) ((3 7)) ((5 6)) ((5 11))))
 
     (do-test
@@ -384,8 +390,7 @@
 
     (snek:with (snk :zwidth 1000.0d0)
       (do-test
-        (sort (snek:verts-in-rad snk
-                (vec:vec 500d0 500d0) 1000.0d0) #'<)
+        (sort (snek:verts-in-rad snk (vec:vec 500d0 500d0) 1000.0d0) #'<)
         #(0 1 2 3 4 5 6 7)))))
 
 
@@ -458,11 +463,9 @@
       (snek:add-vert! snk (vec:vec 600d0 700d0) :p p1)
       (snek:add-vert! snk (vec:vec 700d0 800d0) :p p2)
 
-      (do-test
-        (flatten (snek:itr-prm-verts (snk i :p p2) i)) '(1 5))
+      (do-test (flatten (snek:itr-prm-verts (snk i :p p2) i)) '(1 5))
 
-      (do-test
-        (flatten (snek:itr-prm-verts (snk i :p p1) i)) '(0 3 4))
+      (do-test (flatten (snek:itr-prm-verts (snk i :p p1) i)) '(0 3 4))
 
       (do-test
         (snek:get-prm-verts snk :p p1)

@@ -55,8 +55,7 @@
 
 
 (defmacro rep (&body body)
-  `(vec (progn ,@body)
-        (progn ,@body)))
+  `(vec (progn ,@body) (progn ,@body)))
 
 
 (defstruct (vec (:constructor -make-vec))
@@ -83,15 +82,14 @@
 
 
 (defun vec (x &optional y)
-  (declare (double-float x))
+  (declare (optimize (safety 0) speed (debug 0))
+           (double-float x))
   (if y (-make-vec :x x :y y)
         (-make-vec :x x :y x)))
 
-(defun zero ()
-  (vec 0d0 0d0))
+(defun zero () (vec 0d0 0d0))
 
-(defun one ()
-  (vec 1d0 1d0))
+(defun one () (vec 1d0 1d0))
 
 
 (defparameter *one*  (vec:vec 1d0))
@@ -133,15 +131,13 @@
 (declaim (inline -vfloor*)
          (ftype (function (vec) (values fixnum fixnum)) -vround*))
 (defun -vround* (v)
-  (declare (optimize (safety 0) speed (debug 0))
-           (vec v))
+  (declare (optimize (safety 0) speed (debug 0)) (vec v))
   (values (round (vec-x v)) (round (vec-y v))))
 
 (declaim (inline -vfloor*)
          (ftype (function (vec) (values fixnum fixnum)) -vfloor*))
 (defun -vfloor* (v)
-  (declare (optimize (safety 0) speed (debug 0))
-           (vec v))
+  (declare (optimize (safety 0) speed (debug 0)) (vec v))
   (values (floor (vec-x v)) (floor (vec-y v))))
 
 
@@ -154,24 +150,35 @@
 
 
 (defun vec* (xy)
-  (declare (list xy))
+  "
+  create (coerce) vec from list
+  "
+  (declare (optimize (safety 0) speed (debug 0))
+           (list xy))
   (destructuring-bind (x y) (math:dfloat* xy)
     (declare (double-float x y))
     (vec x y)))
 
 
 (defun sarr-get (a i &aux (ii (* 2 i)))
-  (declare (fixnum i ii)
-           (type (simple-array double-float) a))
+  "
+  returns simple array (as 2d array) ind i.
+  "
+  (declare (optimize (safety 0) speed (debug 0))
+           (fixnum i ii) (type (simple-array double-float) a))
   (vec (aref a ii) (aref a (1+ ii))))
 
 
 (defun sarr-set (a i v &aux (ii (* 2 i)))
-  (declare (vec v)
-           (fixnum i ii)
-           (type (simple-array double-float) a))
+  "
+  set simple array (as 2d array) in i to vec v.
+  returns v.
+  "
+  (declare (optimize (safety 0) speed (debug 0))
+           (vec v) (fixnum i ii) (type (simple-array double-float) a))
   (setf (aref a ii) (the double-float (vec-x v))
-        (aref a (1+ ii)) (the double-float (vec-y v))))
+        (aref a (1+ ii)) (the double-float (vec-y v)))
+  v)
 
 
 
@@ -179,168 +186,156 @@
 
 
 (defun cos-sin (a)
-  (declare (double-float a))
+  (declare (optimize (safety 0) speed (debug 0)) (double-float a))
   (vec (cos a) (sin a)))
 
 
 (defun sin-cos (a)
-  (declare (double-float a))
+  (declare (optimize (safety 0) speed (debug 0)) (double-float a))
   (vec (sin a) (cos a)))
 
 
 (defun angle (v)
-  (declare (vec v))
+  (declare (optimize (safety 0) speed (debug 0)) (vec v))
   (with-xy ((norm v) x y)
     (atan y x)))
 
 
 (defun from (a b s)
-  (declare (double-float s) (vec a b))
+  (declare (optimize (safety 0) speed (debug 0)) (double-float s) (vec a b))
   (vec (+ (vec-x a) (* s (vec-x b)))
        (+ (vec-y a) (* s (vec-y b)))))
 
 
 (declaim (inline scale))
 (defun scale (a s)
-  (declare (optimize (safety 0) speed (debug 0))
-           (vec a)
-           (double-float s))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a) (double-float s))
   (vec (* (vec-x a) s)
        (* (vec-y a) s)))
 
 (defun neg (a)
-  (declare (vec a))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a))
   (scale a -1d0))
 
 
 (defun iscale (a s)
-  (declare (vec a) (double-float s))
-  (vec (/ (vec-x a) s)
-       (/ (vec-y a) s)))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a) (double-float s))
+  (vec (/ (vec-x a) s) (/ (vec-y a) s)))
 
 
 (declaim (inline sub))
 (defun sub (a b)
-  (declare (optimize (safety 0) speed (debug 0))
-           (vec a b))
-  (vec (- (vec-x a) (vec-x b))
-       (- (vec-y a) (vec-y b))))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (vec (- (vec-x a) (vec-x b)) (- (vec-y a) (vec-y b))))
 
 
 (defun lsub (aa bb)
-  (declare (list aa bb))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa bb))
   (mapcar (lambda (a b) (declare (type vec a b)) (sub a b)) aa bb))
 
 
 (defun lsub* (aa b)
-  (declare (list aa) (vec b))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa) (vec b))
   (mapcar (lambda (a) (declare (type vec a)) (sub a b)) aa))
 
 
 (defun isub (a b)
-  (declare (vec a b))
-  (vec (- (vec-x b) (vec-x a))
-       (- (vec-y b) (vec-y a))))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (vec (- (vec-x b) (vec-x a)) (- (vec-y b) (vec-y a))))
 
 
 (defun op (fx a b)
-  (declare (vec a b))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
   (vec (funcall fx (vec-x a) (vec-x b))
        (funcall fx (vec-y a) (vec-y b))))
 
 
 (defun vabs (a)
-  (declare (vec a))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a))
   (vec (abs (vec-x a)) (abs (vec-y a))))
 
 (declaim (inline add))
 (defun add (a b)
-  (declare (optimize (safety 0) speed (debug 0))
-           (vec a b))
-  (vec (+ (vec-x a) (vec-x b))
-       (+ (vec-y a) (vec-y b))))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (vec (+ (vec-x a) (vec-x b)) (+ (vec-y a) (vec-y b))))
 
 
 (defun ladd (aa bb)
-  (declare (list aa bb))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa bb))
   (mapcar (lambda (a b) (declare (type vec a b)) (add a b)) aa bb))
 
 
 (defun ladd* (aa b)
-  (declare (list aa) (vec b))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa) (vec b))
   (mapcar (lambda (a) (declare (type vec a)) (add a b)) aa))
 
 
 (defun lscale* (aa s)
-  (declare (list aa) (double-float s))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa) (double-float s))
   (mapcar (lambda (a) (declare (type vec a)) (scale a s)) aa))
 
 
 (defun mult (a b)
-  (declare (vec a b))
-  (vec (* (vec-x a) (vec-x b))
-       (* (vec-y a) (vec-y b))))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (vec (* (vec-x a) (vec-x b)) (* (vec-y a) (vec-y b))))
 
 
 (defun lmult (aa bb)
-  (declare (list aa bb))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa bb))
   (mapcar (lambda (a b) (declare (type vec a b)) (mult a b)) aa bb))
 
 
 (defun lmult* (aa b)
-  (declare (list aa) (vec b))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa) (vec b))
   (mapcar (lambda (a) (declare (type vec a)) (mult a b)) aa))
 
 
 (defun dot (a b)
-  (declare (vec a b))
-  (+ (* (vec-x a) (vec-x b))
-     (* (vec-y a) (vec-y b))))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (+ (* (vec-x a) (vec-x b)) (* (vec-y a) (vec-y b))))
 
 
 (defun ldot (aa bb)
-  (declare (list aa bb))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa bb))
   (mapcar (lambda (a b) (declare (type vec a b)) (dot a b)) aa bb))
 
 
 (defun div (a b)
-  (declare (vec a b))
-  (vec (/ (vec-x a) (vec-x b))
-       (/ (vec-y a) (vec-y b))))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (vec (/ (vec-x a) (vec-x b)) (/ (vec-y a) (vec-y b))))
 
 
 (defun ldiv (aa bb)
-  (declare (list aa bb))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa bb))
   (mapcar (lambda (a b) (declare (type vec a b)) (div a b)) aa bb))
 
 
 (defun ldiv* (aa b)
-  (declare (list aa) (vec b))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa) (vec b))
   (mapcar (lambda (a) (declare (type vec a)) (div a b)) aa))
 
 
 (defun idiv (a b)
-  (declare (vec a b))
-  (vec (/ (vec-x b) (vec-x a))
-       (/ (vec-y b) (vec-y a))))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (vec (/ (vec-x b) (vec-x a)) (/ (vec-y b) (vec-y a))))
 
 
 (defun len2 (a)
-  (declare (vec a))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a))
   (+ (expt (vec-x a) 2) (expt (vec-y a) 2)))
 
 (defun len (a)
-  (declare (vec a))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a))
   (sqrt (len2 a)))
 
 
 (defun mid (a b)
-  (declare (vec a b))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
   (iscale (add a b) 2d0))
 
 
 (defun lmid (aa)
-  (declare (list aa))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa))
   (let ((n 1))
     (iscale
       (reduce (lambda (a b) (declare (type vec a b)) (incf n) (add a b)) aa)
@@ -348,31 +343,31 @@
 
 
 (defun dst2 (a b)
-  (declare (vec a b))
-  (len2 (sub a b)))
-
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (+ (expt (- (vec-x a) (vec-x b)) 2d0) (expt (- (vec-y a) (vec-y b)) 2d0)))
 
 (defun dst (a b)
-  (declare (vec a b))
-  (len (sub a b)))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a b))
+  (sqrt (dst2 a b)))
+
 
 (defun dst* (aa)
-  (declare (list aa))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa))
   (dst (first aa) (second aa)))
 
 
 (defun ldst (a b)
-  (declare (list a b))
+  (declare (optimize (safety 0) speed (debug 0)) (list a b))
   (mapcar #'dst a b))
 
 
 (defun ldst* (aa b)
-  (declare (list aa) (vec b))
-  (loop for a in aa collect (dst a b)))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa) (vec b))
+  (loop for a of-type vec in aa collect (dst a b)))
 
 
 (defun norm (a &key (s 1d0) (default *zero*))
-  (declare (vec a) (double-float s))
+  (declare (optimize (safety 0) speed (debug 0)) (vec a) (double-float s))
   (let ((l (len a)))
     (if (> l 0d0) (scale a (/ s l)) default)))
 
@@ -383,7 +378,7 @@
 
 
 (defun sum (aa)
-  (declare (list aa))
+  (declare (optimize (safety 0) speed (debug 0)) (list aa))
   (reduce (lambda (a b) (declare (vec a b)) (add a b)) aa))
 
 
@@ -516,8 +511,10 @@
 
 
 (defun on-line (p a b)
-  (declare (double-float p) (vec a b))
-  (from a (sub b a) p))
+  (declare (optimize (safety 0) speed (debug 0))
+           (double-float p) (vec a b))
+  (vec (+ (vec-x a) (* p (- (vec-x b) (vec-x a))))
+       (+ (vec-y a) (* p (- (vec-y b) (vec-y a))))))
 
 
 (defun on-line* (p ab)
