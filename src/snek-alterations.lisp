@@ -124,19 +124,19 @@
 
 ; JOIN VERTS
 
-(defstruct (join-verts-alt (:constructor join-verts? (v w &key g)))
+(defstruct (add-edge-alt (:constructor add-edge? (v w &key g)))
   (v nil :type fixnum :read-only t)
   (w nil :type fixnum :read-only t)
   (g nil :type symbol :read-only t))
 
 
-(defun do-join-verts-alt (snk a)
+(defun do-add-edge-alt (snk a)
   "
   create edge between valid verts v and w (in grp g).
   "
-  (declare (snek snk) (join-verts-alt a))
+  (declare (snek snk) (add-edge-alt a))
   (with-struct (snek- num-verts) snk
-    (with-struct (join-verts-alt- v w g) a
+    (with-struct (add-edge-alt- v w g) a
       (-valid-vert (num-verts v :err nil)
         (-valid-vert (num-verts w :err nil)
           (add-edge! snk (list v w) :g g))))))

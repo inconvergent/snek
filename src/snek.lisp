@@ -66,7 +66,7 @@
               :alt-names (-make-fxns (list '(add-edge-alt do-add-edge-alt)
                                            '(add-vert-alt do-add-vert-alt)
                                            '(move-vert-alt do-move-vert-alt)
-                                           '(join-verts-alt do-join-verts-alt)
+                                           '(add-edge-alt do-add-edge-alt)
                                            '(append-edge-alt do-append-edge-alt)
                                            '(append-edge-segx-alt do-append-edge-segx-alt)
                                            '(split-edge-alt do-split-edge-alt)

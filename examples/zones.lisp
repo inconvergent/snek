@@ -22,7 +22,7 @@
                (snek:move-vert? v (rnd:in-circ 0.7d0))
                (let ((verts (snek:verts-in-rad snk (snek:get-vert snk v) 40.0d0)))
                  (if (> (length verts) 0)
-                   (snek:join-verts? v (rnd:rndget verts))))))
+                   (snek:add-edge? v (rnd:rndget verts))))))
            (snek:draw-edges snk sand grains))
 
    (sandpaint:pixel-hack sand)

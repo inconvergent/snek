@@ -16,19 +16,23 @@
 (defun main ()
   (let* ((itt 5000)
          (num 10000)
+         (ww (vec:vec 10d0 33.3d0))
+         (uu (vec:vec 1d0 3.2d0))
          (snk (init-snek num)))
 
-    (loop for i from 0 below itt do
-      (when (= (mod i 100) 0)
-        (format t "itt ~a edges ~a ~%" i (length (snek:get-edges snk))))
-
+    (time (loop for i from 0 below itt do
       (snek:with (snk)
         (snek:itr-verts (snk v)
-                            ;nil
-          ;(snek:move-vert? v (rnd:in-circ 1d0))
-          ;(snek:move-vert? v 1d0 2d0)
-          ;(math:2d 1.0d0 1.0d0)
-          (rnd:in-circ 1d0))))))
+          nil
+          (snek:move-vert? v ww)
+          (snek:move-vert? v uu)))))
+
+    (time (loop for i from 0 below itt do
+      (snek:cwith (snk %)
+        (snek:itr-verts (snk v :collect nil)
+          (% nil)
+          (% (snek:move-vert? v ww))
+          (% (snek:move-vert? v uu))))))))
 
 (require :sb-sprof)
 (sb-sprof:with-profiling (:max-samples 200000

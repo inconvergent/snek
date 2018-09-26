@@ -459,6 +459,7 @@
     :add-grp!
     :add-path!
     :add-path*!
+    :add-edge?
     :add-polygon!
     :add-prm!
     :add-vert!
@@ -468,11 +469,13 @@
     :append-edge-segx?
     :append-edge?
     :center!
+    :cwith
     :del-edge!
     :del-edge?
     :draw-circ
     :draw-edges
     :draw-verts
+    :edge-exists
     :edge-length
     :get-all-grps
     :get-all-prms
@@ -504,7 +507,6 @@
     :itr-prm-verts
     :itr-prms
     :itr-verts
-    :join-verts?
     :make
     :make-mutate
     :move-vert!

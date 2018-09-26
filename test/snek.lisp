@@ -63,6 +63,14 @@
 
   (do-test (snek:add-edge! snk '(10 9)) '(9 10))
 
+  (do-test (snek:edge-exists snk '(0 2)) t)
+
+  (do-test (snek:edge-exists snk '(5 0)) t)
+
+  (do-test (snek:edge-exists snk '(9 2)) nil)
+
+  (do-test (snek:edge-exists snk '(2 2)) nil)
+
   (do-test (snek:get-vert snk 2) (vec:vec 3.0d0 3.0d0))
 
   (do-test (snek:add-vert! snk (vec:vec 0d0 1d0)) 11)
@@ -180,7 +188,27 @@
             (list (list))))
 
     (do-test (sort (snek:get-vert-inds snk) #'<)
-             (list 0 1 2 3 5 6 7))))
+             (list 0 1 2 3 5 6 7)))
+
+    (let ((snk (init-snek)))
+
+      (do-test (snek:edge-exists snk '(7 2)) nil)
+
+      (snek:cwith (snk %)
+        (list)
+        1 nil
+        (% (snek:add-vert? (vec:vec 12d0 3d0)))
+        (% (snek:add-vert? (vec:vec 13d0 6d0)))
+        (% (snek:add-edge? 1 2))
+        (% (snek:add-edge? 2 7))
+        (% nil))
+
+      (do-test (snek:get-vert snk 12) (vec:vec 13d0 6d0))
+      (do-test (snek:get-vert snk 11) (vec:vec 12d0 3d0))
+
+      (do-test (snek:edge-exists snk '(1 2)) t)
+      (do-test (snek:edge-exists snk '(2 7)) t)
+      (do-test (snek:edge-exists snk '(7 2)) t)))
 
 
 (defun test-snek-add ()
@@ -228,18 +256,18 @@
 (defun test-snek-join ()
   (let ((snk (init-snek)))
     (snek:with (snk)
-      (snek:join-verts? 3 3)
-      (snek:join-verts? 3 3)
-      (snek:join-verts? 3 6)
-      (snek:join-verts? 7 1))
+      (snek:add-edge? 3 3)
+      (snek:add-edge? 3 3)
+      (snek:add-edge? 3 6)
+      (snek:add-edge? 7 1))
 
   (do-test (snek:get-num-edges snk) 14)
 
   (do-test
     (snek:with (snk :collect t)
-      (snek:join-verts? 3 3)
-      (snek:join-verts? 1 6)
-      (snek:join-verts? 1 100))
+      (snek:add-edge? 3 3)
+      (snek:add-edge? 1 6)
+      (snek:add-edge? 1 100))
     '(nil (1 6) nil))))
 
 

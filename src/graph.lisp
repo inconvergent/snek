@@ -59,9 +59,9 @@ a simple (undirected) graph structure based on adjacency lists.
   (multiple-value-bind (val exists) (gethash a adj)
     (if (not exists)
         (hset:del verts a)
-          (when (< (hset:num val) 1)
-            (progn (remhash a adj)
-                   (hset:del verts a))))))
+        (when (< (hset:num val) 1)
+          (progn (remhash a adj)
+                 (hset:del verts a))))))
 
 
 (defun del (grph a b)
@@ -97,10 +97,10 @@ a simple (undirected) graph structure based on adjacency lists.
   (let ((res (make-adjustable-vector :size (graph-size grph)))
         (adj (graph-adj grph)))
     (declare (type (array list) res) (hash-table adj))
-    (loop for a of-type fixnum being the hash-keys of adj do
-      (loop for b of-type fixnum in (hset:to-list (gethash a adj))
-        if (<= a b)
-        do (vextend (list a b) res)))
+    (loop for a of-type fixnum being the hash-keys of adj
+          do (loop for b of-type fixnum being the hash-keys of (gethash a adj)
+                   if (<= a b)
+                   do (vextend (list a b) res)))
     res))
 
 
@@ -117,11 +117,12 @@ a simple (undirected) graph structure based on adjacency lists.
   (let ((edges (get-incident-edges grph (vector-last path))))
     (when (not (= (length edges) 2)) (return-from -do-loop-walk nil))
     (loop named lp
-          for v in (hset:to-list (hset:make :init (flatten edges)))
-          do (when (not (hset:mem visited v))
-               (vextend v path)
-               (hset:add visited v)
-               (return-from lp t)))))
+          for v of-type fixnum being the hash-keys
+            of (hset:make :init (flatten edges))
+          if (not (hset:mem visited v))
+          do (vextend v path)
+             (hset:add visited v)
+             (return-from lp t))))
 
 (defun get-loop (grph)
   "
@@ -140,8 +141,8 @@ a simple (undirected) graph structure based on adjacency lists.
       (declare (vector path))
       (loop with n of-type fixnum = (hash-table-count adj)
             until (= (length path) n)
-            do (when (not (-do-loop-walk grph visited path))
-                     (return-from get-loop nil)))
+            if (not (-do-loop-walk grph visited path))
+            do (return-from get-loop nil))
       ;TODO: return this?
       ;(values path ok)
       path)))
@@ -157,11 +158,12 @@ a simple (undirected) graph structure based on adjacency lists.
   (hset:mem (graph-verts grph) v))
 
 
+; TODO: the collects here seem strange. improve?
 (defmacro with-graph-edges ((grph e) &body body)
   (with-gensyms (adj a b)
     `(let ((,adj (graph-adj ,grph)))
       (loop for ,a of-type fixnum being the hash-keys of ,adj collect
-        (loop for ,b of-type fixnum in (hset:to-list (gethash ,a ,adj))
+        (loop for ,b of-type fixnum being the hash-keys of (gethash ,a ,adj)
               do (setf ,e (list ,a ,b))
               collect (list ,@body))))))
 

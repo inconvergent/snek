@@ -69,7 +69,7 @@ Here is and example of manipulating a `snek` instance called `snk` using
       ; join v and w if they are closer than d
       (if (< (snek:edge-length snk (list v w)) d)
         ; join vertices alteration
-        (snek:join-verts? v w))))
+        (snek:add-edge? v w))))
 ; context end
 ; alterations have been applied
 ```

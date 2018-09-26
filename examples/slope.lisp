@@ -34,7 +34,7 @@
                               (snek:append-edge? v va))
                             (snek:with-rnd-vert (snk v)
                               (snek:with-rnd-vert (snk w)
-                                (snek:join-verts? w v)))))
+                                (snek:add-edge? w v)))))
                  (snek:draw-edges snk sand grains)))
 
 

@@ -15,7 +15,7 @@
                          (ind 0))
   (let ((rules (make-hash-table :test #'equal)))
     (setf (gethash 'append-edge-alt rules) #'mutate-append-edge-alt)
-    (setf (gethash 'join-verts-alt rules) #'mutate-join-verts-alt)
+    (setf (gethash 'add-edge-alt rules) #'mutate-add-edge-alt)
     (setf (gethash 'move-vert-alt rules) #'mutate-move-vert-alt)
     (setf (gethash 'add-vert-alt rules) #'mutate-add-vert-alt)
     (-make-mutate :rules rules
@@ -53,8 +53,8 @@
       (append-edge? ind xy :rel rel))))
 
 
-(defun mutate-join-verts-alt (a mut)
+(defun mutate-add-edge-alt (a mut)
   (with-struct (mutate- ind) mut
-    (with-struct (join-verts-alt- w) a
-      (join-verts? ind w))))
+    (with-struct (add-edge-alt- w) a
+      (add-edge? ind w))))
 

@@ -340,6 +340,14 @@
     (graph:get-incident-edges (grp-grph g*) v)))
 
 
+(defun edge-exists (snk ee &key g)
+  (declare (snek snk) (list ee))
+  (with-grp (snk g* g)
+    (destructuring-bind (a b) ee
+      (declare (fixnum a b))
+      (graph:mem (grp-grph g*) a b))))
+
+
 (defun add-edge! (snk ee &key g)
   "
   adds a new edge to snek. provided the edge is valid.

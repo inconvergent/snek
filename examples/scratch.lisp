@@ -42,7 +42,7 @@
           (progn (sum-alter-velocity velocities noise 100)
                  (snek:with (snk)
                    ; TODO mutate was used here. implement later.
-                   (snek:join-verts? p1 p2)
+                   (snek:add-edge? p1 p2)
                    (snek:itr-grp-verts (snk v)
                      (snek:move-vert? v (vec:sarr-get velocities v)))))))
 

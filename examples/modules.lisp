@@ -6,7 +6,7 @@
 (defun run-join (snk)
   (snek:with (snk :zwidth 100.0d0)
     (snek:with-rnd-vert (snk v)
-      (snek:join-verts? (rnd:rndget (snek:verts-in-rad snk (snek:get-vert snk v) 100.0d0)) v))))
+      (snek:add-edge? (rnd:rndget (snek:verts-in-rad snk (snek:get-vert snk v) 100.0d0)) v))))
 
 (defun run-move (snk)
   (snek:with (snk)
