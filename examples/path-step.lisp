@@ -26,10 +26,9 @@
           (path-b (lin-path:make points-b))
           (path-c (lin-path:make points-c)))
 
-      (snek:add-edge! snk (list v1 v2))
-      (snek:add-edge! snk (list v2 v3))
-      (snek:add-edge! snk (list v3 v1))
-      ;(snek:add-edge! snk (list v1 v3))
+      (snek:add-edge! snk v1 v2)
+      (snek:add-edge! snk v2 v3)
+      (snek:add-edge! snk v3 v1)
 
       (loop for i from 0 to itt do
         (snek:with (snk)

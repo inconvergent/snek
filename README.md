@@ -17,7 +17,7 @@ In short `snek` is four things:
 
 2. A series of useful data structures and tools. E.g. a 2D vector `vec`, a
    package for generating different kinds of random numbers: `rnd`, as well as
-   tools for handling colors (`color`), splines (`bzspl`), and various vector
+   tools for handling colors (`pigment`), splines (`bzspl`), and various vector
    an path functionality (`math`, `lin-path`).
 
 3. A tool for drawing things called `sandpaint`. `sandpaint` uses random

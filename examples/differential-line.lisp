@@ -46,7 +46,7 @@
           (snek:with-dx (snk e dx d)
             (let ((ndx (vec:iscale dx d)))
               (cond ((> d 8.d0)
-                      (snek:split-edge? e))
+                      (snek:lsplit-edge? e))
 
                     ((> d 2.d0)
                       (list

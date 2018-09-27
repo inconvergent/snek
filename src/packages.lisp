@@ -454,12 +454,11 @@
   (:use :common-lisp)
   (:export
     :add-edge!
-    :add-edge*?
+    :add-edge?
     :add-edges!
     :add-grp!
     :add-path!
     :add-path*!
-    :add-edge?
     :add-polygon!
     :add-prm!
     :add-vert!
@@ -507,6 +506,12 @@
     :itr-prm-verts
     :itr-prms
     :itr-verts
+    :ladd-edge!
+    :ladd-edge?
+    :ldel-edge!
+    :ldel-edge?
+    :lsplit-edge!
+    :lsplit-edge?
     :make
     :make-mutate
     :move-vert!
@@ -522,6 +527,7 @@
     :set-prm-props!
     :split-edge!
     :split-edge?
+    :vadd-edge?
     :verts-in-rad
     :with
     :with-dx

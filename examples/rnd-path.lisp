@@ -68,7 +68,7 @@
     (let ((v1 (snek:add-vert! snk (vec:vec 0d0 0d0)))
           (v2 (snek:add-vert! snk (vec:vec 0d0 0d0))))
 
-      (snek:add-edge! snk (list v1 v2))
+      (snek:add-edge! snk v1 v2)
 
       (loop for p in (math:linspace itt 0d0 1d0 :end nil) do
         (snek:with (snk)

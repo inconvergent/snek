@@ -41,7 +41,7 @@
   (with (snk)
     (itr-edges (snk e)
       (when (funcall (the function fx) (edge-length snk e) lim)
-            (del-edge? e)))))
+            (ldel-edge? e)))))
 
 
 (defun center! (snk &key (xy vec:*zero*))
@@ -104,7 +104,7 @@
                    (if (and ; if tested is true: don't perform test.
                             (not (gethash key tested))
                             (-is-rel-neigh verts u v near))
-                       (when (add-edge! snk key :g g) (incf c))
+                       (when (ladd-edge! snk key :g g) (incf c))
                        ; if not rel neigh: update tested
                        (setf (gethash key tested) t))))))
     c))
@@ -115,7 +115,7 @@
   (let ((vv (loop for p of-type double-float in (math:linspace num 0.0d0 1.0d0)
                   collect (add-vert! snk (vec:on-circ p rad :xy xy)))))
     (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)
-          collect (add-edge! snk (list a b) :g g))))
+          collect (add-edge! snk a b :g g))))
 
 
 ; primitives?
@@ -123,7 +123,7 @@
   (let ((vv (loop for v of-type vec:vec in (vec:polygon n rad :xy xy :rot rot)
                   collect (add-vert! snk v))))
     (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)
-          collect (add-edge! snk (list a b) :g g))))
+          collect (add-edge! snk a b :g g))))
 
 
 ; primitives?
@@ -131,18 +131,18 @@
   (let ((vv (add-verts! snk points)))
     (if closed
       (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)
-            collect (add-edge! snk (list a b) :g g))
+            collect (add-edge! snk a b :g g))
       (loop for a of-type fixnum in vv and b of-type fixnum in (cdr vv)
-            collect (add-edge! snk (list a b) :g g)))))
+            collect (add-edge! snk a b :g g)))))
 
 
 ; primitives?
 (defun add-path*! (snk vv &key g closed)
   (if closed
     (loop for a of-type fixnum in vv and b of-type fixnum in (-roll-once vv)
-          collect (add-edge! snk (list a b) :g g))
+          collect (add-edge! snk a b :g g))
     (loop for a of-type fixnum in vv and b of-type fixnum in (cdr vv)
-          collect (add-edge! snk (list a b) :g g))))
+          collect (add-edge! snk a b :g g))))
 
 
 ; PRIMITIVES

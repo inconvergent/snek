@@ -348,23 +348,29 @@
       (graph:mem (grp-grph g*) a b))))
 
 
-(defun add-edge! (snk ee &key g)
+(defun add-edge! (snk a b &key g)
   "
   adds a new edge to snek. provided the edge is valid.
   otherwise it returns nil.
 
   returns nil if the edge exists already.
   "
-  (declare (snek snk) (list ee))
-  (when (apply #'equal ee) (return-from add-edge! nil))
+  (declare (snek snk) (fixnum a b))
+  (when (= a b) (return-from add-edge! nil))
   (with-grp (snk g* g)
     (with-struct (snek- num-verts) snk
       (declare (fixnum num-verts))
       (with-struct (grp- grph) g*
-        (destructuring-bind (a b) ee
-          (declare (fixnum a b))
-          (when (and (< a num-verts) (< b num-verts))
-            (when (graph:add grph a b) (sort (list a b) #'<))))))))
+        (when (and (< a num-verts) (< b num-verts))
+          (when (graph:add grph a b)
+                (sort (list a b) #'<)))))))
+
+
+(defun ladd-edge! (snk ee &key g)
+  (declare (snek snk) (list ee))
+  (destructuring-bind (a b) ee
+    (declare (fixnum a b))
+    (add-edge! snk a b :g g)))
 
 
 (defun add-edges! (snk ee &key g)
@@ -372,10 +378,17 @@
   adds multiple edges (see above). returns a list of the results.
   "
   (declare (snek snk) (list ee))
-  (loop for e of-type list in ee collect (add-edge! snk e :g g)))
+  (loop for e of-type list in ee collect (ladd-edge! snk e :g g)))
 
 
-(defun del-edge! (snk ee &key g)
+(defun del-edge! (snk a b &key g)
+  (declare (snek snk) (fixnum a b))
+  (with-grp (snk g* g)
+    (with-struct (grp- grph) g*
+      (graph:del grph a b))))
+
+
+(defun ldel-edge! (snk ee &key g)
   (declare (snek snk) (list ee))
   (with-grp (snk g* g)
     (with-struct (grp- grph) g*
@@ -384,23 +397,27 @@
         (graph:del grph a b)))))
 
 
-(defun split-edge! (snk ee &key xy g
-                           &aux (xy* (if xy xy (vec:on-line* 0.5d0
-                                                 (get-verts snk ee)))))
+(defun split-edge! (snk u v &key xy g
+                            &aux (xy* (if xy xy (vec:on-line* 0.5d0
+                                                  (get-verts snk (list u v))))))
   "
   split edge at xy (or middle if xy is nil).
   returns new vert ind (and new edges).
   "
-  (declare (snek snk) (list ee))
-  (snek:del-edge! snk ee :g g)
-  (let ((v (add-vert! snk xy*)))
-    (declare (fixnum v))
-    (destructuring-bind (a b) ee
-      (declare (fixnum a b))
-      (let ((edges (list (snek:add-edge! snk (list v a) :g g)
-                         (snek:add-edge! snk (list v b) :g g))))
-        (declare (list edges))
-        (values v edges)))))
+  (declare (snek snk) (fixnum u v))
+  (snek:del-edge! snk u v :g g)
+  (let ((c (add-vert! snk xy*)))
+    (declare (fixnum c))
+    (let ((edges (list (snek:add-edge! snk c u :g g)
+                       (snek:add-edge! snk c v :g g))))
+      (declare (list edges))
+      (values c edges))))
+
+(defun lsplit-edge! (snk ll &key xy g)
+  (declare (snek snk) (list ll))
+  (destructuring-bind (a b) ll
+    (declare (fixnum a b))
+    (split-edge! snk a b :xy xy :g g)))
 
 
 (defun verts-in-rad (snk xy rad)

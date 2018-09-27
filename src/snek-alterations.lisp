@@ -19,19 +19,18 @@
 
 ; ADD EDGE
 
-(defstruct (add-edge*-alt (:constructor add-edge*? (xya xyb &key g)))
+(defstruct (vadd-edge-alt (:constructor vadd-edge? (xya xyb &key g)))
   (xya nil :type vec:vec :read-only t)
   (xyb nil :type vec:vec :read-only t)
   (g nil :type symbol :read-only t))
 
-(defun do-add-edge*-alt (snk a)
+(defun do-vadd-edge-alt (snk a)
   "
   add verts xya and xyb, and creates an edge (in grp g) between them.
   "
-  (declare (snek snk) (add-edge*-alt a))
-  (with-struct (add-edge*-alt- xya xyb g) a
-    (add-edge! snk (list (add-vert! snk xya) (add-vert! snk xyb))
-               :g g)))
+  (declare (snek snk) (vadd-edge-alt a))
+  (with-struct (vadd-edge-alt- xya xyb g) a
+    (add-edge! snk (add-vert! snk xya) (add-vert! snk xyb) :g g)))
 
 
 ; MOVE VERT
@@ -84,7 +83,7 @@
         (let ((w (if rel (add-vert! snk (vec:add (get-vert snk v) xy))
                          (add-vert! snk xy))))
           (declare (fixnum w))
-          (add-edge! snk (list v w) :g g)
+          (add-edge! snk v w :g g)
           w)))))
 
 
@@ -119,7 +118,7 @@
            (hit (-line-segx-edges snk (list p1 p2) :g g)))
       (when (or (and (not x) (not hit))
                 (and x hit))
-        (add-edge! snk (list v (add-vert! snk p2)) :g g)))))
+        (add-edge! snk v (add-vert! snk p2) :g g)))))
 
 
 ; JOIN VERTS
@@ -139,50 +138,67 @@
     (with-struct (add-edge-alt- v w g) a
       (-valid-vert (num-verts v :err nil)
         (-valid-vert (num-verts w :err nil)
-          (add-edge! snk (list v w) :g g))))))
+          (ladd-edge! snk (list v w) :g g))))))
+
+(defun ladd-edge? (ll &key g)
+  (destructuring-bind (a b) ll
+    (declare (fixnum a b))
+    (add-edge? a b :g g)))
 
 
 ; DEL EDGE
 
-(defstruct (del-edge-alt (:constructor del-edge? (e &key g)))
-  (e nil :type list :read-only t)
+(defstruct (del-edge-alt (:constructor del-edge? (v w &key g)))
+  (v nil :type fixnum :read-only t)
+  (w nil :type fixnum :read-only t)
   (g nil :type symbol :read-only t))
 
 (defun do-del-edge-alt (snk a)
   "
-  del edge e (of grp g).
+  del edge (v w) (of grp g).
   "
   (declare (snek snk) (del-edge-alt a))
-  (with-struct (del-edge-alt- e g) a
-    (del-edge! snk e :g g)))
+  (with-struct (del-edge-alt- v w g) a
+    (del-edge! snk v w :g g)))
+
+(defun ldel-edge? (ll &key g)
+  (declare (list ll))
+  (destructuring-bind (a b) ll
+    (declare (fixnum a b))
+    (del-edge? a b :g g)))
 
 
 ; SPLIT EDGE
-(defstruct (split-edge-alt (:constructor split-edge? (e &key xy g)))
-  (e nil :type list :read-only t)
+(defstruct (split-edge-alt (:constructor split-edge? (v w &key xy g)))
+  (v nil :type fixnum :read-only t)
+  (w nil :type fixnum :read-only t)
   (xy nil :read-only t)
   (g nil :type symbol :read-only t))
 
 (defun do-split-edge-alt (snk a)
   "
-  insert a vert, v, at the middle of edge e = (a b)
+  insert a vert, v, at the middle of edge e = (v w)
   if xy is not nil v will be positioned at xy.
   such that we get edges (a v) and (v b).
 
   returns the new edges (or nil).
   "
   (declare (snek snk) (split-edge-alt a))
-  (with-struct (split-edge-alt- e xy g) a
-    (let ((res (del-edge! snk e :g g))
+  (with-struct (split-edge-alt- v w xy g) a
+    (let ((res (del-edge! snk v w :g g))
           (verts (snek-verts snk)))
       (declare (type (simple-array double-float) verts))
       (when res
-        (destructuring-bind (a b) e
-          (declare (fixnum a b))
-          (let ((c (add-vert! snk (if xy xy (vec:mid (vec:sarr-get verts a)
-                                                     (vec:sarr-get verts b))))))
-            (list (add-edge! snk (list a c) :g g)
-                  (add-edge! snk (list c b) :g g))))))))
+        (let ((c (add-vert! snk (if xy xy (vec:mid (vec:sarr-get verts v)
+                                                   (vec:sarr-get verts w))))))
+          (list (add-edge! snk v c :g g)
+                (add-edge! snk c w :g g)))))))
+
+(defun lsplit-edge? (ll &key xy g)
+  (declare (list ll))
+  (destructuring-bind (a b) ll
+    (declare (fixnum a b))
+    (split-edge? a b :xy xy :g g)))
 
 
 ; ALT THEN

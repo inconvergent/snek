@@ -23,7 +23,7 @@
 
       (snek:with (snk)
         (snek:add-edge? (rnd:rndi num) (rnd:rndi num))
-        (snek:del-edge? (math:nrep 2 (rnd:rndi num))))))
+        (snek:del-edge? (rnd:rndi num) (rnd:rndi num)))))
 
     (setf snk (init-snek num))
 
@@ -33,7 +33,7 @@
 
       (snek:cwith (snk %)
         (% (snek:add-edge? (rnd:rndi num) (rnd:rndi num)))
-        (% (snek:del-edge? (math:nrep 2 (rnd:rndi num)))))))))
+        (% (snek:del-edge? (rnd:rndi num) (rnd:rndi num))))))))
 
 (require :sb-sprof)
 (sb-sprof:with-profiling (:max-samples 200000

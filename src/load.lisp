@@ -18,7 +18,7 @@
 
 (asdf:defsystem "snek"
   :description "A System for Making Generative Systems"
-  :version "2.64.0"
+  :version "2.66.0"
   :author "inconvergent"
   :licence "MIT"
   :serial t

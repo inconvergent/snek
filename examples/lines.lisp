@@ -30,10 +30,10 @@
             (setf va (vec:add va (rnd:in-circ (* 0.7d0 j))))
             (setf vb (vec:add vb (rnd:in-circ (* 0.001d0 j))))
 
-            (snek:with (snk)
-              (snek:itr-grp-verts (snk v)
-                (snek:move-vert? v (vec:add (rnd:in-circ 0.1d0) vb)))
-              (snek:add-edge? v1 v2))
+            (snek:cwith (snk %)
+              (snek:itr-grp-verts (snk v :collect nil)
+                (% (snek:move-vert? v (vec:add (rnd:in-circ 0.1d0) vb))))
+              (% (snek:add-edge? v1 v2)))
 
             (snek:draw-edges snk sand grains)
             (snek:draw-verts snk sand)))))
