@@ -42,7 +42,7 @@
         ,finally))))
 
 
-(defmacro cwith ((snk runfx &key zwidth) &body body)
+(defmacro cwith ((snk accfx &key zwidth) &body body)
   "
   creates a context for manipulating snek via alterations.
 
@@ -54,27 +54,30 @@
   all calls to c inside cwith will cause the alteration inside the c form to be
   executed. if the form is nil nothing happens.
 
-  this can be more efficient than snek:with since it will not gather all
-  alterations into a data structure first.
+  this can be more efficient than snek:with in some cases.
   "
-  (declare (symbol snk runfx))
-  (with-gensyms (sname zw aname x y)
+  (declare (symbol snk accfx))
+  (with-gensyms (sname zw aname x y res do-res)
     `(let* ((,sname ,snk)
             (,zw ,zwidth)
+            (,res (make-adjustable-vector))
             (,aname (snek-alt-names ,sname)))
 
       (incf (snek-wc ,sname))
 
-      (labels ((,runfx (,x)
-                 (when ,x (funcall (gethash (type-of ,x) ,aname)
-                                   ,sname ,x))))
+      (labels ((,do-res ()
+                  (loop for ,x across ,res
+                        do (funcall (gethash (type-of ,x) ,aname) ,sname ,x)))
+               (,accfx (,x) (when ,x (vextend ,x ,res))))
 
         (zmap::with* (,zw (snek-verts ,sname)
                           (snek-num-verts ,sname)
                           (lambda (,y) (setf (snek-zmap ,sname) ,y)))
           ; this lets @body be executed in the context of zmap:with;
           ; useful if we want to have a parallel context inside zmap.
-          (progn ,@body)))
+          (progn ,@body))
+
+        (,do-res))
 
       (setf (snek-zmap ,sname) nil))))
 
