@@ -79,11 +79,11 @@
 
   (do-test (snek:add-vert! snk (vec:vec 0d0 7d0)) 12)
 
-  (do-test (snek:edge-length snk '(0 4)) 200.12246250733574d0)
+  (do-test (snek:ledge-length snk '(0 4)) 200.12246250733574d0)
 
-  (do-test (snek:edge-length snk '(2 5)) 7.0710678118654755d0)
+  (do-test (snek:edge-length snk 2 5) 7.0710678118654755d0)
 
-  (do-test (snek:edge-length snk '(1 2)) 7.615773105863909d0)
+  (do-test (snek:ledge-length snk '(1 2)) 7.615773105863909d0)
 
   (do-test (snek:move-vert! snk 3 (vec:vec 1d0 3d0)) (vec:vec 5d0 6d0))
 
@@ -350,7 +350,7 @@
       '(((1 2)) ((1 3)) ((0 1)) ((3 7)) ((5 6)) ((5 11))))
 
     (do-test
-      (sort (flatten (snek:itr-edges (snk e) (snek:edge-length snk e))) #'<)
+      (sort (flatten (snek:itr-edges (snk e) (snek:ledge-length snk e))) #'<)
       '(1.0d0 1.4142135623730951d0 2.23606797749979d0 3.1622776601683795d0
         4.123105625617661d0 4.47213595499958d0))
 

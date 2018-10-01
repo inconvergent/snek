@@ -28,6 +28,13 @@
   (declare (state st))
   (gethash key (state-s st) default))
 
+(defun mget (st keys &key default)
+  "
+  get keys of state (or default)
+  "
+  (declare (state st) (list keys))
+  (loop for key in keys collect (gethash key (state-s st) default)))
+
 
 (defun sset (st key v)
   "
@@ -35,6 +42,15 @@
   "
   (declare (state st))
   (setf (gethash key (state-s st)) v))
+
+
+(defun mset (st keys v)
+  "
+  set keys of st to v. returns keys.
+  "
+  (declare (state st) (list keys))
+  (loop for k in keys do (setf (gethash k (state-s st)) v))
+  keys)
 
 
 (defun kset (st key v)

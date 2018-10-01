@@ -6,7 +6,7 @@
   (butlast (append (last aa) aa) 1))
 
 
-; TODO: move this to primitives
+; TODO: move this to primitives?
 (defun get-grp-as-bzspl (snk g)
   (let ((pts (snek:get-grp-verts snk :g g)))
     (when (> (length pts) 3)
@@ -22,15 +22,23 @@
               (the double-float (aref verts (1+ #4#)))) 2d0)))
 
 
-(defun edge-length (snk e)
+(defun edge-length (snk a b)
   "
-  returns the length of edge e.
+  returns the length of edge (a b).
+  "
+  (declare (snek snk) (fixnum a b))
+  (with-struct (snek- verts) snk
+    (sqrt (-dst2 verts a b))))
+
+
+(defun ledge-length (snk e)
+  "
+  returns the length of edge e=(a b).
   "
   (declare (snek snk) (list e))
-  (with-struct (snek- verts) snk
-    (destructuring-bind (a b) e
-      (declare (type fixnum a b))
-      (sqrt (-dst2 verts a b)))))
+  (destructuring-bind (a b) e
+    (declare (fixnum a b))
+    (edge-length snk a b)))
 
 
 (defun prune-edges-by-len! (snk lim &optional (fx #'>))
@@ -40,7 +48,7 @@
   (declare (snek snk) (double-float lim) (function fx))
   (with (snk)
     (itr-edges (snk e)
-      (when (funcall (the function fx) (edge-length snk e) lim)
+      (when (funcall (the function fx) (ledge-length snk e) lim)
             (ldel-edge? e)))))
 
 

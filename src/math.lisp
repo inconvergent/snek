@@ -195,6 +195,12 @@
   (mod (the double-float (+ x stp)) 1d0))
 
 
+(defun on-line (p aa bb)
+  (declare (optimize (safety 0) speed (debug 0))
+           (list aa bb))
+  (loop for a in aa and b in bb
+        collect (+ a (* p (- b a)))))
+
 ; OTHER
 
 

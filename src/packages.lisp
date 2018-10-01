@@ -125,6 +125,7 @@
     :mod-
     :mod2
     :nrep
+    :on-line
     :path-angles
     :path-normals-closed
     :path-normals-open
@@ -219,6 +220,8 @@
     :awith
     :kset
     :make
+    :mget
+    :mset
     :sget
     :sset
     :with)
@@ -510,6 +513,7 @@
     :ladd-edge?
     :ldel-edge!
     :ldel-edge?
+    :ledge-length
     :lsplit-edge!
     :lsplit-edge?
     :make

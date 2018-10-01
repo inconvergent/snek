@@ -98,6 +98,11 @@
     (setf (gethash b visited) t)))
 
 
+(defun path-simple (state pts selected)
+  (loop for a in selected and b in (cdr selected) do
+    (do-count state (list a b) (rnd:prob 0.1 3 1))))
+
+
 (defun path* (visited state pts selected)
   (loop for a in selected and b in (cdr selected) do
     (do-count state (list a b) 1)

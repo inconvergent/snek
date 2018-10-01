@@ -62,7 +62,8 @@
                    :scene (-get-scene layout))))
 
 
-(defun make* (&key height width (stroke-width 1.1d0) (rep-scale 1.3d0))
+(defun make* (&key (height 1000d0) (width 1000d0)
+                   (stroke-width 1.1d0) (rep-scale 1.3d0))
   (make-draw-svg :layout 'custom
                  :stroke-width stroke-width
                  :rep-scale rep-scale
