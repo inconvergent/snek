@@ -399,6 +399,9 @@
     :mhatch
     :path
     :save
+    :set-rep-scale
+    :set-stroke
+    :set-stroke-width
     :show-boundary
     :show-crop
     :wbzspl
