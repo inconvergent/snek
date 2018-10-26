@@ -293,7 +293,7 @@
   (with-struct (draw-svg- scene stroke-width) psvg
     (if (or (not width) (<= width 1d0))
       ; single path
-      (path psvg pts :sw sw :simplify simplify)
+      (path psvg pts :sw sw :simplify simplify :stroke stroke :so so)
       ; multi path
       (let ((pth (make-adjustable-vector))
             (rep (math:int (ceiling (* (-select-rep-scale psvg rs) width))))
