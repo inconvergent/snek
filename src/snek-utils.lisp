@@ -320,6 +320,17 @@
   (loop for name in names collect (get-vert-ind-by-name snk :name name)))
 
 
+(defun get-num-verts (snk)
+  (declare (snek snk))
+  (snek-num-verts snk))
+
+
+(defun get-grp-num-verts (snk &key g)
+  (declare (snek snk))
+  (with-grp (snk g* g)
+    (graph:get-num-verts (grp-grph g*))))
+
+
 (defun get-num-edges (snk &key g)
   (declare (snek snk))
   (with-grp (snk g* g)

@@ -489,6 +489,7 @@
     :get-grp
     :get-grp-as-bzspl
     :get-grp-loop
+    :get-grp-num-verts
     :get-grp-props
     :get-grp-verts
     :get-incident-edges
