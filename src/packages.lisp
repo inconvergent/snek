@@ -300,6 +300,7 @@
   (:use :common-lisp)
   (:export
     :adaptive-pos
+    :bzx
     :len
     :make
     :normal
@@ -389,7 +390,6 @@
     :*short*
     :*long*
     :bzspl
-    :bzx
     :circ
     :circs
     :cpath

@@ -179,9 +179,9 @@
                  :sw sw :stroke stroke)))
 
 
-(defun bzspl (msvg pts &key sw (stroke "black") closed (dens 1d0))
+(defun bzspl (msvg pts &key sw (stroke "black") closed)
   (declare (draw-tile-svg msvg))
-  (path msvg (bzspl:adaptive-pos (bzspl:make pts :closed closed) :dens dens)
+  (path msvg (bzspl:adaptive-pos (bzspl:make pts :closed closed))
         :sw sw :stroke stroke))
 
 

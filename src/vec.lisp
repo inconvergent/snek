@@ -438,25 +438,32 @@
           (values (dst v (on-line tt va vb)) tt))))))
 
 
+; TODO: this is slow?
 (defun segx (aa bb &key parallel)
   (declare (list aa bb))
-  (destructuring-bind (a1 a2 b1 b2)
-    (concatenate 'list aa bb)
-    (let* ((sa (sub a2 a1))
-           (sb (sub b2 b1))
-           (u (+ (* (- (vec-x sb)) (vec-y sa)) (* (vec-x sa) (vec-y sb)))))
-      (if (= u 0d0)
-        ; return parallel if the lines are parallel (default: nil)
-        (values parallel nil nil)
-        ; otherwise check if they intersect
-        (let ((p (/ (+ (* (- (vec-y sa)) (- (vec-x a1) (vec-x b1)))
-                       (* (vec-x sa) (- (vec-y a1) (vec-y b1)))) u))
-              (q (/ (- (* (vec-x sb) (- (vec-y a1) (vec-y b1)))
-                       (* (vec-y sb) (- (vec-x a1) (vec-x b1)))) u)))
-          ; t if intersection
-          ; nil otherwise
-          (values (and (>= p 0d0) (<= p 1d0) (>= q 0d0) (<= q 1d0))
-                  q p))))))
+  (destructuring-bind (a1 a2) aa
+    (declare (vec:vec a1 a2))
+    (destructuring-bind (b1 b2) bb
+      (declare (vec:vec b1 b2))
+      (let* ((sa (sub a2 a1))
+             (sb (sub b2 b1))
+             (u (+ (* (- (vec-x sb)) (vec-y sa))
+                   (* (vec-x sa) (vec-y sb)))))
+        (declare (vec:vec sa sb) (double-float u))
+        (if (<= (abs u) 0d0)
+          ; return parallel if the lines are parallel (default: nil)
+          ; this is just a div0 guard. it's not a good way to test.
+          (values parallel nil nil)
+          ; otherwise check if they intersect
+          (let ((p (/ (+ (* (- (vec-y sa)) (- (vec-x a1) (vec-x b1)))
+                         (* (vec-x sa) (- (vec-y a1) (vec-y b1)))) u))
+                (q (/ (- (* (vec-x sb) (- (vec-y a1) (vec-y b1)))
+                         (* (vec-y sb) (- (vec-x a1) (vec-x b1)))) u)))
+            (declare (double-float p q))
+            ; t if intersection
+            ; nil otherwise
+            (values (and (>= p 0d0) (<= p 1d0) (>= q 0d0) (<= q 1d0))
+                    q p)))))))
 
 
 (defun segx* (l &key parallel)
@@ -465,13 +472,14 @@
     (segx a b :parallel parallel)))
 
 
+; TODO: this is slow?
 (defun psegx (aa bb &key parallel
                     &aux (aa* (ensure-vector aa))
                          (bb* (ensure-vector bb)))
 
   (loop with res = (make-adjustable-vector)
-        for i from 0 below (1- (length aa*))
-        do (loop for j from 0 below (1- (length bb*))
+        for i of-type fixnum from 0 below (1- (length aa*))
+        do (loop for j of-type fixnum from 0 below (1- (length bb*))
                  do (multiple-value-bind (x s p)
                       (vec:segx (list (aref aa* i) (aref aa* (1+ i)))
                                 (list (aref bb* j) (aref bb* (1+ j)))
