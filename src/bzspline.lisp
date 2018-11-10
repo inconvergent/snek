@@ -37,7 +37,7 @@
                                 (coerce (the fixnum ns) 'double-float))))
   (declare (optimize (safety 0) speed (debug 0))
            (fixnum ns) (double-float x s))
-  ; TODO: wrap around
+  ; TODO: wrap around?
   (if (>= x 1d0) (values (1- ns) 1d0)
                  (truncate (the double-float (* x s)))))
 
@@ -123,13 +123,13 @@
   (declare (bzspl b) (double-float lim))
   (with-struct (bzspl- ns vpts closed) b
     (declare (fixnum ns) (type (simple-array double-float) vpts))
-    (if closed
+    (-remove-s (if closed
         (let ((m (-midsample 0d0 1d0))
               (res (make-adjustable-vector :type 'vec:vec)))
           (-adaptive-pos ns vpts lim :l 0d0 :r m :res res)
           (-adaptive-pos ns vpts lim :l m :r 1d0 :res res)
-          (-remove-s res))
-        (-remove-s (-adaptive-pos ns vpts lim :l 0d0 :r 1d0)))))
+          res)
+        (-adaptive-pos ns vpts lim :l 0d0 :r 1d0)))))
 
 
 (defmacro with-rndpos ((b n rn) &body body)
@@ -204,8 +204,7 @@
 ; TODO: this is probably not very accurate
 (defun tangent (bz x &key (scale 1d0) (offset 1d-10)
                      &aux (scale* (* 0.5d0 scale)))
-  (declare (bzspl bz)
-           (double-float x scale offset scale*))
+  (declare (bzspl bz) (double-float x scale offset scale*))
   (with-struct (bzspl- closed) bz
     (let* ((left (if closed (-modin x offset) (max (- x offset) 0d0)))
            (right (if closed (math:inc x offset) (min 1d0 (+ x offset))))
@@ -241,8 +240,7 @@
                 :vpts vpts :closed closed)))
 
 
-; TODO: estimate intersection pt.
-; TODO: this is slow
+; TODO: estimate intersection pt. remove this?
 (defun bzx (aa bb &key lim)
   (declare (bzspl aa bb))
   (let ((ptsa (adaptive-pos aa :lim lim))
