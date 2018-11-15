@@ -84,6 +84,7 @@
   (declare (optimize (safety 0) speed (debug 0)) (double-float a) (vec:vec av))
   (if (or (< (length res) 1)
           (destructuring-bind (s _) (vector-last res)
+            (declare (double-float s) (ignore _))
             (> a s)))
     (vextend (list a av) res)))
 
@@ -100,11 +101,12 @@
                    (* (vec::vec-x b) (- (vec::vec-y c) (vec::vec-y a)))
                    (* (vec::vec-x c) (- (vec::vec-y a) (vec::vec-y b)))))))
 
-(defun -adaptive-pos (ns vpts lim
-                      &key l r lv rv (res (make-adjustable-vector
-                                            :type 'vec:vec)))
+(defun -adaptive-pos (ns vpts lim &key l r lv rv
+                                       (res (make-adjustable-vector
+                                              :type 'vec:vec)))
   (declare (optimize (safety 0) speed (debug 0))
            (type (simple-array double-float) vpts)
+           (vector res)
            (fixnum ns) (double-float l r lim))
   (let* ((m (-midsample l r))
          (lv* (if lv lv (-x-to-pt vpts ns l)))
@@ -126,6 +128,7 @@
     (-remove-s (if closed
         (let ((m (-midsample 0d0 1d0))
               (res (make-adjustable-vector :type 'vec:vec)))
+          (declare (double-float m) (vector res))
           (-adaptive-pos ns vpts lim :l 0d0 :r m :res res)
           (-adaptive-pos ns vpts lim :l m :r 1d0 :res res)
           res)
@@ -222,7 +225,8 @@
     (let* ((left (if closed (-modin x offset) (max (- x offset) 0d0)))
            (right (if closed (math:inc x offset) (min 1d0 (+ x offset))))
            (pt (pos bz x))
-           (v (vec:perp (vec:norm (vec:sub (pos bz right) (pos bz left)) :s scale*))))
+           (v (vec:perp (vec:norm (vec:sub (pos bz right) (pos bz left))
+                                  :s scale*))))
      (list (vec:sub pt v)
            (vec:add pt v)))))
 

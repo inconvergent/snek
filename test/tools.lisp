@@ -86,6 +86,14 @@
     200.67971443818558d0)
 
   (do-test
+    (multiple-value-bind (x s)
+      (vec:segx (list (vec:vec 1.1d0) (vec:vec 11d0 12.3d0))
+                (list (vec:vec 0.1d0 10d0) (vec:vec 8d0 -1.1d0)))
+      (list x s))
+
+    (list t 0.2984826334627212d0))
+
+  (do-test
     (vec:segx (list (vec:vec 0d0 0d0) (vec:vec 100d0 0d0))
               (list (vec:vec 0d0 1d0) (vec:vec 100d0 1d0)) :parallel :par)
     :par)

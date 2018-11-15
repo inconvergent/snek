@@ -447,18 +447,15 @@
       (declare (vec:vec b1 b2))
       (let* ((sa (sub a2 a1))
              (sb (sub b2 b1))
-             (u (+ (* (- (vec-x sb)) (vec-y sa))
-                   (* (vec-x sa) (vec-y sb)))))
+             (u (vec:cross sa sb)))
         (declare (vec:vec sa sb) (double-float u))
         (if (<= (abs u) 0d0)
           ; return parallel if the lines are parallel (default: nil)
           ; this is just a div0 guard. it's not a good way to test.
           (values parallel nil nil)
           ; otherwise check if they intersect
-          (let ((p (/ (+ (* (- (vec-y sa)) (- (vec-x a1) (vec-x b1)))
-                         (* (vec-x sa) (- (vec-y a1) (vec-y b1)))) u))
-                (q (/ (- (* (vec-x sb) (- (vec-y a1) (vec-y b1)))
-                         (* (vec-y sb) (- (vec-x a1) (vec-x b1)))) u)))
+          (let ((p (/ (vec:cross sa #1=(vec:sub a1 b1)) u))
+                (q (/ (vec:cross sb #1#) u)))
             (declare (double-float p q))
             ; t if intersection
             ; nil otherwise
